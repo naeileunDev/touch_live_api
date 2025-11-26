@@ -1,0 +1,30 @@
+services:
+  app:
+    container_name: 'touch-live-api-local'
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-local
+    volumes:
+      - .:/usr/src/app
+      - ./uploads:/uploads
+    environment:
+      TZ: "Asia/Seoul"
+    command: >
+      sh -c "pnpm run start:local"
+    ports:
+      - '7007:3000'
+
+  postgresdb:
+    container_name: 'touch-live-db'
+    restart: always
+    environment:
+      POSTGRES_DB: touch_live
+      POSTGRES_USER: touch_live
+      POSTGRES_PASSWORD: touch_live
+      TZ: "Asia/Seoul"
+    image: postgres:16
+    ports:
+      - '15432:5432'
+    volumes:
+      - ./postgresql-volume:/var/lib/postgresql/data

@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: 'touch-live-api-service'
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TZ: "Asia/Seoul"
+      # NODE_ENV는 Dockerfile에서 이미 설정했지만, 명시적으로 한 번 더 적어줘도 좋습니다.
+      NODE_ENV: prod 
+    ports:
+      - '80:3000'
