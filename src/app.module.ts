@@ -15,8 +15,7 @@ import { getDataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: `.${process.env.NODE_ENV || 'dev' || 'prod' || 'local'
-            }.env`,
+            envFilePath: `.${process.env.NODE_ENV}.env`,
             validationSchema: validationSchema,
         }),
         CacheModule.register({
