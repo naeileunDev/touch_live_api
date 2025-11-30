@@ -141,19 +141,6 @@ export class AuthService {
     }
 
     /**
-     * 웹 로그인
-     * @param authLoginDto 로그인 DTO
-     * @param res Express Response 객체
-     */
-    async loginWeb(authLoginDto: AuthLoginDto): Promise<[AuthLoginResponseDto, string]> {
-        const AuthLoginResponseDto = await this.login(authLoginDto, OPERATOR_PERMISSION);
-
-        // CSRF 토큰 생성
-        const csrfToken = crypto.randomBytes(32).toString('hex');
-        return [AuthLoginResponseDto, csrfToken];
-    }
-
-    /**
      * SNS 회원가입
      * @param authSnsRegisterDto SNS 회원가입 DTO
      */

@@ -9,9 +9,6 @@ import { ServiceExceptionFilter } from './common/filter/service-exception.filter
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
-//import { getDataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
-import { addTransactionalDataSource } from 'typeorm-transactional';
-import { DataSource } from 'typeorm';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 
 @Module({

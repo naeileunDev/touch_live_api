@@ -21,6 +21,11 @@ import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UserDto } from 'src/user/dto/user.dto';
 import { AuthNiceDecodingTokenIssueDto } from './dto/auth-nice-decoding-token-issue.dto';
 import { NiceRedirectDto } from './dto/nice-redirect.dto';
+import { ApiCreatedSuccessResponse, ApiNoContentSuccessResponse, ApiOkSuccessResponse} from 'src/common/decorator/swagger/api-response.decorator';
+import { AuthLoginResponseDto } from './dto/auth-login-response.dto';
+import { AuthFindIdResponseDto } from './dto/auth-find-id-response.dto';
+import { NiceEncryptionTokenDto } from './dto/nice-encryption-token.dto';
+import { NiceSuccessDto } from './dto/nice-success.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -32,6 +37,7 @@ export class AuthController {
     @Post('register')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '회원가입' })
+    @ApiCreatedSuccessResponse(AuthLoginResponseDto, '회원가입 성공')
     register(@Body() userCreateDto: UserCreateDto) {
         return this.authService.register(userCreateDto);
     }
@@ -43,36 +49,10 @@ export class AuthController {
         return this.authService.login(authLoginDto, USER_PERMISSION);
     }
 
-    @Post('login/web')
-    @Role(ANY_PERMISSION)
-    @ApiOperation({ summary: '웹 로그인' })
-    loginWeb(@Res({ passthrough: true }) res: Response, @Body() authLoginDto: AuthLoginDto) {
-        return this.authService.loginWeb(authLoginDto)
-            .then(
-                ([result, csrfToken]) => {
-                    res.cookie('jwt', result.token.accessToken, {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'strict',
-                        maxAge: 3600 * 1000,
-                    });
-
-                    // CSRF 토큰을 일반 쿠키로 저장 (JS에서 읽을 수 있도록 httpOnly: false)
-                    res.cookie('csrfToken', csrfToken, {
-                        httpOnly: false,
-                        secure: true,
-                        sameSite: 'strict',
-                        maxAge: 3600 * 1000,
-                    });
-                    // JWT를 httpOnly 쿠키로 저장 
-                    return result;
-                },
-            );
-    }
-
     @Post('lookup/id')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '아이디 찾기' })
+    @ApiOkSuccessResponse(AuthFindIdResponseDto, '아이디 찾기 성공')
     findIdBody(@Body()authFindIdDto: AuthFindIdDto) {
         return this.authService.findId(authFindIdDto);
     }
@@ -80,6 +60,7 @@ export class AuthController {
     @Post('password/reset')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '비밀번호 재설정' })
+    @ApiOkSuccessResponse(Boolean, '비밀번호 재설정 성공')
     resetPassword(@Body() authPasswordResetDto: AuthPasswordResetDto) {
         return this.authService.resetPassword(authPasswordResetDto);
     }
@@ -87,6 +68,7 @@ export class AuthController {
     @Post('password/confirm')
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '비밀번호 재확인' })
+    @ApiOkSuccessResponse(Boolean, '비밀번호 재확인 성공')
     confirmPassword(@GetUser() userDto: UserDto, @Body() authPasswordConfirmDto: AuthPasswordConfirmDto) {
         return this.authService.confirmPassword(userDto, authPasswordConfirmDto);
     }
@@ -94,6 +76,7 @@ export class AuthController {
     @Post('logout')
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '로그아웃' })
+    @ApiOkSuccessResponse(Boolean, '로그아웃 성공')
     logoutBody(@Req() req: Request, @GetUser() userDto: UserDto) {
         return this.authService.logout(userDto, req.user['uuid']);
     }
@@ -101,6 +84,7 @@ export class AuthController {
     @Post('leave')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '회원 탈퇴' })
+    @ApiNoContentSuccessResponse('회원 탈퇴 성공')
     leaveBody(@GetUser() userDto: UserDto) {
         return this.authService.leave(userDto);
     }
@@ -108,6 +92,7 @@ export class AuthController {
     @Post('token/reissue')
     @UseGuards(JwtRefreshAuthGuard)
     @ApiOperation({ summary: 'Access Token 재발급' })
+    @ApiOkSuccessResponse(AuthLoginResponseDto, 'Access Token 재발급 성공')
     getAccessTokenBody(@Req() req: Request, @GetUser() userDto: UserDto) {
         return this.authService.reissueAccessToken(userDto, req.headers.authorization?.replace('Bearer ', '') || '');
     }
@@ -142,6 +127,7 @@ export class AuthController {
     @Post('nice/access/token')
     @Role(ADMIN_PERMISSION)
     @ApiOperation({ summary: '[관리자] NICE 엑세스 토큰 발급' })
+    @ApiOkSuccessResponse(String, 'NICE 엑세스 토큰 발급 성공')
     getNiceAccessTokenBody() {
         return this.authService.getNiceAccessToken();
     }
@@ -149,6 +135,7 @@ export class AuthController {
     @Post('nice/decoding/token')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: 'NICE 암호화 토큰 발급 ( Nice 표준 웹 호출을 위한 값 리턴 )' })
+    @ApiOkSuccessResponse(NiceEncryptionTokenDto, 'NICE 암호화 토큰 발급 성공')
     getNiceDecodingTokenBody(@Body() authNiceDecodingTokenIssueDto: AuthNiceDecodingTokenIssueDto) {
         return this.authService.getNiceDecodingToken(authNiceDecodingTokenIssueDto);
     }
@@ -157,6 +144,7 @@ export class AuthController {
     @Role(ANY_PERMISSION)
     @ApiExcludeEndpoint()
     @ApiOperation({ summary: 'NICE 인증 성공 리다이렉트용 주소 [크롬]' })
+    @ApiOkSuccessResponse(NiceSuccessDto, 'NICE 인증 성공 리다이렉트용 주소 성공')
     niceSuccess(@Req() req) {
         return this.authService.niceSuccess(req.query as NiceRedirectDto);
     }
@@ -172,6 +160,7 @@ export class AuthController {
     @Post('sns/register')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: 'SNS 회원가입' })
+    @ApiCreatedSuccessResponse(AuthLoginResponseDto, 'SNS 회원가입 성공')
     registerSnsBody(@Body() authSnsRegisterDto: AuthSnsRegisterDto) {
         return this.authService.registerSns(authSnsRegisterDto);
     }
