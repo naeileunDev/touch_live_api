@@ -1,9 +1,9 @@
-import { AuthRequestHistoryPurposeType } from "../enum/auth-request-history-purpose-type.enum";
+import { NiceAuthRequestPurpose } from "../enum/nice-auth-request-history-purpose.enum";
 
 export class NiceTokenVersionDataDto {
     key: string;
     iv: string;
     hmacKey: string;
     reqNo: string;
-    purposeType: AuthRequestHistoryPurposeType;
+    purpose: NiceAuthRequestPurpose;
 }

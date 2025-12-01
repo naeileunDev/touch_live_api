@@ -1,10 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty } from "class-validator";
-import { AuthRequestHistoryPurposeType } from "../enum/auth-request-history-purpose-type.enum";
+import { NiceAuthRequestPurpose } from "../enum/nice-auth-request-history-purpose.enum";
 
 export class AuthNiceDecodingTokenIssueDto {
-    @ApiProperty({ description: '인증 목적', enum: AuthRequestHistoryPurposeType })
+    @ApiProperty({ description: '인증 목적', enum: NiceAuthRequestPurpose, example: NiceAuthRequestPurpose.Register })
     @IsNotEmpty()
-    @IsEnum(AuthRequestHistoryPurposeType)
-    purposeType: AuthRequestHistoryPurposeType;
+    @IsEnum(NiceAuthRequestPurpose)
+    purpose: NiceAuthRequestPurpose = NiceAuthRequestPurpose.Register;
 }

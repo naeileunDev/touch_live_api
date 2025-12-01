@@ -27,7 +27,7 @@ export class UserDto {
     @ApiProperty({ description: '사용자 이름', example: '홍길동' })
     name: string;
 
-    @ApiProperty({ description: '사용자 전화번호', example: '01012345678' })
+    @ApiProperty({ description: '사용자 전화번호', example: '010-1234-5678', format: 'phone' })
     phone: string;
 
     @ApiProperty({ description: '사용자 성별', enum: UserGender, example: UserGender.Male })
@@ -35,10 +35,10 @@ export class UserDto {
 
     @ApiProperty({ 
         description: '사용자 생년월일', 
-        example: '1990-01-01', 
-        type: Date, 
+        example: '19900101', 
+        type: String, 
         format: 'date-time' })
-    birth: Date;
+    birth: string;
 
     @ApiProperty({ description: '사용자 DI', example: 'DI' })
     di: string;
@@ -62,7 +62,7 @@ export class UserDto {
         this.name = user.name;
         this.phone = user.phone;
         this.gender = user.gender;
-        this.birth = user.birth;
+        this.birth = user.birth.toISOString();
         this.di = user.di;
         this.isAdult = user.isAdult;
         this.storeRegisterStatus = user.storeRegisterStatus;

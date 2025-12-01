@@ -1,10 +1,11 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserCreateDto } from "../dto/user-create.dto";
+import { UserSignupSourceData } from "./user-signup-surce-data.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -48,7 +49,12 @@ export class User extends BaseEntity {
     isAdult: boolean;
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', default: null, nullable: true })
-    storeRegisterStatus?: StoreRegisterStatus;
+    storeRegisterStatus: StoreRegisterStatus;
+
+    @OneToOne(() => UserSignupSourceData, signupSourceData => signupSourceData.user, {
+        nullable: true  // User는 설문조사 없이도 존재 가능 (비즈니스 로직상 필수지만)
+    })
+    userSignupSourceData: UserSignupSourceData;
 
        /**
      * UserCreateDto로부터 User 엔티티 생성
@@ -64,10 +70,12 @@ export class User extends BaseEntity {
         user.name = userCreateDto.name;
         user.phone = userCreateDto.phone;
         user.gender = userCreateDto.gender as unknown as UserGender;
-        user.birth = new Date(userCreateDto.birth);
+        user.birth = new Date(
+            userCreateDto.birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')
+        );
         user.di = userCreateDto.di;
         user.status = UserStatus.Active;
-        user.role = UserRole.User;
+        user.role = userCreateDto.role ?? UserRole.User;
         user.isAdult = User.checkAdult(user.birth);
         user.storeRegisterStatus = null;
         return user;

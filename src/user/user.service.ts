@@ -13,7 +13,10 @@ import { UserOauthType } from './enum/user-oauth-type.enum';
 import { UserOauth } from './entity/user-oauth.entity';
 import { UserDevice } from './entity/user-device.entity';
 import { UserStatus } from './enum/user-status.enum';
-import { UserGender } from './enum/user-gender.enum';
+import { UserSignupSourceData } from './entity/user-signup-surce-data.entity';
+import { UserSignupSourceDataRepository } from './repository/user-signup-source-data.repository';
+import { Transactional } from 'typeorm-transactional';
+import { AuthCheckRegisterFormDto } from 'src/auth/dto/auth-check-register-form.dto';
 
 @Injectable()
 export class UserService {
@@ -21,16 +24,20 @@ export class UserService {
         private readonly userRepository: UserRepository,
         private readonly userOauthRepository: UserOauthRepository,
         private readonly userDeviceRepository: UserDeviceRepository,
+        private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
     ) { }
 
     /**
      * 사용자 생성
      * @param userCreateDto 사용자 생성 정보
+     * 
      */
-    async create(userCreateDto: UserCreateDto): Promise<UserDto> {
-        // User 엔티티로 변환
-        const user = User.fromCreateDto(userCreateDto);
+    @Transactional()
+    async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
+        const user = User.fromCreateDto(dto.userInfo);
         const savedUser = await this.userRepository.save(user);
+        
+        await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
         return new UserDto(savedUser);
     }
 

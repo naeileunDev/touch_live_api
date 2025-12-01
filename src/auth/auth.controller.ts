@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ADMIN_PERMISSION, ALL_PERMISSION, ANY_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { AuthLoginDto } from 'src/auth/dto/auth-login.dto';
@@ -26,6 +26,8 @@ import { AuthLoginResponseDto } from './dto/auth-login-response.dto';
 import { AuthFindIdResponseDto } from './dto/auth-find-id-response.dto';
 import { NiceEncryptionTokenDto } from './dto/nice-encryption-token.dto';
 import { NiceSuccessDto } from './dto/nice-success.dto';
+import { AuthCheckRegisterFormDto } from './dto/auth-check-register-form.dto';
+import { UserSignupSourceDto } from 'src/user/dto/user-signup-source.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -33,13 +35,21 @@ import { NiceSuccessDto } from './dto/nice-success.dto';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
+    // @Get('register')
+    // @Role(ANY_PERMISSION)
+    // @ApiOperation({ summary: '회원가입에 필요한 데이터 표기' })
+    // @ApiOkSuccessResponse(AuthCheckRegisterFormDto, '회원가입에 필요한 데이터 표기 성공')
+    // checkRegister() {
+    //     return true;
+    // }
 
     @Post('register')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '회원가입' })
     @ApiCreatedSuccessResponse(AuthLoginResponseDto, '회원가입 성공')
-    register(@Body() userCreateDto: UserCreateDto) {
-        return this.authService.register(userCreateDto);
+    @ApiExtraModels(UserCreateDto, UserSignupSourceDto) 
+    register(@Body() authCheckRegisterFormDto: AuthCheckRegisterFormDto) {
+        return this.authService.register(authCheckRegisterFormDto);
     }
 
     @Post('login')
@@ -158,13 +168,13 @@ export class AuthController {
         return this.authService.niceSuccess(req.body as NiceRedirectDto);
     }
 
-    @Post('sns/register')
-    @Role(ANY_PERMISSION)
-    @ApiOperation({ summary: 'SNS 회원가입' })
-    @ApiCreatedSuccessResponse(AuthLoginResponseDto, 'SNS 회원가입 성공')
-    registerSnsBody(@Body() authSnsRegisterDto: AuthSnsRegisterDto) {
-        return this.authService.registerSns(authSnsRegisterDto);
-    }
+    // @Post('sns/register')
+    // @Role(ANY_PERMISSION)
+    // @ApiOperation({ summary: 'SNS 회원가입' })
+    // @ApiCreatedSuccessResponse(AuthLoginResponseDto, 'SNS 회원가입 성공')
+    // registerSnsBody(@Body() authSnsRegisterDto: AuthSnsRegisterDto) {
+    //     return this.authService.registerSns(authSnsRegisterDto);
+    // }
 
     @Post('sns/login')
     @Role(ANY_PERMISSION)
