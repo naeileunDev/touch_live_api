@@ -10,6 +10,7 @@ import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
+import { StoreModule } from './store/store.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.con
         }),
         UserModule,
         AuthModule,
+        StoreModule,
     ],
     controllers: [],
     providers: [

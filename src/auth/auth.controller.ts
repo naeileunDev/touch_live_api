@@ -45,6 +45,7 @@ export class AuthController {
     @Post('login')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '로그인' })
+    @ApiOkSuccessResponse(AuthLoginResponseDto, '로그인 성공')
     login(@Body() authLoginDto: AuthLoginDto) {
         return this.authService.login(authLoginDto, USER_PERMISSION);
     }
