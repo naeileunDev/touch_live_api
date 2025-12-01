@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { UserGender } from "../enum/user-gender.enum";
 import { UserRole } from "../enum/user-role.enum";
 
 export class UserCreateDto {
@@ -12,6 +13,11 @@ export class UserCreateDto {
     @IsNotEmpty()
     @IsString()
     password: string;
+
+    @ApiProperty({ description: '닉네임', example: '홍길동' })
+    @IsNotEmpty()
+    @IsString()
+    nickname: string;
     
     @ApiProperty({ description: '나이스 인증 세션키', example: 'test' })
     @IsNotEmpty()
@@ -29,7 +35,7 @@ export class UserCreateDto {
     email?: string;
 
     @ApiProperty({ description: '이름', example: '홍길동' })
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     name: string;
 
@@ -38,23 +44,21 @@ export class UserCreateDto {
     @IsString()
     phone: string;
 
-    @ApiProperty({ description: '성별', example: '남' })
-    @IsOptional()
-    @IsString()
-    gender: string;
+    @ApiProperty({ description: '성별', example: UserGender.Male })
+    @IsEnum(UserGender)
+    gender: UserGender;
 
     @ApiProperty({ description: '생년월일', example: '1990-01-01' })
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     birth: string;
 
     @ApiProperty({ description: 'DI', example: 'DI' })
-    @IsOptional()
-    @IsString()
     di: string;
 
-    @ApiProperty({ description: '권한', example: UserRole.User })
+
+    @ApiProperty({ description: '권한', enum: UserRole, default: UserRole.User })
     @IsOptional()
     @IsEnum(UserRole)
-    role: UserRole;
+    role?: UserRole = UserRole.User;
 }

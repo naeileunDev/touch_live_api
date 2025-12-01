@@ -13,6 +13,7 @@ import { UserOauthType } from './enum/user-oauth-type.enum';
 import { UserOauth } from './entity/user-oauth.entity';
 import { UserDevice } from './entity/user-device.entity';
 import { UserStatus } from './enum/user-status.enum';
+import { UserGender } from './enum/user-gender.enum';
 
 @Injectable()
 export class UserService {
@@ -27,8 +28,10 @@ export class UserService {
      * @param userCreateDto 사용자 생성 정보
      */
     async create(userCreateDto: UserCreateDto): Promise<UserDto> {
-        const user = await this.userRepository.createUser(userCreateDto);
-        return new UserDto(user);
+        // User 엔티티로 변환
+        const user = User.fromCreateDto(userCreateDto);
+        const savedUser = await this.userRepository.save(user);
+        return new UserDto(savedUser);
     }
 
     /**

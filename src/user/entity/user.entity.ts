@@ -4,6 +4,7 @@ import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
+import { UserCreateDto } from "../dto/user-create.dto";
 
 @Entity()
 export class User extends BaseEntity {
@@ -48,4 +49,42 @@ export class User extends BaseEntity {
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', default: null, nullable: true })
     storeRegisterStatus?: StoreRegisterStatus;
+
+       /**
+     * UserCreateDto로부터 User 엔티티 생성
+     * @param userCreateDto 사용자 생성 DTO
+     * @returns User 엔티티
+     */
+       static fromCreateDto(userCreateDto: UserCreateDto): User {
+        const user = new User();
+        user.loginId = userCreateDto.loginId;
+        user.password = userCreateDto.password;
+        user.nickname = userCreateDto.nickname;
+        user.email = userCreateDto.email;
+        user.name = userCreateDto.name;
+        user.phone = userCreateDto.phone;
+        user.gender = userCreateDto.gender as unknown as UserGender;
+        user.birth = new Date(userCreateDto.birth);
+        user.di = userCreateDto.di;
+        user.status = UserStatus.Active;
+        user.role = UserRole.User;
+        user.isAdult = User.checkAdult(user.birth);
+        user.storeRegisterStatus = null;
+        return user;
+    }
+
+    /**
+     * 생년월일로 성인 여부 확인 (1월 1일 기준)
+     * @param birth 생년월일
+     * @returns 성인 여부
+     */
+    static checkAdult(birth: Date): boolean {
+        const today = new Date();
+        const thisYearJan1 = new Date(today.getFullYear(), 0, 1); // 올해 1월 1일
+        const birthDate = new Date(birth);
+        const adultDate = new Date(birthDate.getFullYear() + 19, birthDate.getMonth(), birthDate.getDate()); // 19세가 되는 날
+        
+        // 19세가 되는 날이 올해 1월 1일 이전이거나 같으면 성인
+        return adultDate <= thisYearJan1;
+    }
 }

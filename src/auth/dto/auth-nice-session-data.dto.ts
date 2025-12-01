@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { UserGender } from "src/user/enum/user-gender.enum";
 
 export class AuthNiceSessionDataDto {
     @ApiProperty({ description: 'DI' })
@@ -13,8 +14,8 @@ export class AuthNiceSessionDataDto {
     @ApiProperty({ description: '전화번호' })
     phone: string;
 
-    @ApiProperty({ description: '성별' })
-    gender: string;
+    @ApiProperty({ description: '성별', enum: UserGender })
+    gender: UserGender;
 
     @ApiProperty({ description: '생년월일' })
     birth: string;
