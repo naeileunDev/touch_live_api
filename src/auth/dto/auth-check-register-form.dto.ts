@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
+import { ValidateNested } from "class-validator";
 import { UserCreateDto } from "src/user/dto/user-create.dto";
 import { UserSignupSourceDto } from "src/user/dto/user-signup-source.dto";
 import { UserTermsAgreementDto } from "src/user/dto/user-terms-agreement.dto";
@@ -10,6 +11,7 @@ export class AuthCheckRegisterFormDto {
         type: () => UserCreateDto,
         required: true
     })
+    @ValidateNested()
     @Type(() => UserCreateDto)
     userInfo: UserCreateDto;
     @ApiProperty({ 
@@ -17,6 +19,7 @@ export class AuthCheckRegisterFormDto {
         type: () => UserSignupSourceDto,
         required: true
     })
+    @ValidateNested()
     @Type(() => UserSignupSourceDto)
     signupSourceInfo: UserSignupSourceDto
 
@@ -25,6 +28,7 @@ export class AuthCheckRegisterFormDto {
         type: () => UserTermsAgreementDto,
         required: true
     })
+    @ValidateNested()
     @Type(() => UserTermsAgreementDto)
     termsAgreementInfo: UserTermsAgreementDto;;
 }
