@@ -11,7 +11,11 @@ export class UserSignupSourceDataRepository extends Repository<UserSignupSourceD
     }
 
     async createUserSignupSourceData(createDto: UserSignupSourceDto, user: User): Promise<UserSignupSourceData> {
-        const data = UserSignupSourceData.fromDto(createDto, user);
+        const data = this.create({
+            category: createDto.category,
+            etcDescription: createDto.etcDescription,
+            user: user,
+        });
         return await this.save(data);
     }
 

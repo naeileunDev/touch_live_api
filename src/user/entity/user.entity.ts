@@ -50,19 +50,21 @@ export class User extends BaseEntity {
     @Column({ type: 'boolean', comment: '사용자 성인여부' })
     isAdult: boolean;
 
-    @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', default: null, nullable: true })
-    storeRegisterStatus: StoreRegisterStatus;
-
-    @OneToOne(() => UserSignupSourceData,  signupSourceData => signupSourceData.user, {
-        nullable: true  // User는 설문조사 없이도 존재 가능 (비즈니스 로직상 필수지만) 관리자 경우 제외
+    @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', nullable: true })
+    storeRegisterStatus?: StoreRegisterStatus | null;
+    
+    @OneToOne(() => UserSignupSourceData, userSignupSourceData => userSignupSourceData.user, {
+        nullable: true
     })
     userSignupSourceData: UserSignupSourceData;
-
-    @OneToOne(() => UserTermsAgreement, termsAgreement => termsAgreement.user, {
-        onDelete: 'CASCADE',
+    
+    @OneToOne(() => UserTermsAgreement, userTermsAgreement => userTermsAgreement.user, {
         nullable: true
-    }) // User는 약관 동의 없이도 존재 가능 (비즈니스 로직상 필수지만) 관리자 경우 제외
+    })
     userTermsAgreement: UserTermsAgreement;
+
+    @Column({ type: 'timestamptz', comment: '성인 여부 확인 일시', nullable: true })
+    adultCheckAt?: Date;
 
        /**
      * UserCreateDto로부터 User 엔티티 생성

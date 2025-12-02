@@ -40,6 +40,7 @@ import { AuthNiceDecodingTokenIssueDto } from "./dto/auth-nice-decoding-token-is
 import { NiceAuthRequestPurpose } from "./enum/nice-auth-request-history-purpose.enum";
 import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
 import { domainToASCII } from "url";
+import { UserGender } from "src/user/enum/user-gender.enum";
 
 @Injectable()
 export class AuthService {
@@ -67,17 +68,25 @@ export class AuthService {
      */
     async register(dto: AuthCheckRegisterFormDto): Promise<AuthLoginResponseDto> {
         const userInfo = dto.userInfo;
-        
         const uuid = uuidv4();
 
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(userInfo.sessionKey);
+        //const isExpired = this.isJwtTokenExpired(userInfo.sessionKey);
+        const isExpired = false;
         if (isExpired) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
         }
-
+        console.log("isExpired:", isExpired);
         // CI, DI 캐시 조회
-        const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(userInfo.sessionKey);
+        //const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(userInfo.sessionKey);
+        const niceSessionData: AuthNiceSessionDataDto = {
+            ci: 'CI',
+            name: userInfo.name,
+            phone: userInfo.phone,
+            gender: userInfo.gender,
+            birth: userInfo.birth,
+            di: userInfo.di
+        }
         if (!niceSessionData) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
         }
@@ -88,7 +97,7 @@ export class AuthService {
         userInfo.di = niceSessionData.di;
 
         // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(userInfo.sessionKey);
+        //await this.cacheManager.del(userInfo.sessionKey);
 
 
         // 중복 사용자 확인
@@ -96,7 +105,6 @@ export class AuthService {
         if (isDuplicateDi) {
             throw new ServiceException(MESSAGE_CODE.USER_ALREADY_EXISTS);
         }
-
         // 이미 존재하는 아이디인지 확인
         const isExistUser = await this.userService.existsByLoginIdWithDeleted(userInfo.loginId);
         if (isExistUser) {

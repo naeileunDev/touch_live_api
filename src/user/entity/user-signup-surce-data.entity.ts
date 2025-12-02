@@ -1,17 +1,17 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne, Unique } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, Unique } from "typeorm";
 import { User } from "./user.entity";
 import { UserSignupSourceCategory } from "../enum/user-signup-source-category.enum";
 import { UserSignupSourceDto } from "../dto/user-signup-source.dto";
+import { BaseEntity } from "src/common/base-entity/base.entity";
 
 @Entity()
-@Unique(['userId'])
 export class UserSignupSourceData extends BaseEntity {
     @Column({ 
         type: 'enum', 
         enum: UserSignupSourceCategory, 
         comment: '유입경로 카테고리' 
     })
-    answer: UserSignupSourceCategory;
+    category: UserSignupSourceCategory;
 
     @Column({ 
         type: 'varchar', 
@@ -36,7 +36,7 @@ export class UserSignupSourceData extends BaseEntity {
      */
       static fromDto(dto: UserSignupSourceDto, user: User): UserSignupSourceData {
         const signupSourceData = new UserSignupSourceData();
-        signupSourceData.answer = dto.category;
+        signupSourceData.category = dto.category;
         signupSourceData.etcDescription = dto.etcDescription;
         signupSourceData.user = user;
         return signupSourceData;

@@ -36,9 +36,16 @@ export class UserService {
     @Transactional()
     async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
         const user = User.fromCreateDto(dto.userInfo);
+        const isAdult = User.checkAdult(user.birth);
+        user.isAdult = isAdult;
+        if (isAdult) {
+            user.adultCheckAt = new Date();
+        }
         const savedUser = await this.userRepository.save(user);
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
-        await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
+        const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
+        savedUser.userTermsAgreement = userTermsAgreement;
+        await this.userRepository.save(savedUser);
         return new UserDto(savedUser);
     }
 
@@ -181,6 +188,7 @@ export class UserService {
      * @param di DI
      */
     async existsByDiWithDeleted(di: string): Promise<boolean> {
+        console.log("di:", di);
         return await this.userRepository.existsByDiWithDeleted(di);
     }
 

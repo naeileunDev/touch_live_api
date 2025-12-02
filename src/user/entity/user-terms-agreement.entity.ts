@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { User } from "./user.entity";
+import { BaseEntity } from "src/common/base-entity/base.entity";
 
 @Entity()
 export class UserTermsAgreement extends BaseEntity {
