@@ -6,6 +6,7 @@ import { UserGender } from "../enum/user-gender.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserCreateDto } from "../dto/user-create.dto";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";
+import { UserTermsAgreement } from "./user-terms-agreement.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -14,7 +15,8 @@ export class User extends BaseEntity {
 
     @Column({ type: 'varchar', length: 255, comment: '사용자 비밀번호'})
     password: string;
-
+    
+    //관리자의 경우 이메일 필수 아님
     @Column({ type: 'varchar', length: 255, comment: '사용자 이메일', nullable: true })
     email: string;
 
@@ -51,10 +53,16 @@ export class User extends BaseEntity {
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', default: null, nullable: true })
     storeRegisterStatus: StoreRegisterStatus;
 
-    @OneToOne(() => UserSignupSourceData, signupSourceData => signupSourceData.user, {
-        nullable: true  // User는 설문조사 없이도 존재 가능 (비즈니스 로직상 필수지만)
+    @OneToOne(() => UserSignupSourceData,  signupSourceData => signupSourceData.user, {
+        nullable: true  // User는 설문조사 없이도 존재 가능 (비즈니스 로직상 필수지만) 관리자 경우 제외
     })
     userSignupSourceData: UserSignupSourceData;
+
+    @OneToOne(() => UserTermsAgreement, termsAgreement => termsAgreement.user, {
+        onDelete: 'CASCADE',
+        nullable: true
+    }) // User는 약관 동의 없이도 존재 가능 (비즈니스 로직상 필수지만) 관리자 경우 제외
+    userTermsAgreement: UserTermsAgreement;
 
        /**
      * UserCreateDto로부터 User 엔티티 생성

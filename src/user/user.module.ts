@@ -5,6 +5,7 @@ import { UserRepository } from './repository/user.repository';
 import { UserOauthRepository } from './repository/user-oauth.repository';
 import { UserDeviceRepository } from './repository/user-device.repository';
 import { UserSignupSourceDataRepository } from './repository/user-signup-source-data.repository';
+import { UserTermsAgreementRepository } from './repository/user-terms-agreement.repository';
 
 @Module({
     controllers: [UserController],
@@ -14,6 +15,7 @@ import { UserSignupSourceDataRepository } from './repository/user-signup-source-
         UserOauthRepository,
         UserDeviceRepository,
         UserSignupSourceDataRepository,
+        UserTermsAgreementRepository,
     ],
     exports: [UserService],
 })

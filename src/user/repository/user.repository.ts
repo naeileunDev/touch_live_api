@@ -57,6 +57,16 @@ export class UserRepository extends Repository<User> {
             withDeleted: true,
         });
     }
+
+    async existsByNicknameWithDeleted(nickname: string): Promise<boolean> {
+        return await this.exists({
+            where: {
+                nickname,
+            },
+            withDeleted: true,
+        });
+    }
+    
     async existsByDi(di: string): Promise<boolean> {
         return await this.exists({
             where: {

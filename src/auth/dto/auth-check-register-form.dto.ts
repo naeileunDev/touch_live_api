@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { UserCreateDto } from "src/user/dto/user-create.dto";
 import { UserSignupSourceDto } from "src/user/dto/user-signup-source.dto";
+import { UserTermsAgreementDto } from "src/user/dto/user-terms-agreement.dto";
 
 export class AuthCheckRegisterFormDto {
     @ApiProperty({ 
@@ -17,5 +18,13 @@ export class AuthCheckRegisterFormDto {
         required: true
     })
     @Type(() => UserSignupSourceDto)
-    signupSourceInfo: UserSignupSourceDto;
+    signupSourceInfo: UserSignupSourceDto
+
+    @ApiProperty({ 
+        description: '약관 동의 정보', 
+        type: () => UserTermsAgreementDto,
+        required: true
+    })
+    @Type(() => UserTermsAgreementDto)
+    termsAgreementInfo: UserTermsAgreementDto;;
 }

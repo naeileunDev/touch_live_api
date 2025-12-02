@@ -1,29 +1,23 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
 import { UserGender } from "../enum/user-gender.enum";
 import { UserRole } from "../enum/user-role.enum";
-import { UserSignupSourceDto } from "./user-signup-source.dto";
-import { Type } from "class-transformer";
 
 export class UserCreateDto {
     @ApiProperty({ description: '로그인 아이디', example: 'test' })
-    @IsNotEmpty()
-    @IsString()
+    @IsString({ always: true })
     loginId: string;
 
     @ApiProperty({ description: '비밀번호', example: 'test' })
-    @IsNotEmpty()
-    @IsString()
+    @IsString({ always: true })
     password: string;
 
     @ApiProperty({ description: '닉네임', example: '홍길동' })
-    @IsNotEmpty()
-    @IsString()
+    @IsString({ always: true })
     nickname: string;
     
     @ApiProperty({ description: '나이스 인증 세션키', example: 'test' })
-    @IsNotEmpty()
-    @IsString()
+    @IsString({ always: true })
     sessionKey: string;
 
     @ApiProperty({ description: 'FCM 토큰', example: '토큰' })
@@ -37,28 +31,26 @@ export class UserCreateDto {
     email?: string;
 
     @ApiProperty({ description: '이름', example: '홍길동' })
-    @IsNotEmpty()
-    @IsString()
+    @IsString({ always: true })
     name: string;
 
-    @ApiProperty({ description: '전화번호', example: '010-1234-5678', format: 'phone' })
-    @IsNotEmpty()
-    @IsString()
-    @IsPhoneNumber()
+    @ApiProperty({ description: '전화번호', example: '01012345678', format: 'phone' })
+    @IsString({ always: true })
+    @Matches(/^01[0-9]\d{7,8}$/, { message: '전화번호는 하이픈 없이 11자리 숫자여야 합니다.', always: true })
     phone: string;
 
     @ApiProperty({ description: '성별', example: UserGender.Male })
-    @IsEnum(UserGender)
+    @IsEnum(UserGender, { always: true })
     gender: UserGender;
 
     @ApiProperty({ description: '생년월일', example: '19900101' })
-    @IsNotEmpty()
-    @IsDateString()
+    @IsString({ always: true })
+    @Matches(/^\d{8}$/, { message: '생년월일은 YYYYMMDD 형식(8자리 숫자)이어야 합니다.', always: true })
     birth: string;
 
     @ApiProperty({ description: 'DI', example: 'DI' })
+    @IsString({ always: true })
     di: string;
-
 
     @ApiProperty({ 
         description: '권한', 
@@ -69,5 +61,4 @@ export class UserCreateDto {
     @IsOptional() 
     @IsEnum(UserRole)
     role?: UserRole; 
-    
 }

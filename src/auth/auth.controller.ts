@@ -8,7 +8,7 @@ import { AuthFindIdDto } from 'src/auth/dto/auth-find-id.dto';
 import { AuthPasswordResetDto } from 'src/auth/dto/auth-password-reset.dto';
 import { AuthPasswordConfirmDto } from 'src/auth/dto/auth-password-confirm.dto';
 import { JwtRefreshAuthGuard } from 'src/common/guard/jwt-refresh.guard';
-import { AuthSnsRegisterDto } from 'src/auth/dto/auth-sns-register.dto';
+//import { AuthSnsRegisterDto } from 'src/auth/dto/auth-sns-register.dto';
 import { AuthSnsLoginDto } from 'src/auth/dto/auth-sns-login.dto';
 import { AuthSnsLinkDto } from 'src/auth/dto/auth-sns-link.dto';
 import { AuthSnsUnlinkDto } from 'src/auth/dto/auth-sns-unlink.dto';
@@ -28,6 +28,7 @@ import { NiceEncryptionTokenDto } from './dto/nice-encryption-token.dto';
 import { NiceSuccessDto } from './dto/nice-success.dto';
 import { AuthCheckRegisterFormDto } from './dto/auth-check-register-form.dto';
 import { UserSignupSourceDto } from 'src/user/dto/user-signup-source.dto';
+import { UserTermsAgreementDto } from 'src/user/dto/user-terms-agreement.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -47,7 +48,7 @@ export class AuthController {
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '회원가입' })
     @ApiCreatedSuccessResponse(AuthLoginResponseDto, '회원가입 성공')
-    @ApiExtraModels(UserCreateDto, UserSignupSourceDto) 
+    @ApiExtraModels(UserCreateDto, UserSignupSourceDto, UserTermsAgreementDto) 
     register(@Body() authCheckRegisterFormDto: AuthCheckRegisterFormDto) {
         return this.authService.register(authCheckRegisterFormDto);
     }

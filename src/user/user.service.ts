@@ -13,10 +13,10 @@ import { UserOauthType } from './enum/user-oauth-type.enum';
 import { UserOauth } from './entity/user-oauth.entity';
 import { UserDevice } from './entity/user-device.entity';
 import { UserStatus } from './enum/user-status.enum';
-import { UserSignupSourceData } from './entity/user-signup-surce-data.entity';
 import { UserSignupSourceDataRepository } from './repository/user-signup-source-data.repository';
 import { Transactional } from 'typeorm-transactional';
 import { AuthCheckRegisterFormDto } from 'src/auth/dto/auth-check-register-form.dto';
+import { UserTermsAgreementRepository } from './repository/user-terms-agreement.repository';
 
 @Injectable()
 export class UserService {
@@ -25,6 +25,7 @@ export class UserService {
         private readonly userOauthRepository: UserOauthRepository,
         private readonly userDeviceRepository: UserDeviceRepository,
         private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
+        private readonly userTermsAgreementRepository: UserTermsAgreementRepository,
     ) { }
 
     /**
@@ -36,8 +37,8 @@ export class UserService {
     async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
         const user = User.fromCreateDto(dto.userInfo);
         const savedUser = await this.userRepository.save(user);
-        
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
+        await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
         return new UserDto(savedUser);
     }
 
@@ -191,6 +192,13 @@ export class UserService {
         return await this.userRepository.existsByLoginIdWithDeleted(loginId);
     }
 
+    /**
+     * 닉네임으로 사용자가 존재하는지 확인
+     * @param nickname 닉네임
+     */
+    async existsByNicknameWithDeleted(nickname: string): Promise<boolean> {
+        return await this.userRepository.existsByNicknameWithDeleted(nickname);
+    }
     /**
      * 아이디로 사용자 조회 (로그인시 패스워드 비교용)
      * @param loginId 아이디

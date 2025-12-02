@@ -16,7 +16,7 @@ import { AuthLoginDto } from "./dto/auth-login.dto";
 import * as crypto from 'crypto';
 import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { UserDto } from "src/user/dto/user.dto";
-import { AuthSnsRegisterDto } from "./dto/auth-sns-register.dto";
+//import { AuthSnsRegisterDto } from "./dto/auth-sns-register.dto";
 import { AuthSnsProfileDto } from "./dto/auth-sns-profile.dto";
 import { UserOauthCreateDto } from "src/user/dto/user-oauth-create.dto";
 import { AuthSnsLoginDto } from "./dto/auth-sns-login.dto";
@@ -459,7 +459,7 @@ export class AuthService {
 
         // 사용자 조회
         const user = await this.userService.findByDi(sessionData.di);
-        authFindIdResponseDto.snsInfos = await this.userService.findUserOauthAllByUserId(user.id);
+        authFindIdResponseDto.loginId = user.loginId;
 
         return authFindIdResponseDto;
     }

@@ -4,6 +4,7 @@ import { User } from "../entity/user.entity";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
+import { IsString, Matches } from "class-validator";
 
 export class UserDto {
     @ApiProperty({ description: '사용자 식별자', example: 1 })
@@ -28,6 +29,8 @@ export class UserDto {
     name: string;
 
     @ApiProperty({ description: '사용자 전화번호', example: '010-1234-5678', format: 'phone' })
+    @IsString({ always: true })
+    @Matches(/^01[0-9]\d{7,8}$/, { message: '전화번호는 하이픈 없이 11자리 숫자여야 합니다.', always: true })
     phone: string;
 
     @ApiProperty({ description: '사용자 성별', enum: UserGender, example: UserGender.Male })
@@ -62,7 +65,7 @@ export class UserDto {
         this.name = user.name;
         this.phone = user.phone;
         this.gender = user.gender;
-        this.birth = user.birth.toISOString();
+        this.birth = user.birth.toISOString().slice(0, 10).replace(/-/g, '');
         this.di = user.di;
         this.isAdult = user.isAdult;
         this.storeRegisterStatus = user.storeRegisterStatus;
