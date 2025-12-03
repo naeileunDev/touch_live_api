@@ -109,33 +109,6 @@ export class AuthController {
         return this.authService.reissueAccessToken(userDto, req.headers.authorization?.replace('Bearer ', '') || '');
     }
 
-    @Post('token/reissue/web')
-    @UseGuards(JwtRefreshAuthGuard)
-    @ApiOperation({ summary: '웹 Access Token 재발급' })
-    getAccessTokenWeb(@Req() req: Request, @Res({ passthrough: true }) res: Response, @GetUser() userDto: UserDto) {
-        return this.authService.reissueAccessTokenWeb(userDto, req.headers.authorization?.replace('Bearer ', '') || '')
-            .then(
-                ([result, csrfToken]) => {
-                    res.cookie('jwt', result.token.accessToken, {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'strict',
-                        maxAge: 3600 * 1000,
-                    });
-
-                    // CSRF 토큰을 일반 쿠키로 저장 (JS에서 읽을 수 있도록 httpOnly: false)
-                    res.cookie('csrfToken', csrfToken, {
-                        httpOnly: false,
-                        secure: true,
-                        sameSite: 'strict',
-                        maxAge: 3600 * 1000,
-                    });
-                    // JWT를 httpOnly 쿠키로 저장 
-                    return result;
-                },
-            );
-    }
-
     @Post('nice/access/token')
     @Role(ADMIN_PERMISSION)
     @ApiOperation({ summary: '[관리자] NICE 엑세스 토큰 발급' })
@@ -177,70 +150,70 @@ export class AuthController {
     //     return this.authService.registerSns(authSnsRegisterDto);
     // }
 
-    @Post('sns/login')
-    @Role(ANY_PERMISSION)
-    @ApiOperation({ summary: 'SNS 로그인' })
-    loginSnsBody(@Body() authSnsLoginDto: AuthSnsLoginDto) {
-        return this.authService.loginSns(authSnsLoginDto);
-    }
+    // @Post('sns/login')
+    // @Role(ANY_PERMISSION)
+    // @ApiOperation({ summary: 'SNS 로그인' })
+    // loginSnsBody(@Body() authSnsLoginDto: AuthSnsLoginDto) {
+    //     return this.authService.loginSns(authSnsLoginDto);
+    // }
 
-    @Post('sns/link')
-    @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: 'SNS 계정 연동' })
-    linkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsLinkDto: AuthSnsLinkDto) {
-        return this.authService.linkSns(userDto, authSnsLinkDto);
-    }
+    // @Post('sns/link')
+    // @Role(ALL_PERMISSION)
+    // @ApiOperation({ summary: 'SNS 계정 연동' })
+    // linkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsLinkDto: AuthSnsLinkDto) {
+    //     return this.authService.linkSns(userDto, authSnsLinkDto);
+    // }
 
-    @Post('sns/unlink')
-    @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: 'SNS 계정 연동 해제' })
-    unlinkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsUnlinkDto: AuthSnsUnlinkDto) {
-        return this.authService.unlinkSns(userDto, authSnsUnlinkDto);
-    }
+    // @Post('sns/unlink')
+    // @Role(ALL_PERMISSION)
+    // @ApiOperation({ summary: 'SNS 계정 연동 해제' })
+    // unlinkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsUnlinkDto: AuthSnsUnlinkDto) {
+    //     return this.authService.unlinkSns(userDto, authSnsUnlinkDto);
+    // }
 
-    @Get('login/google')
-    @UseGuards(GoogleGuard)
-    @ApiOperation({ summary: '구글 로그인' })
-    googleLogin() { }
+    // @Get('login/google')
+    // @UseGuards(GoogleGuard)
+    // @ApiOperation({ summary: '구글 로그인' })
+    // googleLogin() { }
 
-    @Get('login/google/callback')
-    @UseGuards(GoogleGuard)
-    @ApiExcludeEndpoint()
-    @ApiOperation({ summary: '구글 로그인 리다이렉트' })
-    googleLoginCallback(@Req() req) {
-        return this.authService.oauthLogin(req.user);
-    }
+    // @Get('login/google/callback')
+    // @UseGuards(GoogleGuard)
+    // @ApiExcludeEndpoint()
+    // @ApiOperation({ summary: '구글 로그인 리다이렉트' })
+    // googleLoginCallback(@Req() req) {
+    //     return this.authService.oauthLogin(req.user);
+    // }
 
-    @Get('login/kakao')
-    @UseGuards(KakaoGuard)
-    @ApiOperation({ summary: '카카오톡 로그인' })
-    kakaoLogin() { }
+    // @Get('login/kakao')
+    // @UseGuards(KakaoGuard)
+    // @ApiOperation({ summary: '카카오톡 로그인' })
+    // kakaoLogin() { }
 
-    @Get('login/kakao/callback')
-    @UseGuards(KakaoGuard)
-    @ApiExcludeEndpoint()
-    @ApiOperation({ summary: '카카오톡 로그인 리다이렉트' })
-    kakaoLoginCallback(@Req() req) {
-        return this.authService.oauthLogin(req.user);
-    }
+    // @Get('login/kakao/callback')
+    // @UseGuards(KakaoGuard)
+    // @ApiExcludeEndpoint()
+    // @ApiOperation({ summary: '카카오톡 로그인 리다이렉트' })
+    // kakaoLoginCallback(@Req() req) {
+    //     return this.authService.oauthLogin(req.user);
+    // }
 
-    @Get('login/naver')
-    @UseGuards(NaverGuard)
-    @ApiOperation({ summary: '네이버 로그인' })
-    naverLogin() { }
+    // @Get('login/naver')
+    // @UseGuards(NaverGuard)
+    // @ApiOperation({ summary: '네이버 로그인' })
+    // naverLogin() { }
 
-    @Get('login/naver/callback')
-    @UseGuards(NaverGuard)
-    @ApiExcludeEndpoint()
-    @ApiOperation({ summary: '네이버 로그인 리다이렉트' })
-    naverLoginCallback(@Req() req) {
-        return this.authService.oauthLogin(req.user);
-    }
+    // @Get('login/naver/callback')
+    // @UseGuards(NaverGuard)
+    // @ApiExcludeEndpoint()
+    // @ApiOperation({ summary: '네이버 로그인 리다이렉트' })
+    // naverLoginCallback(@Req() req) {
+    //     return this.authService.oauthLogin(req.user);
+    // }
 
-    @Post('login/apple/callback')
-    @ApiExcludeEndpoint()
-    @ApiOperation({ summary: '애플 로그인 리다이렉트' })
-    appleLoginCallback(@Req() req) {
-        return this.authService.appleLogin(req.body);
-    }
+    // @Post('login/apple/callback')
+    // @ApiExcludeEndpoint()
+    // @ApiOperation({ summary: '애플 로그인 리다이렉트' })
+    // appleLoginCallback(@Req() req) {
+    //     return this.authService.appleLogin(req.body);
+    // }
 }

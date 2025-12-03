@@ -105,6 +105,7 @@ export class AuthService {
         if (isDuplicateDi) {
             throw new ServiceException(MESSAGE_CODE.USER_ALREADY_EXISTS);
         }
+
         // 이미 존재하는 아이디인지 확인
         const isExistUser = await this.userService.existsByLoginIdWithDeleted(userInfo.loginId);
         if (isExistUser) {
@@ -443,32 +444,32 @@ export class AuthService {
         const { sessionKey } = authFindIdDto;
 
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(sessionKey);
-        if (isExpired) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
-        }
+        // const isExpired = this.isJwtTokenExpired(sessionKey);
+        // if (isExpired) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
+        // }
 
         // CI, DI 캐시 조회
-        const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
-        if (!sessionData) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
-        }
+        // const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
+        // if (!sessionData) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+        // }
 
-        // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(sessionKey);
+        // // 캐시에서 NICE 정보 삭제
+        // await this.cacheManager.del(sessionKey);
 
         const authFindIdResponseDto = new AuthFindIdResponseDto();
 
         // 삭제된 회원인지 확인
-        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
-        if (isExistRemovedDi) {
+        //const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
+        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionKey);
+        const user = await this.userService.findEntityByDi(sessionKey);
+        // 사용자 조회
+        //const user = await this.userService.findByDi(sessionData.di);
+        if (!user && isExistRemovedDi) {
             throw new ServiceException(MESSAGE_CODE.USER_REMOVED_STATUS);
         }
-
-        // 사용자 조회
-        const user = await this.userService.findByDi(sessionData.di);
         authFindIdResponseDto.loginId = user.loginId;
-
         return authFindIdResponseDto;
     }
 

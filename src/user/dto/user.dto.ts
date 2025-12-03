@@ -65,7 +65,7 @@ export class UserDto {
         this.name = user.name;
         this.phone = user.phone;
         this.gender = user.gender;
-        this.birth = user.birth.toISOString().slice(0, 10).replace(/-/g, '');
+        this.birth = user.birth.toString().slice(0, 10).replace(/-/g, '');
         this.di = user.di;
         this.isAdult = user.isAdult;
         this.storeRegisterStatus = user.storeRegisterStatus;

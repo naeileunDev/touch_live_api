@@ -16,16 +16,16 @@ export class UserController {
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '로그인 아이디 중복 확인' })
     @ApiOkSuccessResponse(Boolean, '로그인 아이디 중복 확인 성공')
-    existsLoginId(@Query('loginId') loginId: string): Promise<boolean> {
-        return this.userService.existsByLoginIdWithDeleted(loginId);
+    existsLoginId(@Query('loginId') loginId: string): Promise<{exists: boolean}> {
+        return this.userService.existsByLoginIdWithDeleted(loginId).then(result => ({ exists: result }));
     }
 
     @Get('exists/nickname')
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '닉네임 중복 확인' })
     @ApiOkSuccessResponse(Boolean, '닉네임 중복 확인 성공')
-    existsNickname(@Query('nickname') nickname: string): Promise<boolean> {
-        return this.userService.existsByNicknameWithDeleted(nickname);
+    existsNickname(@Query('nickname') nickname: string): Promise<{exists: boolean}> {
+        return this.userService.existsByNicknameWithDeleted(nickname).then(result => ({ exists: result }));
     }
 
 
