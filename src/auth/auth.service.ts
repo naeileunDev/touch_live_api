@@ -504,6 +504,10 @@ export class AuthService {
         await this.cacheManager.del(sessionKey);
 
         const user = await this.userService.findEntityByDi(sessionData.di);
+        const isMatch = await compare(password, user.password);
+        if (isMatch) {
+            throw new ServiceException(MESSAGE_CODE.USER_PASSWORD_SAME);
+        }
         user.password = this.hashPassword(password);
         await this.userService.save(user);
         return true;
