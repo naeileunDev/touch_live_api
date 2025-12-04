@@ -207,6 +207,14 @@ export class UserService {
     async existsByNicknameWithDeleted(nickname: string): Promise<boolean> {
         return await this.userRepository.existsByNicknameWithDeleted(nickname);
     }
+
+    /**
+     * 이메일로 사용자가 존재하는지 확인
+     * @param email 이메일
+     */
+    async existsByEmailWithDeleted(email: string): Promise<boolean> {
+        return await this.userRepository.existsByEmailWithDeleted(email);
+    }
     /**
      * 아이디로 사용자 조회 (로그인시 패스워드 비교용)
      * @param loginId 아이디

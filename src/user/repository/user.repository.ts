@@ -66,7 +66,15 @@ export class UserRepository extends Repository<User> {
             withDeleted: true,
         });
     }
-    
+
+    async existsByEmailWithDeleted(email: string): Promise<boolean> {
+        return await this.exists({
+            where: {
+                email,
+            },
+            withDeleted: true,
+        });
+    }
     async existsByDi(di: string): Promise<boolean> {
         return await this.exists({
             where: {

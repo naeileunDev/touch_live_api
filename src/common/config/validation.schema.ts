@@ -69,6 +69,8 @@ export const validationSchema = Joi.object({
     
     // Login Attempt
     MAX_LOGIN_DEVICE_COUNT: Joi.number().required(),
+    // Term 
+    TERM_HTML_FILE_BASE_PATH: Joi.string().required(),
     // KG Inicis
     /* INICIS_MID: Joi.string().required(),
     INICIS_HASH_KEY: Joi.string().required(),

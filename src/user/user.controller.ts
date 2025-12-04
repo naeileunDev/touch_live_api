@@ -28,5 +28,14 @@ export class UserController {
         return this.userService.existsByNicknameWithDeleted(nickname).then(result => ({ exists: result }));
     }
 
+    @Get('exists/email')
+    @Role(ANY_PERMISSION)
+    @ApiOperation({ summary: '이메일 중복 확인' })
+    @ApiOkSuccessResponse(Boolean, '이메일 중복 확인 성공')
+    existsEmail(@Query('email') email: string): Promise<{exists: boolean}> {
+        return this.userService.existsByEmailWithDeleted(email).then(result => ({ exists: result }));
+    }
+
+
 
 }

@@ -18,7 +18,7 @@ async function bootstrap() {
     });
 
     // API 접두사 설정
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api/v1');
 
     // CORS 허용
     app.enableCors({
