@@ -14,6 +14,8 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.USER_REMOVED_STATUS]: '사용자가 탈퇴되었습니다.',
     [MESSAGE_CODE.USER_PASSWORD_SAME]: '직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.',
     [MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED]: '로그인 아이디가 일치하지 않습니다.',
+    [MESSAGE_CODE.USER_ADDRESS_NOT_FOUND]: '배송지 주소를 찾을 수 없습니다.',
+    [MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED]: '배송지 주소 수정 권한이 없습니다.',
 
     // Auth
     [MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED]: 'Nice session key expired',

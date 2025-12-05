@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
@@ -8,6 +8,7 @@ import { UserAddressCreateDto } from './dto/user-address-create.dto';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UserDto } from './dto/user.dto';
 import { UserAddressDto } from './dto/user-address.dto';
+import { UserAddressUpdateDto } from './dto/user-address-update.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -46,6 +47,14 @@ export class UserController {
     @ApiOkSuccessResponse(UserAddressDto, '주소 등록 성공')
     registerAddress(@Body() userAddressCreateDto: UserAddressCreateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
         return this.userService.registerAddress(userAddressCreateDto, userDto);
+    }
+
+    @Put('update/address/:id')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '주소 수정' })
+    @ApiOkSuccessResponse(UserAddressDto, '주소 수정 성공')
+    updateAddress(@Param('id') id: number, @Body() userAddressUpdateDto: UserAddressUpdateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
+        return this.userService.updateAddress(id, userAddressUpdateDto, userDto);
     }
 
 

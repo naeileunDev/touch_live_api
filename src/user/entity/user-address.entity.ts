@@ -19,6 +19,6 @@ export class UserAddress extends BaseEntity {
     email: string;
     @Column({ type: 'varchar', length: 255, comment: '이름' })
     name: string;
-    @Column({ type: 'boolean', comment: '기본 주소 여부', default: false })
+    @Column({ type: 'boolean', comment: '기본 주소 설정여부', default: false })
     isDefault: boolean;
 }

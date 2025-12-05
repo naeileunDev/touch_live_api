@@ -11,7 +11,6 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 import { StoreModule } from './store/store.module';
-import { TermModule } from './term/term.module';
 import { ProductModule } from './product/product.module';
 
 @Module({
@@ -32,7 +31,6 @@ import { ProductModule } from './product/product.module';
         UserModule,
         AuthModule,
         StoreModule,
-        TermModule,
         ProductModule,
     ],
     controllers: [],

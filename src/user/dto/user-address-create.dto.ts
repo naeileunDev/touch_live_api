@@ -6,13 +6,18 @@ export class UserAddressCreateDto {
     @IsString({ always: true })
     basicAddress: string;
     @ApiProperty({ description: '상세주소', example: '101동 101호', required: true })
+    @IsString({ always: true })
     detailAddress: string;
     @ApiProperty({ description: '우편번호', example: '12345', required: true })
+    @IsString({ always: true })
     zipCode: string;
     @ApiProperty({ description: '전화번호', example: '01012345678', required: true })
+    @IsString({ always: true })
     phone: string;
     @ApiProperty({ description: '이메일', example: 'test@test.com', required: true })
+    @IsString({ always: true })
     email: string;
     @ApiProperty({ description: '이름', example: '홍길동', required: true })
+    @IsString({ always: true })
     name: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
 import { UserOauthRepository } from './repository/user-oauth.repository';
 import { UserCreateDto } from './dto/user-create.dto';
@@ -21,6 +21,9 @@ import { UserAddressCreateDto } from './dto/user-address-create.dto';
 import { UserAddress } from './entity/user-address.entity';
 import { UserAddressRepository } from './repository/user-address-repository';
 import { UserAddressDto } from './dto/user-address.dto';
+import { UserAddressUpdateDto } from './dto/user-address-update.dto';
+import { ServiceException } from 'src/common/filter/exception/service.exception';
+import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 
 @Injectable()
 export class UserService {
@@ -286,5 +289,24 @@ export class UserService {
         const user = await this.userRepository.findById(userDto.id);
         const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, user);
         return new UserAddressDto(userAddress);
+    }
+
+    async updateAddress(id: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
+        const isAuth = await this.checkAuthAddress(id, userDto);
+        if (!isAuth) {
+            throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED);
+        }
+        const userAddress = await this.userAddressRepository.findById(id);
+        const updatedUserAddress = await this.userAddressRepository.updateUserAddress(userAddress, userAddressUpdateDto);
+        return new UserAddressDto(updatedUserAddress);
+    }
+
+    async checkAuthAddress(id: number, userDto: UserDto): Promise<boolean> {
+        const user = await this.userRepository.findById(userDto.id);
+        const userAddress = await this.userAddressRepository.findById(id);
+        if (userAddress.user.id !== user.id) {
+            return false;
+        }
+        return true;
     }
 }
