@@ -41,4 +41,13 @@ export class UserAddressRepository extends Repository<UserAddress> {
         });
         return await this.save(userAddress);
     }
+
+    async findAllByUserId(userId: number): Promise<UserAddress[]> {
+        return await this.find({
+            where: {
+                user: { id: userId },
+            },
+            relations: ['user'],
+        });
+    }
 }

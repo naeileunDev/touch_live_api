@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { UserService } from './user.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserService } from './service/user.service';
+import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ALL_PERMISSION, ANY_PERMISSION } from 'src/common/permission/permission';
@@ -57,6 +57,13 @@ export class UserController {
         return this.userService.updateAddress(id, userAddressUpdateDto, userDto);
     }
 
+    @Get('address')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '주소 목록 조회' })
+    @ApiOkSuccessResponse(UserAddressDto, '주소 목록 조회 성공', true)
+    findUserAddressAllByUserId(@GetUser() userDto: UserDto): Promise<UserAddressDto[]> {
+        return this.userService.findUserAddressAllByUserId(userDto.id);
+    }
 
 
 }
