@@ -486,24 +486,25 @@ export class AuthService {
      * 비밀번호 재설정
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
-    async resetPassword(authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
+    async resetPassword(authPasswordResetDto: AuthPasswordResetDto, di: string): Promise<boolean> {
         const { sessionKey, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(sessionKey);
+        //const isExpired = this.isJwtTokenExpired(sessionKey);
+        const isExpired = false;
         if (isExpired) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
         }
 
         // CI, DI 캐시 조회
-        const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
-        if (!sessionData) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
-        }
+        // const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
+        // if (!sessionData) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+        // }
 
-        // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(sessionKey);
+        // // 캐시에서 NICE 정보 삭제
+        // await this.cacheManager.del(sessionKey);
 
-        const user = await this.userService.findEntityByDi(sessionData.di);
+        const user = await this.userService.findEntityByDi(di);
         const isMatch = await compare(password, user.password);
         if (isMatch) {
             throw new ServiceException(MESSAGE_CODE.USER_PASSWORD_SAME);
