@@ -13,6 +13,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.USER_OAUTH_ALREADY_LINKED]: '사용자 인증 정보가 이미 연결되어 있습니다.',
     [MESSAGE_CODE.USER_REMOVED_STATUS]: '사용자가 탈퇴되었습니다.',
     [MESSAGE_CODE.USER_PASSWORD_SAME]: '직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.',
+    [MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED]: '로그인 아이디가 일치하지 않습니다.',
 
     // Auth
     [MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED]: 'Nice session key expired',

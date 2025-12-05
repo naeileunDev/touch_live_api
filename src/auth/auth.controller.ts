@@ -71,7 +71,7 @@ export class AuthController {
 
     @Post('password/reset')
     @Role(ANY_PERMISSION)
-    @ApiOperation({ summary: '비밀번호 재설정: 직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.' })
+    @ApiOperation({ summary: '비밀번호 재설정: 직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. 로그인 아이디도 함께 확인합니다.' })
     @ApiOkSuccessResponse(Boolean, '비밀번호 재설정 성공')
     resetPassword(@Body() authPasswordResetDto: AuthPasswordResetDto, @GetUser() userDto: UserDto) {
         return this.authService.resetPassword(authPasswordResetDto, userDto.di);

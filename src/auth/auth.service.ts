@@ -487,7 +487,7 @@ export class AuthService {
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
     async resetPassword(authPasswordResetDto: AuthPasswordResetDto, di: string): Promise<boolean> {
-        const { sessionKey, password } = authPasswordResetDto;
+        const { sessionKey, loginId, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(sessionKey);
         const isExpired = false;
@@ -505,8 +505,12 @@ export class AuthService {
         // await this.cacheManager.del(sessionKey);
 
         const user = await this.userService.findEntityByDi(di);
-        const isMatch = await compare(password, user.password);
-        if (isMatch) {
+        const isLoginIdMatch = loginId === user.loginId;
+        if (!isLoginIdMatch) {
+            throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED);
+        }
+        const isPasswordMatch = await compare(password, user.password);
+        if (isPasswordMatch) {
             throw new ServiceException(MESSAGE_CODE.USER_PASSWORD_SAME);
         }
         user.password = this.hashPassword(password);
