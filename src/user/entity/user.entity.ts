@@ -1,5 +1,5 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
@@ -7,6 +7,7 @@ import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserCreateDto } from "../dto/user-create.dto";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";
 import { UserTermsAgreement } from "./user-terms-agreement.entity";
+import { UserAddress } from "./user-address.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -65,6 +66,9 @@ export class User extends BaseEntity {
 
     @Column({ type: 'timestamptz', comment: '성인 여부 확인 일시', nullable: true })
     adultCheckAt?: Date;
+
+    @OneToMany(() => UserAddress, userAddress => userAddress.user)
+    userAddresses: UserAddress[];
 
        /**
      * UserCreateDto로부터 User 엔티티 생성

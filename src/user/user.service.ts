@@ -17,6 +17,10 @@ import { UserSignupSourceDataRepository } from './repository/user-signup-source-
 import { Transactional } from 'typeorm-transactional';
 import { AuthCheckRegisterFormDto } from 'src/auth/dto/auth-check-register-form.dto';
 import { UserTermsAgreementRepository } from './repository/user-terms-agreement.repository';
+import { UserAddressCreateDto } from './dto/user-address-create.dto';
+import { UserAddress } from './entity/user-address.entity';
+import { UserAddressRepository } from './repository/user-address-repository';
+import { UserAddressDto } from './dto/user-address.dto';
 
 @Injectable()
 export class UserService {
@@ -26,6 +30,7 @@ export class UserService {
         private readonly userDeviceRepository: UserDeviceRepository,
         private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
         private readonly userTermsAgreementRepository: UserTermsAgreementRepository,
+        private readonly userAddressRepository: UserAddressRepository,
     ) { }
 
     /**
@@ -277,4 +282,9 @@ export class UserService {
         return await this.userOauthRepository.deleteById(id);
     }
 
+    async registerAddress(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
+        const user = await this.userRepository.findById(userDto.id);
+        const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, user);
+        return new UserAddressDto(userAddress);
+    }
 }
