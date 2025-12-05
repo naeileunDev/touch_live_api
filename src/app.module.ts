@@ -11,6 +11,10 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 import { StoreModule } from './store/store.module';
+import { TermModule } from './term/term.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { createStaticOptions } from './file/config/file.config';
+import { FileModule } from './file/file.module';
 
 @Module({
     imports: [
@@ -27,9 +31,14 @@ import { StoreModule } from './store/store.module';
             useFactory: getTypeOrmConfig,
             dataSourceFactory: dataSourceFactory,
         }),
+        ServeStaticModule.forRootAsync({
+            useFactory: async () => createStaticOptions(),
+          }),
         UserModule,
         AuthModule,
         StoreModule,
+        TermModule,
+        FileModule,
     ],
     controllers: [],
     providers: [
