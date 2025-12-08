@@ -18,7 +18,7 @@ export class User extends BaseEntity {
     password: string;
     
     //관리자의 경우 이메일 필수 아님
-    @Column({ type: 'varchar', length: 255, comment: '사용자 이메일', nullable: true })
+    @Column({ type: 'varchar', length: 255, comment: '사용자 이메일', nullable: true, unique: true })
     email: string;
 
     @Column({ type: 'varchar', length: 20, comment: '닉네임', unique: true })

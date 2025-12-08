@@ -2,18 +2,24 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
 import { UserGender } from "../enum/user-gender.enum";
 import { UserRole } from "../enum/user-role.enum";
+import { IsLoginId } from "src/common/validator/is-login-id";
+import { IsPassword } from "src/common/validator/is-password";
+import { IsNickname } from "src/common/validator/is_nickname";
 
 export class UserCreateDto {
     @ApiProperty({ description: '로그인 아이디', example: 'test' })
     @IsString({ always: true })
+    @IsLoginId()
     loginId: string;
 
     @ApiProperty({ description: '비밀번호', example: 'test' })
     @IsString({ always: true })
+    @IsPassword()
     password: string;
 
     @ApiProperty({ description: '닉네임', example: '홍길동' })
     @IsString({ always: true })
+    @IsNickname()
     nickname: string;
     
     @ApiProperty({ description: '나이스 인증 세션키', example: 'test' })
