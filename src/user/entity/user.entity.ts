@@ -8,6 +8,8 @@ import { UserCreateDto } from "../dto/user-create.dto";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";
 import { UserTermsAgreement } from "./user-terms-agreement.entity";
 import { UserAddress } from "./user-address.entity";
+import { PaymentMethod } from "src/payment-method/entity/payment-method.entity";
+import { Store } from "src/store/entity/store.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -69,6 +71,13 @@ export class User extends BaseEntity {
 
     @OneToMany(() => UserAddress, userAddress => userAddress.user)
     userAddresses: UserAddress[];
+
+    @OneToMany(() => PaymentMethod, paymentMethod => paymentMethod.user)
+    paymentMethods: PaymentMethod[];
+
+    @OneToOne(() => Store, store => store.user)
+    @JoinColumn({ name: 'storeId' })
+    store?: Store | null;
 
        /**
      * UserCreateDto로부터 User 엔티티 생성

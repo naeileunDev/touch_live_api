@@ -12,6 +12,7 @@ import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { ProductModule } from './product/product.module';
         AuthModule,
         StoreModule,
         ProductModule,
+        PaymentMethodModule,
     ],
     controllers: [],
     providers: [
