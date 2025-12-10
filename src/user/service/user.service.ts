@@ -15,10 +15,8 @@ import { UserDeviceService } from './user-device.service';
 import { UserAddressService } from './user-address.service';
 import { UserOauthService } from './user-oauth.service';
 import {UserDto, UserOauthDto, UserOauthCreateDto, UserDeviceCreateDto, UserAddressCreateDto, UserAddressDto, UserAddressUpdateDto} from '../dto/index';
-import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
-//import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid'; 
 
 
 @Injectable()
@@ -43,7 +41,6 @@ export class UserService {
     @Transactional()
     async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
         const user = new User();
-        const uuid = crypto.randomUUID();
         user.isAdult = this.checkAdult(dto.userInfo.birth);
         if (user.isAdult) {
             user.adultCheckAt = new Date();
@@ -54,7 +51,7 @@ export class UserService {
                 dto.userInfo[key] = this.encryptionUtil.encryptDeterministic(value);
             }
         });
-        user.publicId = uuid;
+        user.publicId = uuidv4();
         user.status = UserStatus.Active;
         const savedUser = await this.userRepository.save(user);
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
@@ -67,12 +64,19 @@ export class UserService {
 
     private checkAdult(birth: string): boolean {
         const today = new Date();
-        const thisYearJan1 = new Date(today.getFullYear(), 0, 1); // 올해 1월 1일
-        const birthDate = new Date(Date.parse(birth));
-        const adultDate = new Date(birthDate.getFullYear() + 19, birthDate.getMonth(), birthDate.getDate()); // 19세가 되는 날
-        
-        // 19세가 되는 날이 올해 1월 1일 이전이거나 같으면 성인
-        return adultDate <= thisYearJan1;
+    const thisYearJan1 = new Date(today.getFullYear(), 0, 1); // 올해 1월 1일
+    
+    // YYYYMMDD 형식 파싱 (예: '19900101')
+    const year = parseInt(birth.substring(0, 4), 10);
+    const month = parseInt(birth.substring(4, 6), 10) - 1; // 월은 0부터 시작 실제로는 1월
+    const day = parseInt(birth.substring(6, 8), 10);
+    const birthDate = new Date(year, month, day);
+    
+    // 19세가 되는 날 계산
+    const adultDate = new Date(year + 19, month, day);
+    
+    // 19세가 되는 날이 올해 1월 1일 이전이거나 같으면 성인
+    return adultDate <= thisYearJan1;
     }
 
 
@@ -247,7 +251,5 @@ export class UserService {
         return this.userAddressService.findUserAddressAllByUserId(userId);
     }
 }
-function uuidv4(): string {
-    throw new Error('Function not implemented.');
-}
+
 

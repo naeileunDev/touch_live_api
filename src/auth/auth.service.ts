@@ -71,7 +71,6 @@ export class AuthService {
     async register(dto: AuthCheckRegisterFormDto): Promise<AuthLoginResponseDto> {
         const userInfo = dto.userInfo;
         const uuid = uuidv4();
-
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(userInfo.sessionKey);
         const isExpired = false;

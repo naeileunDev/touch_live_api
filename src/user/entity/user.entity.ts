@@ -51,7 +51,7 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', length: 255, comment: '사용자 DI' })
     di: string;
 
-    @Column({ type: 'boolean', default: false, comment: '사용자 성인여부' })
+    @Column({ type: 'boolean', comment: '사용자 성인여부' })
     isAdult: boolean;
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', nullable: true })
