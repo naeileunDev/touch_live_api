@@ -8,6 +8,7 @@ import { UserTermsAgreement } from "./user-terms-agreement.entity";
 import { UserAddress } from "./user-address.entity";
 import { PaymentMethod } from "src/payment-method/entity/payment-method.entity";
 import { Store } from "src/store/entity/store.entity";
+import { UserRole } from "../enum/user-role.enum";
 
 @Entity()
 export class User extends BaseEntity {
@@ -27,8 +28,8 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', length: 20, comment: '닉네임', unique: true })
     nickname: string;
     
-    @Column({ type: 'varchar', length: 255, comment: '사용자 권한' })
-    role: string;
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.User, comment: '사용자 권한' })
+    role: UserRole;
 
     @Column({ type: 'enum', enum: UserStatus, comment: '사용자 상태' })
     status: UserStatus;
