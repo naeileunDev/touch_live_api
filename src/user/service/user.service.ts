@@ -31,7 +31,7 @@ export class UserService {
         private readonly userOauthService: UserOauthService,
         private readonly encryptionUtil: EncryptionUtil,
     ) {}
-    private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email', 'role'];
+    private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email'];
 
     /**
      * 사용자 생성
@@ -48,7 +48,7 @@ export class UserService {
         Object.assign(user, dto.userInfo);
         Object.entries(user).forEach(([key, value]) => {
             if (this.ENCRYPTED_FIELDS.includes(key)) {
-                dto.userInfo[key] = this.encryptionUtil.encryptDeterministic(value);
+                user[key] = this.encryptionUtil.encryptDeterministic(value);
             }
         });
         user.publicId = uuidv4();
@@ -58,7 +58,7 @@ export class UserService {
         const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
         savedUser.userTermsAgreement = userTermsAgreement;
         await this.userRepository.save(savedUser);
-        return new UserDto(savedUser);
+        return new UserDto(savedUser, this.encryptionUtil);
     }
 
 
@@ -86,7 +86,7 @@ export class UserService {
      */
     async findById(id: string): Promise<UserDto> {
         const user = await this.userRepository.findById(id);
-        return new UserDto(user);
+        return new UserDto(user, this.encryptionUtil);
     }
 
     /**
@@ -102,8 +102,9 @@ export class UserService {
      * @param di DI
      */
     async findByDi(di: string): Promise<UserDto> {
-        const user = await this.userRepository.findByDi(di);
-        return new UserDto(user);
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        const user = await this.userRepository.findByDi(encryptedDi);
+        return new UserDto(user, this.encryptionUtil);
     }
 
     /**
@@ -111,7 +112,8 @@ export class UserService {
      * @param di DI
      */
     async findEntityByDi(di: string): Promise<User> {
-        return await this.userRepository.findByDi(di);
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        return await this.userRepository.findByDi(encryptedDi);
     }
 
     /**
@@ -120,7 +122,7 @@ export class UserService {
      */
     async save(user: User): Promise<UserDto> {
         const savedUser = await this.userRepository.save(user);
-        return new UserDto(savedUser);
+        return new UserDto(savedUser, this.encryptionUtil);
     }
 
     /**
@@ -149,7 +151,8 @@ export class UserService {
      * @param ci CI
      */
     async existsByDi(di: string): Promise<boolean> {
-        return await this.userRepository.existsByDi(di);
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        return await this.userRepository.existsByDi(encryptedDi);
     }
 
     /**
@@ -157,8 +160,8 @@ export class UserService {
      * @param di DI
      */
     async existsByDiWithDeleted(di: string): Promise<boolean> {
-        console.log("di:", di);
-        return await this.userRepository.existsByDiWithDeleted(di);
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        return await this.userRepository.existsByDiWithDeleted(encryptedDi);
     }
 
     /**
@@ -166,7 +169,8 @@ export class UserService {
      * @param loginId 아이디
      */
     async existsByLoginIdWithDeleted(loginId: string): Promise<boolean> {
-        return await this.userRepository.existsByLoginIdWithDeleted(loginId);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.existsByLoginIdWithDeleted(encryptedLoginId);
     }
 
     /**
@@ -182,14 +186,16 @@ export class UserService {
      * @param email 이메일
      */
     async existsByEmailWithDeleted(email: string): Promise<boolean> {
-        return await this.userRepository.existsByEmailWithDeleted(email);
+        const encryptedEmail = this.encryptionUtil.encryptDeterministic(email);
+        return await this.userRepository.existsByEmailWithDeleted(encryptedEmail);
     }
     /**
      * 아이디로 사용자 조회 (로그인시 패스워드 비교용)
      * @param loginId 아이디
      */
     async findEntityByLoginIdAndRoles(loginId: string, roles: UserRole[]): Promise<User> {
-        return await this.userRepository.findByLoginIdAndRoles(loginId, roles);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.findByLoginIdAndRoles(encryptedLoginId, roles);
     }
 
     // ========== Device 관련 메서드 위임 ==========

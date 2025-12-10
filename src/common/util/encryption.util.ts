@@ -37,7 +37,7 @@ export class EncryptionUtil {
      * @returns 암호화된 문자열
      */
     encryptDeterministic(text: string): string {
-        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.ENCRYPTION_KEY), this.FIXED_IV);
+        const cipher = crypto.createCipheriv('aes-256-cbc', this.ENCRYPTION_KEY, this.FIXED_IV);
         let encrypted = cipher.update(text, 'utf8', 'base64');
         encrypted += cipher.final('base64');
         return encrypted;
@@ -49,7 +49,7 @@ export class EncryptionUtil {
      * @returns 복호화된 문자열
      */
     decryptDeterministic(encrypted: string): string {
-        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.ENCRYPTION_KEY), this.FIXED_IV);
+        const decipher = crypto.createDecipheriv('aes-256-cbc',this.ENCRYPTION_KEY, this.FIXED_IV);
         let decrypted = decipher.update(encrypted, 'base64', 'utf8');
         decrypted += decipher.final('utf8');
         return decrypted;

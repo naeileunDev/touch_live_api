@@ -143,7 +143,7 @@ export class AuthService {
         }
 
         const uuid = uuidv4();
-        const userDto = new UserDto(user);
+        const userDto = new UserDto(user, this.encryptionUtil);
         const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(userDto, uuid);
         return new AuthLoginResponseDto(userDto, accessToken, refreshToken);

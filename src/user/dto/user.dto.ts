@@ -58,7 +58,7 @@ export class UserDto {
     constructor(user: User, encryptionUtil?: EncryptionUtil) {
         this.id = user.publicId;
         this.loginId = encryptionUtil ? encryptionUtil.decryptDeterministic(user.loginId) : user.loginId;
-        this.role = encryptionUtil ? encryptionUtil.decryptDeterministic(user.role) as UserRole : user.role as UserRole;
+        this.role = user.role as UserRole;
         this.status = user.status;
         this.email = encryptionUtil ? encryptionUtil.decryptDeterministic(user.email) : user.email;
         this.nickname = user.nickname;
