@@ -560,9 +560,10 @@ export class AuthService {
             jwtUuid: uuid,
             user: userDto,
         }
+        const user = await this.userService.findEntityById(userDto.id);
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role },
+            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, store: user.store },
             {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),

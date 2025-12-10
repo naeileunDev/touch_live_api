@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
 import { Store } from "../entity/store.entity";
 import { Injectable } from "@nestjs/common";
-import { CreateStoreDto } from "../dto/create-store.dto";
+import { CreateStoreDto } from "../dto/store-create.dto";
 import { User } from "src/user/entity/user.entity";
 
 @Injectable()
