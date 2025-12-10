@@ -13,6 +13,7 @@ import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.con
 import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
 import { PaymentMethodModule } from './payment-method/payment-method.module';
+import { EncryptionUtil } from './common/util/encryption.util';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { PaymentMethodModule } from './payment-method/payment-method.module';
     ],
     controllers: [],
     providers: [
+        EncryptionUtil,
         Logger,
         {
             provide: APP_FILTER,

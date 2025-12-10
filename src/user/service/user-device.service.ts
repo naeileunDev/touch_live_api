@@ -62,7 +62,7 @@ export class UserDeviceService {
      * 사용자 식별자로 모든 디바이스 삭제
      * @param userId 사용자 식별자
      */
-    async deleteAllUserDeviceByUserId(userId: number): Promise<boolean> {
+    async deleteAllUserDeviceByUserId(userId: string): Promise<boolean> {
         return await this.userDeviceRepository.deleteAllByUserId(userId);
     }
 }

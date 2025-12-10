@@ -4,7 +4,7 @@ import { UserOauthType } from "../enum/user-oauth-type.enum";
 
 export class UserOauthDto {
     @ApiProperty({ description: '사용자 식별자' })
-    userId: number;
+    userId: string;
 
     @ApiProperty({ enum: UserOauthType, description: 'OAuth 타입' })
     type: UserOauthType;
@@ -13,7 +13,7 @@ export class UserOauthDto {
     email: string;
 
     constructor(userOauth: UserOauth) {
-        this.userId = userOauth.user.id;
+        this.userId = userOauth.user.publicId;
         this.type = userOauth.type;
         this.email = userOauth.email;
     }

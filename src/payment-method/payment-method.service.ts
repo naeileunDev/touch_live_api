@@ -9,7 +9,7 @@ export class PaymentMethodService {
         private readonly paymentMethodRepository: PaymentMethodRepository
     ) {
     }
-    async findPaymentMethodAllByUserId(id: number): Promise<PaymentMethodDto[]> {
+    async findPaymentMethodAllByUserId(id: string): Promise<PaymentMethodDto[]> {
         const paymentMethods = await this.paymentMethodRepository.findAllByUserId(id);
         if (!paymentMethods) {
             return [];

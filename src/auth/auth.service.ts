@@ -41,6 +41,7 @@ import { NiceAuthRequestPurpose } from "./enum/nice-auth-request-history-purpose
 import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
 import { domainToASCII } from "url";
 import { UserGender } from "src/user/enum/user-gender.enum";
+import { EncryptionUtil } from "src/common/util/encryption.util";
 
 @Injectable()
 export class AuthService {
@@ -50,6 +51,7 @@ export class AuthService {
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
         private readonly jwksClient: jwksClient.JwksClient,
+        private readonly encryptionUtil: EncryptionUtil,
     ) { }
 
     // Nice
@@ -486,7 +488,7 @@ export class AuthService {
      * 비밀번호 재설정
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
-    async resetPassword(authPasswordResetDto: AuthPasswordResetDto, di: string): Promise<boolean> {
+    async resetPassword(userDto: UserDto, authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
         const { sessionKey, loginId, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(sessionKey);
@@ -504,8 +506,8 @@ export class AuthService {
         // // 캐시에서 NICE 정보 삭제
         // await this.cacheManager.del(sessionKey);
 
-        const user = await this.userService.findEntityByDi(di);
-        const isLoginIdMatch = loginId === user.loginId;
+        const user = await this.userService.findEntityById(userDto.id);
+        const isLoginIdMatch = loginId === this.encryptionUtil.decryptDeterministic(user.loginId);
         if (!isLoginIdMatch) {
             throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED);
         }

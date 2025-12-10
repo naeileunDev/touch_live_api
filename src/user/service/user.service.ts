@@ -15,6 +15,11 @@ import { UserDeviceService } from './user-device.service';
 import { UserAddressService } from './user-address.service';
 import { UserOauthService } from './user-oauth.service';
 import {UserDto, UserOauthDto, UserOauthCreateDto, UserDeviceCreateDto, UserAddressCreateDto, UserAddressDto, UserAddressUpdateDto} from '../dto/index';
+import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
+import { EncryptionUtil } from 'src/common/util/encryption.util';
+//import { v4 as uuidv4 } from 'uuid'; 
+
 
 @Injectable()
 export class UserService {
@@ -26,7 +31,9 @@ export class UserService {
         private readonly userDeviceService: UserDeviceService,
         private readonly userAddressService: UserAddressService,
         private readonly userOauthService: UserOauthService,
-    ) { }
+        private readonly encryptionUtil: EncryptionUtil,
+    ) {}
+    private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email', 'role'];
 
     /**
      * 사용자 생성
@@ -35,12 +42,20 @@ export class UserService {
      */
     @Transactional()
     async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
-        const user = User.fromCreateDto(dto.userInfo);
-        const isAdult = User.checkAdult(user.birth);
-        user.isAdult = isAdult;
-        if (isAdult) {
+        const user = new User();
+        const uuid = crypto.randomUUID();
+        user.isAdult = this.checkAdult(dto.userInfo.birth);
+        if (user.isAdult) {
             user.adultCheckAt = new Date();
         }
+        Object.assign(user, dto.userInfo);
+        Object.entries(user).forEach(([key, value]) => {
+            if (this.ENCRYPTED_FIELDS.includes(key)) {
+                dto.userInfo[key] = this.encryptionUtil.encryptDeterministic(value);
+            }
+        });
+        user.publicId = uuid;
+        user.status = UserStatus.Active;
         const savedUser = await this.userRepository.save(user);
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
         const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
@@ -49,11 +64,23 @@ export class UserService {
         return new UserDto(savedUser);
     }
 
+
+    private checkAdult(birth: string): boolean {
+        const today = new Date();
+        const thisYearJan1 = new Date(today.getFullYear(), 0, 1); // 올해 1월 1일
+        const birthDate = new Date(Date.parse(birth));
+        const adultDate = new Date(birthDate.getFullYear() + 19, birthDate.getMonth(), birthDate.getDate()); // 19세가 되는 날
+        
+        // 19세가 되는 날이 올해 1월 1일 이전이거나 같으면 성인
+        return adultDate <= thisYearJan1;
+    }
+
+
     /**
      * 사용자 단일 조회
      * @param id 사용자 식별자
      */
-    async findById(id: number): Promise<UserDto> {
+    async findById(id: string): Promise<UserDto> {
         const user = await this.userRepository.findById(id);
         return new UserDto(user);
     }
@@ -62,7 +89,7 @@ export class UserService {
      * 식별자로 사용자 조회 (비밀번호 재확인 패스워드 비교용)
      * @param id 사용자 식별자
      */
-    async findEntityById(id: number): Promise<User> {
+    async findEntityById(id: string): Promise<User> {
         return await this.userRepository.findById(id);
     }
 
@@ -103,10 +130,10 @@ export class UserService {
         await this.save(user);
 
         // 사용자 삭제
-        await this.userRepository.deleteById(user.id);
+        await this.userRepository.deleteById(user.publicId);
 
         // Oauth 삭제
-        const userOauths = await this.userOauthRepository.findAllByUserId(user.id);
+        const userOauths = await this.userOauthRepository.findAllByUserId(user.publicId);
         for (const userOauth of userOauths) {
             await this.userOauthRepository.deleteById(userOauth.id);
         }
@@ -178,7 +205,7 @@ export class UserService {
         return this.userDeviceService.deleteUserDeviceByJwtUuid(jwtUuid);
     }
 
-    async deleteAllUserDeviceByUserId(userId: number): Promise<boolean> {
+    async deleteAllUserDeviceByUserId(userId: string): Promise<boolean> {
         return this.userDeviceService.deleteAllUserDeviceByUserId(userId);
     }
 
@@ -191,7 +218,7 @@ export class UserService {
         return this.userOauthService.existsBySnsUserIdAndTypeWithDeleted(snsUserId, type);
     }
 
-    async findUserOauthAllByUserId(userId: number): Promise<UserOauthDto[]> {
+    async findUserOauthAllByUserId(userId: string): Promise<UserOauthDto[]> {
         return this.userOauthService.findUserOauthAllByUserId(userId);
     }
 
@@ -199,7 +226,7 @@ export class UserService {
         return this.userOauthService.findUserOauthBySnsUserIdAndType(snsUserId, type);
     }
 
-    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
+    async findUserOauthEntityByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
         return this.userOauthService.findUserOauthEntityByUserIdAndType(userId, type);
     }
 
@@ -212,11 +239,15 @@ export class UserService {
         return this.userAddressService.registerAddress(userAddressCreateDto, userDto);
     }
 
-    async updateAddress(id: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
-        return this.userAddressService.updateAddress(id, userAddressUpdateDto, userDto);
+    async updateAddress(addressId: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
+        return this.userAddressService.updateAddress(addressId, userAddressUpdateDto, userDto);
     }
 
-    async findUserAddressAllByUserId(userId: number): Promise<UserAddressDto[]> {
+    async findUserAddressAllByUserId(userId: string): Promise<UserAddressDto[]> {
         return this.userAddressService.findUserAddressAllByUserId(userId);
     }
 }
+function uuidv4(): string {
+    throw new Error('Function not implemented.');
+}
+

@@ -19,7 +19,7 @@ class NicknameValidator implements ValidatorConstraintInterface{
             return false;
         }
         // 한글, 영문대소문자, 숫자만 허용하는 정규식
-        const nicknameRegex = /^[a-zA-Z0-9가-힣]$/g;
+        const nicknameRegex = /^[a-zA-Z0-9가-힣]*$/;
         if (!nicknameRegex.test(trimmed)) {
             return false;
         }
@@ -50,7 +50,7 @@ export function IsNickname(validationOptions?: ValidationOptions){
         })(object, propertyName);
 
         // 영문, 숫자만 허용하는 정규식
-        Matches(/^[a-zA-Z0-9가-힣]$/g, {
+        Matches(/^[a-zA-Z0-9가-힣]*$/, {
             ...validationOptions,
             message: '닉네임은 한글, 영문대소문자, 숫자만 사용 가능합니다',
         })(object, propertyName);

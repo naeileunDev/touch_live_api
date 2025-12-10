@@ -9,10 +9,10 @@ export class PaymentMethodRepository extends Repository<PaymentMethod> {
         super(PaymentMethod, dataSource.createEntityManager());
     }
 
-    async findAllByUserId(id: number): Promise<PaymentMethod[]> {
+    async findAllByUserId(id: string): Promise<PaymentMethod[]> {
         return await this.find({
             where: {
-                user: { id },
+                user: { publicId: id },
             },
             relations: ['user'],
             order: {

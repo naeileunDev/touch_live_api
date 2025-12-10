@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import * as jwksClient from 'jwks-rsa';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
+import { EncryptionUtil } from 'src/common/util/encryption.util';
 
 @Module({
     controllers: [AuthController],
@@ -22,6 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
         NaverStrategy,
         JwtRefreshStrategy,
         JwtRefreshAuthGuard,
+        EncryptionUtil,
         {
             provide: jwksClient.JwksClient, // JwksClient 타입 자체를 provide 합니다.
             useFactory: (configService: ConfigService) => {

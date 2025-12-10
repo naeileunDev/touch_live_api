@@ -10,6 +10,7 @@ import { UserAddressRepository } from './repository/user-address-repository';
 import { UserDeviceService } from './service/user-device.service';
 import { UserAddressService } from './service/user-address.service';
 import { UserOauthService } from './service/user-oauth.service';
+import { EncryptionUtil } from 'src/common/util/encryption.util';
 
 @Module({
     controllers: [UserController],
@@ -24,6 +25,7 @@ import { UserOauthService } from './service/user-oauth.service';
         UserDeviceService,
         UserAddressService,
         UserOauthService,
+        EncryptionUtil,
     ],
     exports: [UserService],
 })

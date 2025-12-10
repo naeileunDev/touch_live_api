@@ -26,20 +26,20 @@ export class UserAddressService {
         if (!isAuth) {
             throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED);
         }
-        const userAddress = await this.userAddressRepository.findById(id);
+        const userAddress = await this.userAddressRepository.findByAddressId(id);
         const updatedUserAddress = await this.userAddressRepository.updateUserAddress(userAddress, userAddressUpdateDto);
         return new UserAddressDto(updatedUserAddress);
     }
 
     async checkAuthAddress(id: number, userDto: UserDto): Promise<boolean> {
         const user = await this.userRepository.findById(userDto.id);
-        const userAddress = await this.userAddressRepository.findById(id);
+        const userAddress = await this.userAddressRepository.findByAddressId(id);
         if (userAddress.user.id !== user.id) {
             return false;
         }
         return true;
     }
-    async findUserAddressAllByUserId(userId: number): Promise<UserAddressDto[]> {
+    async findUserAddressAllByUserId(userId: string): Promise<UserAddressDto[]> {
         const userAddresses = await this.userAddressRepository.findAllByUserId(userId);
         return userAddresses.map(userAddress => new UserAddressDto(userAddress));
     }

@@ -31,7 +31,7 @@ export class UserOauthService {
      * 사용자 식별자로 모든 oauth 정보 조회
      * @param userId 사용자 식별자
      */
-    async findUserOauthAllByUserId(userId: number): Promise<UserOauthDto[]> {
+    async findUserOauthAllByUserId(userId: string): Promise<UserOauthDto[]> {
         const userOauths = await this.userOauthRepository.findAllByUserId(userId);
         return userOauths.map(userOauth => new UserOauthDto(userOauth));
     }
@@ -51,7 +51,7 @@ export class UserOauthService {
      * @param userId 사용자 식별자
      * @param type OAuth 타입
      */
-    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
+    async findUserOauthEntityByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
         return await this.userOauthRepository.findByUserIdAndType(userId, type);
     }
 

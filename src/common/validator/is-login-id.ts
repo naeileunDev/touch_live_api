@@ -37,7 +37,7 @@ class LoginIdValidator implements ValidatorConstraintInterface{
         }
         
         // 영문, 숫자만 허용 (대소문자 구분 있음, 소문자만 허용, 공백 불가)
-        const loginIdRegex = /^[a-z0-9]$/g;
+        const loginIdRegex = /^[a-z][a-z0-9]*$/;
         if (!loginIdRegex.test(trimmed)) {
             return false;
         }
@@ -77,7 +77,7 @@ export function IsLoginId(validationOptions?: ValidationOptions){
         })(object, propertyName);
         
         // 영문, 숫자만 허용하는 정규식
-        Matches(/^[a-z0-9]$/g, {
+        Matches(/^[a-z0-9]*$/, {
             ...validationOptions,
             message: '로그인ID는 영문 소문자, 숫자만 사용 가능합니다',
         })(object, propertyName);

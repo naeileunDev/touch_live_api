@@ -19,10 +19,10 @@ export class UserAddressRepository extends Repository<UserAddress> {
         return await this.save(userAddress);
     }
 
-    async findById(id: number): Promise<UserAddress> {
+    async findByAddressId(addressId: number): Promise<UserAddress> {
         const userAddress = await this.findOne({
             where: {
-                id,
+                id: addressId,
             },
             relations: ['user'],
         });
@@ -42,10 +42,10 @@ export class UserAddressRepository extends Repository<UserAddress> {
         return await this.save(userAddress);
     }
 
-    async findAllByUserId(userId: number): Promise<UserAddress[]> {
+    async findAllByUserId(userId: string): Promise<UserAddress[]> {
         return await this.find({
             where: {
-                user: { id: userId },
+                user: { publicId: userId },
             },
             relations: ['user'],
         });
