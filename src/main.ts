@@ -58,6 +58,18 @@ async function bootstrap() {
 
     SwaggerModule.setup('api/docs', app, document);
 
+    if (document.components?.schemas) {
+        Object.keys(document.components.schemas).forEach(key => {
+            if (
+                key.startsWith('SuccessResponseWrapper')  
+                || key === 'Boolean'
+                || key === 'String'
+            ) {
+                delete document.components.schemas[key];
+            }
+        });
+    }
+
     await app.listen(3000);
 }
 bootstrap();
