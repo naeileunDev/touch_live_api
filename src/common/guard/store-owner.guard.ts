@@ -14,6 +14,7 @@ export class StoreOwnerGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
+
         const requireStore = this.reflector.get<boolean>(
             'requireStore',
             context.getHandler(),
