@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { KeywordRepository } from "./repository/keyword.repository";
 import { KeywordFindDto } from "./dto/keyword-find.dto";
 import { Equal, In } from "typeorm";
-import { CategoryType } from "./enum/category-type.enum";
+import { CategoryType, SPECIFIC_CATEGORIES } from "./enum/category-type.enum";
 import { KeywordFindResponseDto } from "./dto/keyword-find-response.dto";
 
 @Injectable()

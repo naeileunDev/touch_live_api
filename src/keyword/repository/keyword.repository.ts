@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Keyword } from "../entity/keyword.entity";
 import { DataSource, In, Repository } from "typeorm";
 import { UsageType } from "../enum/usage-type.enum";
-import { CategoryType } from "../enum/category-type.enum";
+import { CategoryType, SPECIFIC_CATEGORIES } from "../enum/category-type.enum";
 import { KeywordFindResponseDto } from "../dto/keyword-find-response.dto";
 
 @Injectable()
@@ -14,17 +14,23 @@ export class KeywordRepository extends Repository<Keyword> {
     }
 
     async findAllByUsageAndCategory(usage: UsageType, category: CategoryType): Promise<KeywordFindResponseDto> {
+        let categoryFilter: CategoryType[] = [];        
+        if (category === CategoryType.Total) {
+            categoryFilter = [...SPECIFIC_CATEGORIES, CategoryType.Public];
+        } else {
+            categoryFilter = [category, CategoryType.Public];
+        }
         const [keywords, total] = await this.findAndCount({
             where: {
                 usage,
-                category: In([category, CategoryType.Public]),
+                category: In(categoryFilter),
             },
         });
         const response = new KeywordFindResponseDto();
         Object.assign(response, {
             name: keywords.map(keyword => keyword.name),
             usage,
-            category: [category, CategoryType.Public],
+            category: [category],
             total,
         });
         return response;
