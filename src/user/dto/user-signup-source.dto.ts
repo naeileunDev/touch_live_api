@@ -3,7 +3,7 @@ import { UserSignupSourceCategory } from "../enum/user-signup-source-category.en
 import { IsEnum, IsOptional, IsString, Length } from "class-validator";
 
 export class UserSignupSourceDto {
-    @ApiProperty({ description: '유입경로 카테고리', example: UserSignupSourceCategory.Acquaintance })
+    @ApiProperty({ description: '유입경로 카테고리', example: UserSignupSourceCategory.Acquaintance, enum: UserSignupSourceCategory })
     @IsEnum(UserSignupSourceCategory)
     category: UserSignupSourceCategory;
 

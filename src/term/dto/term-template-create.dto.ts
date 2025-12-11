@@ -5,7 +5,7 @@ import { ConvertHtmlToMarkdownDto } from "./convert-html-to-markdown.dto";
 import { Type } from "class-transformer";
 
 export class TermTemplateCreateDto {
-    @ApiProperty({ description: '약관 유형' })
+    @ApiProperty({ description: '약관 유형', enum: TermsType })
     @IsEnum(TermsType)
     type: TermsType;
 

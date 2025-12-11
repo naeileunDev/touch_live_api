@@ -25,7 +25,7 @@ export class FileCreateDto {
       }
     }
 
-    @ApiProperty({ description: '파일 카테고리', example: FileCategory.User })
+    @ApiProperty({ description: '파일 카테고리', example: FileCategory.User, enum: FileCategory })
     @IsOptional()
     @IsEnum(FileCategory)
     category?: FileCategory = FileCategory.Temp;
