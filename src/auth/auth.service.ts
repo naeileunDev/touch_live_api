@@ -1,7 +1,7 @@
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/service/user.service';
 import * as jwt from 'jsonwebtoken';
 import * as jwksClient from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
@@ -41,6 +41,7 @@ import { NiceAuthRequestPurpose } from "./enum/nice-auth-request-history-purpose
 import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
 import { domainToASCII } from "url";
 import { UserGender } from "src/user/enum/user-gender.enum";
+import { EncryptionUtil } from "src/common/util/encryption.util";
 
 @Injectable()
 export class AuthService {
@@ -50,6 +51,7 @@ export class AuthService {
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
         private readonly jwksClient: jwksClient.JwksClient,
+        private readonly encryptionUtil: EncryptionUtil,
     ) { }
 
     // Nice
@@ -69,7 +71,6 @@ export class AuthService {
     async register(dto: AuthCheckRegisterFormDto): Promise<AuthLoginResponseDto> {
         const userInfo = dto.userInfo;
         const uuid = uuidv4();
-
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(userInfo.sessionKey);
         const isExpired = false;
@@ -142,7 +143,7 @@ export class AuthService {
         }
 
         const uuid = uuidv4();
-        const userDto = new UserDto(user);
+        const userDto = new UserDto(user, this.encryptionUtil);
         const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(userDto, uuid);
         return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
@@ -486,7 +487,7 @@ export class AuthService {
      * 비밀번호 재설정
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
-    async resetPassword(authPasswordResetDto: AuthPasswordResetDto, di: string): Promise<boolean> {
+    async resetPassword(userDto: UserDto, authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
         const { sessionKey, loginId, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(sessionKey);
@@ -504,8 +505,8 @@ export class AuthService {
         // // 캐시에서 NICE 정보 삭제
         // await this.cacheManager.del(sessionKey);
 
-        const user = await this.userService.findEntityByDi(di);
-        const isLoginIdMatch = loginId === user.loginId;
+        const user = await this.userService.findEntityById(userDto.id);
+        const isLoginIdMatch = loginId === this.encryptionUtil.decryptDeterministic(user.loginId);
         if (!isLoginIdMatch) {
             throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED);
         }
@@ -559,9 +560,10 @@ export class AuthService {
             jwtUuid: uuid,
             user: userDto,
         }
+        const user = await this.userService.findEntityById(userDto.id);
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role },
+            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, store: user.store },
             {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),

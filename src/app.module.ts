@@ -11,8 +11,10 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 import { StoreModule } from './store/store.module';
-import { TermModule } from './term/term.module';
 import { ProductModule } from './product/product.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
+import { EncryptionUtil } from './common/util/encryption.util';
+import { KeywordModule } from './keyword/keyword.module';
 
 @Module({
     imports: [
@@ -32,11 +34,13 @@ import { ProductModule } from './product/product.module';
         UserModule,
         AuthModule,
         StoreModule,
-        TermModule,
         ProductModule,
+        PaymentMethodModule,
+        KeywordModule,
     ],
     controllers: [],
     providers: [
+        EncryptionUtil,
         Logger,
         {
             provide: APP_FILTER,

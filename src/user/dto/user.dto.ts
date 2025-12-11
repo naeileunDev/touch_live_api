@@ -1,14 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { UserRole } from "../enum/user-role.enum";
-import { User } from "../entity/user.entity";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
 import { IsString, Matches } from "class-validator";
+import { User } from "../entity/user.entity";
+import { EncryptionUtil } from "src/common/util/encryption.util";
 
 export class UserDto {
-    @ApiProperty({ description: '사용자 식별자', example: 1 })
-    id: number;
+    @ApiProperty({ description: '사용자 식별자', example: 'uuid' })
+    id: string;
 
     @ApiProperty({ description: '사용자 로그인 아이디', example: 'test' })
     loginId: string;    
@@ -43,9 +44,6 @@ export class UserDto {
         format: 'date-time' })
     birth: string;
 
-    @ApiProperty({ description: '사용자 DI', example: 'DI' })
-    di: string;
-
     @ApiProperty({ description: '사용자 성인여부', example: true })
     isAdult: boolean;
 
@@ -56,17 +54,18 @@ export class UserDto {
         enum: StoreRegisterStatus 
     })
     storeRegisterStatus?: StoreRegisterStatus | null;
-    constructor(user: User) {
-        this.id = user.id;
-        this.loginId = user.loginId;
-        this.role = user.role;
+
+    constructor(user: User, encryptionUtil?: EncryptionUtil) {
+        this.id = user.publicId;
+        this.loginId = encryptionUtil ? encryptionUtil.decryptDeterministic(user.loginId) : user.loginId;
+        this.role = user.role as UserRole;
         this.status = user.status;
-        this.email = user.email;
-        this.name = user.name;
-        this.phone = user.phone;
-        this.gender = user.gender;
-        this.birth = user.birth.toString().slice(0, 10).replace(/-/g, '');
-        this.di = user.di;
+        this.email = encryptionUtil ? encryptionUtil.decryptDeterministic(user.email) : user.email;
+        this.nickname = user.nickname;
+        this.name = encryptionUtil ? encryptionUtil.decryptDeterministic(user.name) : user.name;
+        this.phone = encryptionUtil ? encryptionUtil.decryptDeterministic(user.phone) : user.phone;
+        this.gender = encryptionUtil ? encryptionUtil.decryptDeterministic(user.gender) as UserGender : user.gender as UserGender;
+        this.birth = encryptionUtil ? encryptionUtil.decryptDeterministic(user.birth) : user.birth.toString();
         this.isAdult = user.isAdult;
         this.storeRegisterStatus = user.storeRegisterStatus;
     }

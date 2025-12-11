@@ -17,10 +17,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findById(id: number): Promise<User> {
+    async findById(id: string): Promise<User> {
         const user = await this.findOne({
             where: {
-                id,
+                publicId: id,
             },
         });
         if (!user) {
@@ -29,9 +29,9 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async deleteById(id: number): Promise<boolean> {
+    async deleteById(id: string): Promise<boolean> {
         const rtn: DeleteResult = await this.softDelete({
-            id,
+            publicId: id,
         });
         return rtn.affected > 0;
     }

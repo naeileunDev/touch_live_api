@@ -6,11 +6,12 @@ import { SuccessResponseWrapper } from './response-wrapper.dto';
 export function ApiOkSuccessResponse<T>(
     model: Type<T>,
     description = '요청 성공',
+    isArray = false,  // 배열 여부 옵션 추가
 ) {
-    const ResponseWrapper = SuccessResponseWrapper.create(model);
+    const ResponseWrapper = SuccessResponseWrapper.create(model, isArray);
     
     return applyDecorators(
-        ApiExtraModels(model),  // 모델 등록
+        ApiExtraModels(model),
         ApiResponse({
             status: 200,
             description,

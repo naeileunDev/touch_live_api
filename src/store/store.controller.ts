@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get} from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
+import { StoreCreateDto } from './dto/store-create.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from 'src/common/decorator/role.decorator';
+import { USER_PERMISSION } from 'src/common/permission/permission';
+import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { User } from 'src/user/entity/user.entity';
 
 @Controller('store')
 export class StoreController {
-  constructor(private readonly storeService: StoreService) {}
+  constructor(private readonly storeService: StoreService) {
+  }
 
   @Post()
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storeService.create(createStoreDto);
+  @Role(USER_PERMISSION)
+  @NonStoreOwner()
+  @ApiBearerAuth('access-token')
+  create(@Body() storeCreateDto: StoreCreateDto, @GetUser() user: User) {
+    const store = this.storeService.create(storeCreateDto, user);
+    return store;
   }
 
   @Get()
-  findAll() {
-    return this.storeService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storeService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storeService.update(+id, updateStoreDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.storeService.remove(+id);
+  @Role(USER_PERMISSION)
+  @StoreOwner()
+  @ApiBearerAuth('access-token')
+  get(@GetUser() user: User) {
+    return 'This action returns a store';
   }
 }
+
