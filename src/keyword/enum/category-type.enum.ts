@@ -12,4 +12,20 @@ export enum CategoryType {
     Kids = 'KIDS',               // 키즈
     Pet = 'PET',                 // 펫
     Car = 'CAR',                 // 자동차
+    Total = 'TOTAL',             // 전체
 }
+
+export const SPECIFIC_CATEGORIES = [
+    CategoryType.Food,
+    CategoryType.Lifestyle,
+    CategoryType.Fashion,
+    CategoryType.Beauty,
+    CategoryType.Health,
+    CategoryType.Tech,
+    CategoryType.Interior,
+    CategoryType.Travel,
+    CategoryType.HobbyLeisure,
+    CategoryType.Kids,
+    CategoryType.Pet,
+    CategoryType.Car
+];
