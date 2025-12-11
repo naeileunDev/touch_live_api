@@ -14,6 +14,7 @@ import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
 import { PaymentMethodModule } from './payment-method/payment-method.module';
 import { EncryptionUtil } from './common/util/encryption.util';
+import { KeywordModule } from './keyword/keyword.module';
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { EncryptionUtil } from './common/util/encryption.util';
         StoreModule,
         ProductModule,
         PaymentMethodModule,
+        KeywordModule,
     ],
     controllers: [],
     providers: [
