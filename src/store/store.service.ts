@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStoreDto } from './dto/store-create.dto';
+import { StoreCreateDto } from './dto/store-create.dto';
 import { User } from 'src/user/entity/user.entity';
 import { StoreRepository } from './repository/store.respository';
 
@@ -7,7 +7,7 @@ import { StoreRepository } from './repository/store.respository';
 export class StoreService {
   constructor(private readonly storeRepository: StoreRepository) {
   }
-  create(createStoreDto: CreateStoreDto, user: User) {
+  create(storeCreateDto: StoreCreateDto, user: User) {
     return 'This action adds a new store';
   }
 }

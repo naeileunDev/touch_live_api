@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
 import { Store } from "../entity/store.entity";
 import { Injectable } from "@nestjs/common";
-import { CreateStoreDto } from "../dto/store-create.dto";
+import { StoreCreateDto } from "../dto/store-create.dto";
 import { User } from "src/user/entity/user.entity";
 
 @Injectable()
@@ -10,8 +10,8 @@ export class StoreRepository extends Repository<Store> {
         super(Store, dataSource.createEntityManager());
     }
 
-    async createStore(createStoreDto: CreateStoreDto, user: User): Promise<Store> {
-        const store = this.create(createStoreDto);
+    async createStore(storeCreateDto: StoreCreateDto, user: User): Promise<Store> {
+        const store = this.create(storeCreateDto);
         store.user = user;
         return await this.save(store);
     }
