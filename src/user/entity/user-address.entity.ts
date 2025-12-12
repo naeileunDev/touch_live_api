@@ -15,8 +15,6 @@ export class UserAddress extends BaseEntity {
     zipCode: string;
     @Column({ type: 'varchar', length: 255, comment: '전화번호' })
     phone: string;
-    @Column({ type: 'varchar', length: 255, comment: '이메일' })
-    email: string;
     @Column({ type: 'varchar', length: 255, comment: '이름' })
     name: string;
     @Column({ type: 'boolean', comment: '기본 주소 설정여부', default: false })
