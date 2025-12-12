@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class UserAddressCreateDto {
     @ApiProperty({ description: '주소', example: '서울특별시 종로구 통일로 123', required: true })
@@ -20,4 +20,8 @@ export class UserAddressCreateDto {
     @ApiProperty({ description: '이름', example: '홍길동', required: true })
     @IsString({ always: true })
     name: string;
+    @ApiProperty({ description: '주소 별명', example: '홍길동 집', required: false })
+    @IsString({ always: true })
+    @IsOptional()
+    addressAlias?: string;
 }

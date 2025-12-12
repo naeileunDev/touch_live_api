@@ -4,11 +4,11 @@ import { CategoryType } from "../enum/category-type.enum";
 import { IsEnum, IsNotIn } from "class-validator";
 
 export class KeywordFindDto {
-    @ApiProperty({ description: '키워드 사용 타입', example: UsageType.Store })
+    @ApiProperty({ description: '키워드 사용 타입', example: UsageType.Store, enum: UsageType })
     @IsEnum(UsageType)
     usage: UsageType;
 
-    @ApiProperty({ description: '키워드 카테고리 타입', example: CategoryType.Public })
+    @ApiProperty({ description: '키워드 카테고리 타입', example: CategoryType.Public, enum: CategoryType })
     @IsEnum(CategoryType)
     @IsNotIn([CategoryType.Public])
     category: CategoryType;

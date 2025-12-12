@@ -29,7 +29,7 @@ export class User extends BaseEntity {
     nickname: string;
     
     @Column({ type: 'enum', enum: UserRole, default: UserRole.User, comment: '사용자 권한' })
-    role: UserRole;
+    role: UserRole = UserRole.User;
 
     @Column({ type: 'enum', enum: UserStatus, comment: '사용자 상태' })
     status: UserStatus;

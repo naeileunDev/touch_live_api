@@ -45,7 +45,7 @@ export class UserCreateDto {
     @Matches(/^01[0-9]\d{7,8}$/, { message: '전화번호는 하이픈 없이 11자리 숫자여야 합니다.', always: true })
     phone: string;
 
-    @ApiProperty({ description: '성별', example: UserGender.Male })
+    @ApiProperty({ description: '성별', example: UserGender.Male, enum: UserGender })
     @IsEnum(UserGender, { always: true })
     gender: UserGender;
 
