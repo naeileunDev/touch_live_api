@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileCreateDto } from './dto/file-create.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('File')
 @Controller('file')
@@ -11,8 +12,21 @@ export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post()
-  saveLocal(@Body()fileCreateDto: FileCreateDto) {
-    return this.fileService.saveLocalToUploads(fileCreateDto);
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiOperation({ summary: '파일 저장' })
+  saveLocal(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    //this.fileService.saveLocalToUploads(file.originalname, file)
+    return ;
   }
 
 //   @Get()
