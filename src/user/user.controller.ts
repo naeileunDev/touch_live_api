@@ -3,7 +3,7 @@ import { UserService } from './service/user.service';
 import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
-import { ALL_PERMISSION, ANY_PERMISSION } from 'src/common/permission/permission';
+import { ALL_PERMISSION, ANY_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { UserAddressCreateDto } from './dto/user-address-create.dto';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UserDto } from './dto/user.dto';
@@ -42,7 +42,7 @@ export class UserController {
     }
 
     @Post('register/address')
-    @Role(ALL_PERMISSION)
+    @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 등록' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 등록 성공')
     registerAddress(@Body() userAddressCreateDto: UserAddressCreateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
@@ -50,7 +50,7 @@ export class UserController {
     }
 
     @Put('update/address/:id')
-    @Role(ALL_PERMISSION)
+    @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 수정' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 수정 성공')
     updateAddress(@Param('id') id: number, @Body() userAddressUpdateDto: UserAddressUpdateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
