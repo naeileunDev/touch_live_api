@@ -12,8 +12,6 @@ export class UserAddressDto {
     zipCode: string;
     @ApiProperty({ description: '전화번호', example: '01012345678' })
     phone: string;
-    @ApiProperty({ description: '이메일', example: 'test@test.com' })
-    email: string;
     @ApiProperty({ description: '이름', example: '홍길동' })
     name: string;
     @ApiProperty({ description: '사용자 식별자', example: 1 })
@@ -25,7 +23,6 @@ export class UserAddressDto {
         this.detailAddress = userAddress.detailAddress;
         this.zipCode = userAddress.zipCode;
         this.phone = userAddress.phone;
-        this.email = userAddress.email;
         this.name = userAddress.name;
         this.userId = userAddress.user.id;
     }
