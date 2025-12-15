@@ -24,9 +24,9 @@ export class FileController {
   })
   @ApiOperation({ summary: '파일 저장' })
   saveLocal(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    //console.log(file);
     //this.fileService.saveLocalToUploads(file.originalname, file)
-    return ;
+    return this.fileService.getVideoInfoFromBuffer(file) ;
   }
 
 //   @Get()
