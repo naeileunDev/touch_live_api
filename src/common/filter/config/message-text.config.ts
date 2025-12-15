@@ -16,6 +16,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED]: '로그인 아이디가 일치하지 않습니다.',
     [MESSAGE_CODE.USER_ADDRESS_NOT_FOUND]: '배송지 주소를 찾을 수 없습니다.',
     [MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED]: '배송지 주소 수정 권한이 없습니다.',
+    [MESSAGE_CODE.USER_OPERATION_ALREADY_EXISTS]: '사용자 권한이 이미 설정되어 있습니다.',
 
     // Auth
     [MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED]: 'Nice session key expired',

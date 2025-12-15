@@ -9,6 +9,7 @@ import { UserAddress } from "./user-address.entity";
 import { PaymentMethod } from "src/payment-method/entity/payment-method.entity";
 import { Store } from "src/store/entity/store.entity";
 import { UserRole } from "../enum/user-role.enum";
+import { UserOperation } from "./user-operation.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -29,7 +30,7 @@ export class User extends BaseEntity {
     nickname: string;
     
     @Column({ type: 'enum', enum: UserRole, default: UserRole.User, comment: '사용자 권한' })
-    role: UserRole = UserRole.User;
+    role: UserRole;
 
     @Column({ type: 'enum', enum: UserStatus, comment: '사용자 상태' })
     status: UserStatus;
@@ -81,4 +82,6 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'storeId' })
     store?: Store | null;
 
+    @OneToOne(() => UserOperation, userOperation => userOperation.user)
+    userOperation: UserOperation;
 }

@@ -128,14 +128,15 @@ export class AuthService {
      * 로그인
      * @param authLoginDto 로그인 DTO
      */
-    async login(authLoginDto: AuthLoginDto, roles: UserRole[]): Promise<AuthLoginResponseDto> {
+    async login(authLoginDto: AuthLoginDto): Promise<AuthLoginResponseDto> {
         const { loginId, password, fcmToken } = authLoginDto;
         // 로그인 실패 5회 이상일 경우 10분 동안 로그인 제한
         const loginFailedCount: number = await this.cacheManager.get(`login_failed_count:${loginId}`) ?? 0;
         if (loginFailedCount >= 5) {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
-        const user = await this.userService.findEntityByLoginIdAndRoles(loginId, roles);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        const user = await this.userService.findEntityByLoginId(encryptedLoginId);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
             await this.cacheManager.set(`login_failed_count:${loginId}`, loginFailedCount + 1, 10 * 60 * 1000);

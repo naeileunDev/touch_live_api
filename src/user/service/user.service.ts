@@ -17,6 +17,8 @@ import { UserOauthService } from './user-oauth.service';
 import {UserDto, UserOauthDto, UserOauthCreateDto, UserDeviceCreateDto, UserAddressCreateDto, UserAddressDto, UserAddressUpdateDto} from '../dto/index';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { v4 as uuidv4 } from 'uuid'; 
+import { UserOperationRepository } from '../repository/user-operation-repository';
+import { UserOperationDto } from '../dto/user-operaion.dto';
 
 
 @Injectable()
@@ -30,6 +32,7 @@ export class UserService {
         private readonly userAddressService: UserAddressService,
         private readonly userOauthService: UserOauthService,
         private readonly encryptionUtil: EncryptionUtil,
+        private readonly userOperationRepository: UserOperationRepository,
     ) {}
     private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email'];
 
@@ -59,6 +62,14 @@ export class UserService {
         savedUser.userTermsAgreement = userTermsAgreement;
         await this.userRepository.save(savedUser);
         return new UserDto(savedUser, this.encryptionUtil);
+    }
+
+    async setOperationRole(loginId: string): Promise<UserOperationDto> {
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        const user = await this.userRepository.findEntityByLoginId(encryptedLoginId);
+        const userOperation = await this.userOperationRepository.createOperationUser(user);
+        const userDto = new UserDto(user, this.encryptionUtil);
+        return new UserOperationDto(userDto, userOperation.role);
     }
 
 
@@ -116,6 +127,13 @@ export class UserService {
         return await this.userRepository.findByDi(encryptedDi);
     }
 
+    /**
+     * 아이디로 사용자 조회
+     * @param loginId 아이디
+     */
+    async findEntityByLoginId(loginId: string): Promise<User> {
+        return await this.userRepository.findEntityByLoginId(loginId);
+    }
     /**
      * 사용자 정보 저장
      * @param user 사용자 엔티티
