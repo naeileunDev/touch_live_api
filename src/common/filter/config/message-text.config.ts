@@ -33,4 +33,9 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.APPLE_TOKEN_EXCHANGE_FAILED]: 'Apple token exchange 실패',
     [MESSAGE_CODE.APPLE_ID_TOKEN_INVALID_FORMAT]: 'Apple id token 형식이 올바르지 않습니다.',
     [MESSAGE_CODE.APPLE_ID_TOKEN_INVALID_OR_EXPIRED]: 'Apple id token 만료',
+
+    // File
+    [MESSAGE_CODE.FILE_METADATA_ANALYSIS_FAILED]: '영상 파일 메타데이터 분석에 실패했습니다.',
+    [MESSAGE_CODE.FILE_RESOLUTION_NOT_FOUND]: '영상 해상도 정보를 찾을 수 없습니다.',
+    [MESSAGE_CODE.FILE_TEMP_CREATE_FAILED]: '임시 파일 생성에 실패했습니다.',
 };

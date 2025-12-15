@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FileCreateDto } from './dto/file-create.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import * as path from 'path';
@@ -7,11 +7,14 @@ import { promises as fs } from 'fs'
 import * as ffmpeg from 'fluent-ffmpeg';
 import { VideoInfoDto } from './dto/video-info.dto';
 import { ResolutionGradeType } from './enum/resolution-grade-type.enum';
+import { ServiceException } from 'src/common/filter/exception/service.exception';
+import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 
 
 @Injectable()
 export class FileService {
-    private basePath = path.join(process.cwd(), 'uploads');  
+    private basePath = path.join(process.cwd(), 'uploads');
+      
     async saveLocalToUploads(key: string, file: Express.Multer.File): Promise<string> {
         const fullPath = path.join(this.basePath, key); // category/entityId/filename
     
@@ -55,7 +58,7 @@ export class FileService {
                     
                     if (err) {
                         console.error('FFprobe 오류:', err);
-                        return reject(new InternalServerErrorException('영상 파일 메타데이터 분석에 실패했습니다.'));
+                        return reject(new ServiceException(MESSAGE_CODE.FILE_METADATA_ANALYSIS_FAILED));
                     }
                     
                     const duration = metadata.format.duration;
@@ -64,7 +67,7 @@ export class FileService {
                     );
 
                     if (!videoStream || !videoStream.width || !videoStream.height) {
-                        return reject(new InternalServerErrorException('영상 해상도 정보를 찾을 수 없습니다.'));
+                        return reject(new ServiceException(MESSAGE_CODE.FILE_RESOLUTION_NOT_FOUND));
                     }
 
                     const resolutionGrade = this.getResolutionGrade(videoStream.width, videoStream.height);
@@ -84,7 +87,7 @@ export class FileService {
         } catch (error) {
             // 파일 쓰기 실패 시 임시 파일 정리
             fs.unlink(tempFilePath).catch(() => {});
-            throw new InternalServerErrorException('임시 파일 생성에 실패했습니다.');
+            throw new ServiceException(MESSAGE_CODE.FILE_TEMP_CREATE_FAILED);
         }
     }
 

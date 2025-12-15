@@ -33,14 +33,8 @@ export class VideoInfoDto {
     @IsNumber()
     size: number;
 
-    constructor(duration: number, width: number, height: number, bitrate: number, codec: string, format: string, size: number, resolutionGrade: ResolutionGradeType) {
+    constructor(duration: number, size: number) {
         this.duration = duration;
-        this.width = width;
-        this.height = height;
-        this.bitrate = bitrate;
-        this.codec = codec;
-        this.format = format;
         this.size = size;
-        this.resolutionGrade = resolutionGrade;
     }
 }
