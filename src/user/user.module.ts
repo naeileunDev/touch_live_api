@@ -11,6 +11,7 @@ import { UserDeviceService } from './service/user-device.service';
 import { UserAddressService } from './service/user-address.service';
 import { UserOauthService } from './service/user-oauth.service';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
+import { UserOperationRepository } from './repository/user-operation-repository';
 
 @Module({
     controllers: [UserController],
@@ -26,6 +27,7 @@ import { EncryptionUtil } from 'src/common/util/encryption.util';
         UserAddressService,
         UserOauthService,
         EncryptionUtil,
+        UserOperationRepository,
     ],
     exports: [UserService],
 })

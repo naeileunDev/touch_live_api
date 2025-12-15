@@ -17,6 +17,18 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
+    async findEntityByLoginId(loginId: string): Promise<User> {
+        const user = await this.findOne({
+            where: {
+                loginId,
+            },
+        });
+        if (!user) {
+            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+        }
+        return user;
+    }
+
     async findById(id: string): Promise<User> {
         const user = await this.findOne({
             where: {
