@@ -12,13 +12,13 @@ export class UserOperationRepository extends Repository<UserOperation> {
         super(UserOperation, dataSource.createEntityManager());
     }
 
-    async createOperationUser(user: User): Promise<UserOperation> {
+    async createOperationUser(user: User, role: UserRole): Promise<UserOperation> {
         if (await this.existsOperationUserByUserId(user.publicId)) {
             throw new ServiceException(MESSAGE_CODE.USER_OPERATION_ALREADY_EXISTS);
         }
         const userOperation = this.create({
             user: user,
-            role: UserRole.Manager,
+            role: role,
         });
         return await this.save(userOperation);
     }
@@ -31,5 +31,20 @@ export class UserOperationRepository extends Repository<UserOperation> {
                 },
             },
         });
+    }
+
+    async findOperationUserByLoginId(loginId: string): Promise<UserOperation> {
+        const userOperation = await this.findOne({
+            where: {
+                user: {
+                    loginId,
+                },
+            },
+          relations: ['user'],
+        });
+        if (!userOperation) {
+            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+        }
+        return userOperation;
     }
 }

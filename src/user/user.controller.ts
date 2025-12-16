@@ -10,6 +10,8 @@ import { UserDto } from './dto/user.dto';
 import { UserAddressDto } from './dto/user-address.dto';
 import { UserAddressUpdateDto } from './dto/user-address-update.dto';
 import { UserOperationDto } from './dto/user-operaion.dto';
+import { UserRole } from './enum/user-role.enum';
+import { UserOperationRequestDto } from './dto/user-operation-request.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -70,8 +72,16 @@ export class UserController {
     @Role(ADMIN_PERMISSION)
     @ApiOperation({ summary: '해당 사용자를 운영자로 설정' })
     @ApiOkSuccessResponse(UserOperationDto, '사용자 권성 설정 성공')
-    setOperationRole(@Query('loginId') loginId: string): Promise<UserOperationDto> {
-        return this.userService.setOperationRole(loginId);
+    setOperationRole(@Body() userOperationRequestDto: UserOperationRequestDto): Promise<UserOperationDto> {
+        return this.userService.setOperationRole(userOperationRequestDto);
+    }
+
+    @Put('operation/role/update')
+    @Role(ADMIN_PERMISSION)
+    @ApiOperation({ summary: '해당 사용자의 운영자 권한 업데이트' })
+    @ApiOkSuccessResponse(UserOperationDto, '사용자 권성 변경 성공')
+    modifyOperationRole(@Body() userOperationRequestDto: UserOperationRequestDto): Promise<UserOperationDto> {
+        return this.userService.modifyOperationRole(userOperationRequestDto);
     }
 
 }

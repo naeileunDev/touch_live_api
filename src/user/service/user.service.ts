@@ -19,6 +19,7 @@ import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { v4 as uuidv4 } from 'uuid'; 
 import { UserOperationRepository } from '../repository/user-operation-repository';
 import { UserOperationDto } from '../dto/user-operaion.dto';
+import { UserOperationRequestDto } from '../dto/user-operation-request.dto';
 
 
 @Injectable()
@@ -64,11 +65,20 @@ export class UserService {
         return new UserDto(savedUser, this.encryptionUtil);
     }
 
-    async setOperationRole(loginId: string): Promise<UserOperationDto> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+    async setOperationRole(dto: UserOperationRequestDto): Promise<UserOperationDto> {
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(dto.loginId);
         const user = await this.userRepository.findEntityByLoginId(encryptedLoginId);
-        const userOperation = await this.userOperationRepository.createOperationUser(user);
+        const userOperation = await this.userOperationRepository.createOperationUser(user, dto.role);
         const userDto = new UserDto(user, this.encryptionUtil);
+        return new UserOperationDto(userDto, userOperation.role);
+    }
+
+    async modifyOperationRole(dto: UserOperationRequestDto): Promise<UserOperationDto> {
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(dto.loginId);
+        const userOperation = await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
+        userOperation.role = dto.role;
+        await this.userOperationRepository.save(userOperation);
+        const userDto = new UserDto(userOperation.user, this.encryptionUtil);
         return new UserOperationDto(userDto, userOperation.role);
     }
 

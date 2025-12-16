@@ -10,7 +10,7 @@ export class UserOperation extends BaseEntity {
     @JoinColumn({ name: 'userId' })
     user: User;
 
-    @Column({ type: 'enum', enum: UserRole, comment: '사용자 권한', default: UserRole.Manager })
-    @IsIn([UserRole.Manager])
+    @Column({ type: 'enum', enum: UserRole, comment: '사용자 권한' })
+    @IsIn([UserRole.Manager, UserRole.Admin])
     role: UserRole;
 }
