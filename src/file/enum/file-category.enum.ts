@@ -1,4 +1,4 @@
-export enum FileCategory {
+export enum ContentCategory {
     User = 'USER',
     Store = 'STORE',
     Operator = 'OPERATOR',
@@ -13,7 +13,7 @@ export enum MediaType {
     Video = 'video'
 }
 
-export enum MediaFormat {
+export enum MimeType {
     Jpeg = 'image/jpeg',
     Jpg = 'image/jpg',
     Png = 'image/png',
