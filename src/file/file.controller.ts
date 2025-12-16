@@ -5,6 +5,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipe } from './pipe/media-validation.pipe';
 import { FileCreateDto } from './dto/file-create.dto';
 import { ContentCategory, UsageType } from './enum/file-category.enum';
+import { FileDto } from './dto/file.dto';
+import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 
 @ApiTags('File')
 @Controller('file')
@@ -57,8 +59,10 @@ export class FileController {
 //   }
 
   @Get(':id')
+  @ApiOperation({ summary: '파일 조회' })
+  @ApiOkSuccessResponse(FileDto, '파일 조회 성공', true)
   async findOne(@Param('id') id: number) {
-    return await this.fileService.findOne(+id);
+    return await this.fileService.findOne(id);
   }
 
 //   @Patch(':id')
