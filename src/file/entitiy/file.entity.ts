@@ -17,8 +17,8 @@ export class File extends BaseEntity {
     @Column({ type: 'enum', enum: UsageType, comment: '파일 사용 용도' })
     usageType: UsageType;
 
-    @Column({ type: 'varchar', length: 255, comment: '파일 이름' })
-    fileName: string;
+    @Column({ type: 'varchar', length: 255, comment: '파일 원래 이름' })
+    originalName: string;
 
     @Column({ type: 'varchar', length: 255, comment: '파일 경로' })
     fileUrl: string;

@@ -47,11 +47,8 @@ export class FileController {
     },
   })
   @ApiOperation({ summary: '파일 저장' })
-  saveLocal(@UploadedFile(MediaValidationPipe) file: Express.Multer.File, @Body() fileCreateDto: FileCreateDto) {
-    console.log('ContentCategory value received:', fileCreateDto.contentCategory); 
-    console.log('Type of ContentCategory received:', typeof fileCreateDto.contentCategory);
-    //this.fileService.saveLocalToUploads(file.originalname, file)
-    return this.fileService.saveLocalToUploads(file, fileCreateDto) ;
+  async saveLocal(@UploadedFile(MediaValidationPipe) file: Express.Multer.File, @Body() fileCreateDto: FileCreateDto) {
+    return await this.fileService.saveLocalToUploads(file, fileCreateDto) ;
   }
 
 //   @Get()
@@ -59,10 +56,10 @@ export class FileController {
 //     return this.fileService.findAll();
 //   }
 
-//   @Get(':id')
-//   findOne(@Param('id') id: string) {
-//     return this.fileService.findOne(+id);
-//   }
+  @Get(':id')
+  async findOne(@Param('id') id: number) {
+    return await this.fileService.findOne(+id);
+  }
 
 //   @Patch(':id')
 //   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
