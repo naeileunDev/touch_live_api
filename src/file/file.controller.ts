@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes } from '@nestjs/common';
 import { FileService } from './file.service';
-import { FileCreateDto } from './dto/file-create.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MediaValidationPipe } from './pipe/media-validation.pipe';
+import { FileCreateDto } from './dto/file-create.dto';
+import { ContentCategory, UsageType } from './enum/file-category.enum';
+import { FileDto } from './dto/file.dto';
+import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 
 @ApiTags('File')
 @Controller('file')
@@ -16,17 +19,38 @@ export class FileController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
-      type: 'object',
-      properties: {
-        file: { type: 'string', format: 'binary' },
-      },
+        type: 'object',
+        required: ['file', 'contentCategory', 'usageType'],
+        properties: {
+          file: { 
+            type: 'string', 
+            format: 'binary',
+            description: '업로드할 파일'
+          },
+          contentCategory: { 
+            type: 'string', 
+            enum: Object.values(ContentCategory),
+            description: '콘텐츠 카테고리',
+            example: ContentCategory.User,
+          },
+          usageType: { 
+            type: 'string', 
+            enum: Object.values(UsageType),
+            description: '파일 사용 용도',
+            example: UsageType.Profile,
+          },
+          contentId: { 
+            type: 'number',
+            description: '콘텐츠 ID',
+            example: 1,
+            nullable: true,
+          },
+        },
     },
   })
   @ApiOperation({ summary: '파일 저장' })
-  saveLocal(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    //this.fileService.saveLocalToUploads(file.originalname, file)
-    return ;
+  async saveLocal(@UploadedFile(MediaValidationPipe) file: Express.Multer.File, @Body() fileCreateDto: FileCreateDto) {
+    return await this.fileService.saveLocalToUploads(file, fileCreateDto) ;
   }
 
 //   @Get()
@@ -34,10 +58,12 @@ export class FileController {
 //     return this.fileService.findAll();
 //   }
 
-//   @Get(':id')
-//   findOne(@Param('id') id: string) {
-//     return this.fileService.findOne(+id);
-//   }
+  @Get(':id')
+  @ApiOperation({ summary: '파일 조회' })
+  @ApiOkSuccessResponse(FileDto, '파일 조회 성공', true)
+  async findOne(@Param('id') id: number) {
+    return await this.fileService.findOne(id);
+  }
 
 //   @Patch(':id')
 //   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {

@@ -1,32 +1,20 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
-import { FileCategory } from "../enum/file-category.enum";
+import { ContentCategory, UsageType } from "../enum/file-category.enum";
+import { Expose } from "class-transformer";
+import { IsEnum, IsNumber, IsOptional } from "class-validator";
 
 export class FileCreateDto {
-    @ApiProperty({ description: '파일원래이름', example: '파일원래이름', required: true })
-    @IsString({ always: true })
-    originalName: string;
-    @ApiProperty({ description: 'mime 타입', example: '파일타입', required: true })
-    @IsString({ always: true })
-    mimeType: string;
-    @ApiProperty({ description: '파일크기', example: '파일크기', required: true })
+    @Expose()
+    @ApiProperty({ description: '콘텐츠 카테고리', example: ContentCategory.User, enum: ContentCategory })
+    @IsEnum(ContentCategory)
+    contentCategory: ContentCategory;
+
+    @ApiProperty({ description: '파일 사용 용도', example: UsageType.Profile, enum: UsageType })
+    @IsEnum(UsageType)
+    usageType: UsageType;
+
+    @ApiProperty({ description: '콘텐츠 타입', example: 1, type: Number, nullable: true })
     @IsNumber()
-    size: number;
-
-    @ApiProperty({ description: '파일 버퍼 base64 인코딩', example: '파일 버퍼 base64 인코딩' })
-    base64?: string;
-  
-    constructor(file: Express.Multer.File){
-      this.originalName = file.originalname;
-      this.mimeType = file.mimetype;
-      this.size = file.size;
-      if (file.buffer) {
-        this.base64 = file.buffer.toString('base64');
-      }
-    }
-
-    @ApiProperty({ description: '파일 카테고리', example: FileCategory.User, enum: FileCategory })
     @IsOptional()
-    @IsEnum(FileCategory)
-    category?: FileCategory = FileCategory.Temp;
+    contentId?: number;
 }
