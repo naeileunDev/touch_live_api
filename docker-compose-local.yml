@@ -8,12 +8,8 @@ services:
     volumes:
       - .:/usr/src/app
       - ./uploads:/uploads
-    env_file:
-      - .local.env
     environment:
       TZ: 'Asia/Seoul'
-    depends_on:
-      - postgresdb
     command: >
       sh -c "pnpm run start:local"
     ports:
@@ -29,6 +25,6 @@ services:
       TZ: 'Asia/Seoul'
     image: postgres:16
     ports:
-      - '15433:5432'
+      - '15432:5432'
     volumes:
       - ./postgresql-volume:/var/lib/postgresql/data

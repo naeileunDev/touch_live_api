@@ -18,7 +18,7 @@ async function bootstrap() {
     });
 
     // API 접두사 설정
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api/v1');
 
     // CORS 허용
     app.enableCors({
@@ -57,6 +57,18 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
 
     SwaggerModule.setup('api/docs', app, document);
+
+    if (document.components?.schemas) {
+        Object.keys(document.components.schemas).forEach(key => {
+            if (
+                key.startsWith('SuccessResponseWrapper')  
+                || key === 'Boolean'
+                || key === 'String'
+            ) {
+                delete document.components.schemas[key];
+            }
+        });
+    }
 
     await app.listen(3000);
 }

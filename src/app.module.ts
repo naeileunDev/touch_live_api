@@ -9,7 +9,13 @@ import { ServiceExceptionFilter } from './common/filter/service-exception.filter
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
-import { getDataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
+import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
+import { StoreModule } from './store/store.module';
+import { ProductModule } from './product/product.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
+import { EncryptionUtil } from './common/util/encryption.util';
+import { KeywordModule } from './keyword/keyword.module';
+import { FileModule } from './file/file.module';
 
 @Module({
     imports: [
@@ -22,17 +28,21 @@ import { getDataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.
             isGlobal: true,
         }),
         TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: getTypeOrmConfig,
             inject: [ConfigService],
-            name: 'default',
-            dataSourceFactory: getDataSourceFactory(),
+            useFactory: getTypeOrmConfig,
+            dataSourceFactory: dataSourceFactory,
         }),
         UserModule,
         AuthModule,
+        StoreModule,
+        ProductModule,
+        PaymentMethodModule,
+        KeywordModule,
+        FileModule,
     ],
     controllers: [],
     providers: [
+        EncryptionUtil,
         Logger,
         {
             provide: APP_FILTER,

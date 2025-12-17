@@ -1,7 +1,7 @@
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/service/user.service';
 import * as jwt from 'jsonwebtoken';
 import * as jwksClient from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
@@ -15,9 +15,8 @@ import { AuthNiceSessionDataDto } from "./dto/auth-nice-session-data.dto";
 import { AuthLoginDto } from "./dto/auth-login.dto";
 import * as crypto from 'crypto';
 import { compare, genSaltSync, hashSync } from 'bcrypt';
-import { OPERATOR_PERMISSION } from "src/common/permission/permission";
 import { UserDto } from "src/user/dto/user.dto";
-import { AuthSnsRegisterDto } from "./dto/auth-sns-register.dto";
+//import { AuthSnsRegisterDto } from "./dto/auth-sns-register.dto";
 import { AuthSnsProfileDto } from "./dto/auth-sns-profile.dto";
 import { UserOauthCreateDto } from "src/user/dto/user-oauth-create.dto";
 import { AuthSnsLoginDto } from "./dto/auth-sns-login.dto";
@@ -37,8 +36,12 @@ import { NiceTokenVersionDataDto } from "./dto/nice-token-version-data.dto";
 import { NiceRedirectDto } from "./dto/nice-redirect.dto";
 import { NiceSuccessDto } from "./dto/nice-success.dto";
 import { AuthPasswordConfirmDto } from "./dto/auth-password-confirm.dto";
-import { AuthRequestHistoryPurposeType } from "./enum/auth-request-history-purpose-type.enum";
 import { AuthNiceDecodingTokenIssueDto } from "./dto/auth-nice-decoding-token-issue.dto";
+import { NiceAuthRequestPurpose } from "./enum/nice-auth-request-history-purpose.enum";
+import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
+import { domainToASCII } from "url";
+import { UserGender } from "src/user/enum/user-gender.enum";
+import { EncryptionUtil } from "src/common/util/encryption.util";
 
 @Injectable()
 export class AuthService {
@@ -48,6 +51,7 @@ export class AuthService {
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
         private readonly jwksClient: jwksClient.JwksClient,
+        private readonly encryptionUtil: EncryptionUtil,
     ) { }
 
     // Nice
@@ -64,53 +68,58 @@ export class AuthService {
      * 회원가입
      * @param userCreateDto 회원가입 DTO
      */
-    async register(userCreateDto: UserCreateDto): Promise<AuthLoginResponseDto> {
-        const { password, sessionKey, fcmToken } = userCreateDto;
+    async register(dto: AuthCheckRegisterFormDto): Promise<AuthLoginResponseDto> {
+        const userInfo = dto.userInfo;
         const uuid = uuidv4();
-
-        // 기본 역할 설정
-        userCreateDto.role = UserRole.User;
-
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(sessionKey);
+        //const isExpired = this.isJwtTokenExpired(userInfo.sessionKey);
+        const isExpired = false;
         if (isExpired) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
         }
-
+        console.log("isExpired:", isExpired);
         // CI, DI 캐시 조회
-        const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
+        //const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(userInfo.sessionKey);
+        const niceSessionData: AuthNiceSessionDataDto = {
+            ci: 'CI',
+            name: userInfo.name,
+            phone: userInfo.phone,
+            gender: userInfo.gender,
+            birth: userInfo.birth,
+            di: userInfo.di
+        }
         if (!niceSessionData) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
         }
-        userCreateDto.name = niceSessionData.name;
-        userCreateDto.phone = niceSessionData.phone;
-        userCreateDto.gender = niceSessionData.gender;
-        userCreateDto.birth = niceSessionData.birth;
-        userCreateDto.di = niceSessionData.di;
+        userInfo.name = niceSessionData.name;
+        userInfo.phone = niceSessionData.phone;
+        userInfo.gender = niceSessionData.gender;
+        userInfo.birth = niceSessionData.birth;
+        userInfo.di = niceSessionData.di;
 
         // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(sessionKey);
+        //await this.cacheManager.del(userInfo.sessionKey);
 
 
         // 중복 사용자 확인
-        const isDuplicateDi = await this.userService.existsByDiWithDeleted(userCreateDto.di);
+        const isDuplicateDi = await this.userService.existsByDiWithDeleted(userInfo.di);
         if (isDuplicateDi) {
             throw new ServiceException(MESSAGE_CODE.USER_ALREADY_EXISTS);
         }
 
         // 이미 존재하는 아이디인지 확인
-        const isExistUser = await this.userService.existsByLoginIdWithDeleted(userCreateDto.loginId);
+        const isExistUser = await this.userService.existsByLoginIdWithDeleted(userInfo.loginId);
         if (isExistUser) {
             throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_ALREADY_EXISTS);
         }
 
         // 비밀번호 암호화
-        userCreateDto.password = this.hashPassword(password);
+        userInfo.password = this.hashPassword(userInfo.password);
 
         // 사용자 생성
-        const userDto = await this.userService.create(userCreateDto);
+        const userDto = await this.userService.create(dto);
 
-        const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
+        const accessToken = await this.generateAccessToken(userDto, uuid, userInfo.fcmToken);
         const refreshToken = await this.generateRefreshToken(userDto, uuid);
         return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
     }
@@ -119,14 +128,15 @@ export class AuthService {
      * 로그인
      * @param authLoginDto 로그인 DTO
      */
-    async login(authLoginDto: AuthLoginDto, roles: UserRole[]): Promise<AuthLoginResponseDto> {
+    async login(authLoginDto: AuthLoginDto): Promise<AuthLoginResponseDto> {
         const { loginId, password, fcmToken } = authLoginDto;
         // 로그인 실패 5회 이상일 경우 10분 동안 로그인 제한
         const loginFailedCount: number = await this.cacheManager.get(`login_failed_count:${loginId}`) ?? 0;
         if (loginFailedCount >= 5) {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
-        const user = await this.userService.findEntityByLoginIdAndRoles(loginId, roles);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        const user = await this.userService.findEntityByLoginId(encryptedLoginId);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
             await this.cacheManager.set(`login_failed_count:${loginId}`, loginFailedCount + 1, 10 * 60 * 1000);
@@ -134,102 +144,89 @@ export class AuthService {
         }
 
         const uuid = uuidv4();
-        const userDto = new UserDto(user);
+        const userDto = new UserDto(user, this.encryptionUtil);
         const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(userDto, uuid);
         return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
     }
 
-    /**
-     * 웹 로그인
-     * @param authLoginDto 로그인 DTO
-     * @param res Express Response 객체
-     */
-    async loginWeb(authLoginDto: AuthLoginDto): Promise<[AuthLoginResponseDto, string]> {
-        const AuthLoginResponseDto = await this.login(authLoginDto, OPERATOR_PERMISSION);
+    // /**
+    //  * SNS 회원가입
+    //  * @param authSnsRegisterDto SNS 회원가입 DTO
+    //  */
+    // async registerSns(authSnsRegisterDto: AuthSnsRegisterDto): Promise<AuthLoginResponseDto> {
+    //     const { niceSessionKey, snsSessionKey, fcmToken } = authSnsRegisterDto;
+    //     const uuid = uuidv4();
 
-        // CSRF 토큰 생성
-        const csrfToken = crypto.randomBytes(32).toString('hex');
-        return [AuthLoginResponseDto, csrfToken];
-    }
+    //     // 기본 역할 설정
+    //     authSnsRegisterDto.role = UserRole.User;
 
-    /**
-     * SNS 회원가입
-     * @param authSnsRegisterDto SNS 회원가입 DTO
-     */
-    async registerSns(authSnsRegisterDto: AuthSnsRegisterDto): Promise<AuthLoginResponseDto> {
-        const { niceSessionKey, snsSessionKey, fcmToken } = authSnsRegisterDto;
-        const uuid = uuidv4();
+    //     // NICE 세션 토큰 유효기간 확인
+    //     const isNiceSessionKeyExpired = this.isJwtTokenExpired(niceSessionKey);
+    //     if (isNiceSessionKeyExpired) {
+    //         throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
+    //     }
 
-        // 기본 역할 설정
-        authSnsRegisterDto.role = UserRole.User;
+    //     // SNS 세션 토큰 유효기간 확인
+    //     const isSnsSessionKeyExpired: boolean = this.isJwtTokenExpired(snsSessionKey);
+    //     if (isSnsSessionKeyExpired) {
+    //         throw new ServiceException(MESSAGE_CODE.SNS_SESSION_KEY_EXPIRED);
+    //     }
 
-        // NICE 세션 토큰 유효기간 확인
-        const isNiceSessionKeyExpired = this.isJwtTokenExpired(niceSessionKey);
-        if (isNiceSessionKeyExpired) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
-        }
+    //     // NICE 세션키로부터 DI, CI 조회
+    //     const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(niceSessionKey);
+    //     if (!niceSessionData) {
+    //         throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+    //     }
 
-        // SNS 세션 토큰 유효기간 확인
-        const isSnsSessionKeyExpired: boolean = this.isJwtTokenExpired(snsSessionKey);
-        if (isSnsSessionKeyExpired) {
-            throw new ServiceException(MESSAGE_CODE.SNS_SESSION_KEY_EXPIRED);
-        }
+    //     // 캐시에서 NICE 정보 삭제
+    //     await this.cacheManager.del(niceSessionKey);
 
-        // NICE 세션키로부터 DI, CI 조회
-        const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(niceSessionKey);
-        if (!niceSessionData) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
-        }
+    //     // SNS 세션키로부터 Oauth 프로필 조회
+    //     const snsProfile: AuthSnsProfileDto = await this.cacheManager.get(snsSessionKey);
+    //     if (!snsProfile) {
+    //         throw new ServiceException(MESSAGE_CODE.SNS_SESSION_DATA_MISSING);
+    //     }
 
-        // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(niceSessionKey);
+    //     // 캐시에서 SNS 정보 삭제
+    //     await this.cacheManager.del(snsSessionKey);
 
-        // SNS 세션키로부터 Oauth 프로필 조회
-        const snsProfile: AuthSnsProfileDto = await this.cacheManager.get(snsSessionKey);
-        if (!snsProfile) {
-            throw new ServiceException(MESSAGE_CODE.SNS_SESSION_DATA_MISSING);
-        }
+    //     // Oauth 중복 확인
+    //     const isExistOauth = await this.userService.existsBySnsUserIdAndTypeWithDeleted(snsProfile.snsUserId, snsProfile.type);
+    //     if (isExistOauth) {
+    //         throw new ServiceException(MESSAGE_CODE.USER_OAUTH_ALREADY_LINKED);
+    //     }
 
-        // 캐시에서 SNS 정보 삭제
-        await this.cacheManager.del(snsSessionKey);
+    //     const userCreateDto = new UserCreateDto();
+    //     userCreateDto.fcmToken = fcmToken;
+    //     userCreateDto.name = niceSessionData.name;
+    //     userCreateDto.phone = niceSessionData.phone;
+    //     userCreateDto.gender = niceSessionData.gender;
+    //     userCreateDto.birth = niceSessionData.birth;
+    //     userCreateDto.di = niceSessionData.di;
 
-        // Oauth 중복 확인
-        const isExistOauth = await this.userService.existsBySnsUserIdAndTypeWithDeleted(snsProfile.snsUserId, snsProfile.type);
-        if (isExistOauth) {
-            throw new ServiceException(MESSAGE_CODE.USER_OAUTH_ALREADY_LINKED);
-        }
+    //     // 중복 사용자 확인
+    //     const isDuplicateDi = await this.userService.existsByDiWithDeleted(userCreateDto.di);
+    //     if (isDuplicateDi) {
+    //         throw new ServiceException(MESSAGE_CODE.USER_ALREADY_EXISTS);
+    //     }
 
-        const userCreateDto = new UserCreateDto();
-        userCreateDto.fcmToken = fcmToken;
-        userCreateDto.name = niceSessionData.name;
-        userCreateDto.phone = niceSessionData.phone;
-        userCreateDto.gender = niceSessionData.gender;
-        userCreateDto.birth = niceSessionData.birth;
-        userCreateDto.di = niceSessionData.di;
+    //     // 사용자 생성
+    //     const userDto = await this.userService.create(userCreateDto);
 
-        // 중복 사용자 확인
-        const isDuplicateDi = await this.userService.existsByDiWithDeleted(userCreateDto.di);
-        if (isDuplicateDi) {
-            throw new ServiceException(MESSAGE_CODE.USER_ALREADY_EXISTS);
-        }
+    //     // Oauth 등록
+    //     const userOauthCreateDto: UserOauthCreateDto = {
+    //         snsUserId: snsProfile.snsUserId,
+    //         email: snsProfile.email,
+    //         type: snsProfile.type,
+    //         user: userDto
+    //     }
+    //     await this.userService.createUserOauth(userOauthCreateDto);
 
-        // 사용자 생성
-        const userDto = await this.userService.create(userCreateDto);
-
-        // Oauth 등록
-        const userOauthCreateDto: UserOauthCreateDto = {
-            snsUserId: snsProfile.snsUserId,
-            email: snsProfile.email,
-            type: snsProfile.type,
-            user: userDto
-        }
-        await this.userService.createUserOauth(userOauthCreateDto);
-
-        const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
-        const refreshToken = await this.generateRefreshToken(userDto, uuid);
-        return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
-    }
+    //     const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
+    //     const refreshToken = await this.generateRefreshToken(userDto, uuid);
+    //     return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
+    // }
 
 
     /**
@@ -449,32 +446,32 @@ export class AuthService {
         const { sessionKey } = authFindIdDto;
 
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(sessionKey);
-        if (isExpired) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
-        }
+        // const isExpired = this.isJwtTokenExpired(sessionKey);
+        // if (isExpired) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
+        // }
 
         // CI, DI 캐시 조회
-        const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
-        if (!sessionData) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
-        }
+        // const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
+        // if (!sessionData) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+        // }
 
-        // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(sessionKey);
+        // // 캐시에서 NICE 정보 삭제
+        // await this.cacheManager.del(sessionKey);
 
         const authFindIdResponseDto = new AuthFindIdResponseDto();
 
         // 삭제된 회원인지 확인
-        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
-        if (isExistRemovedDi) {
+        //const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
+        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionKey);
+        const user = await this.userService.findEntityByDi(sessionKey);
+        // 사용자 조회
+        //const user = await this.userService.findByDi(sessionData.di);
+        if (!user && isExistRemovedDi) {
             throw new ServiceException(MESSAGE_CODE.USER_REMOVED_STATUS);
         }
-
-        // 사용자 조회
-        const user = await this.userService.findByDi(sessionData.di);
-        authFindIdResponseDto.snsInfos = await this.userService.findUserOauthAllByUserId(user.id);
-
+        authFindIdResponseDto.loginId = user.loginId;
         return authFindIdResponseDto;
     }
 
@@ -491,24 +488,33 @@ export class AuthService {
      * 비밀번호 재설정
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
-    async resetPassword(authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
-        const { sessionKey, password } = authPasswordResetDto;
+    async resetPassword(userDto: UserDto, authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
+        const { sessionKey, loginId, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
-        const isExpired = this.isJwtTokenExpired(sessionKey);
+        //const isExpired = this.isJwtTokenExpired(sessionKey);
+        const isExpired = false;
         if (isExpired) {
             throw new ServiceException(MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED);
         }
 
         // CI, DI 캐시 조회
-        const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
-        if (!sessionData) {
-            throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+        // const sessionData: AuthNiceSessionDataDto = await this.cacheManager.get(sessionKey);
+        // if (!sessionData) {
+        //     throw new ServiceException(MESSAGE_CODE.NICE_SESSION_DATA_MISSING);
+        // }
+
+        // // 캐시에서 NICE 정보 삭제
+        // await this.cacheManager.del(sessionKey);
+
+        const user = await this.userService.findEntityById(userDto.id);
+        const isLoginIdMatch = loginId === this.encryptionUtil.decryptDeterministic(user.loginId);
+        if (!isLoginIdMatch) {
+            throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED);
         }
-
-        // 캐시에서 NICE 정보 삭제
-        await this.cacheManager.del(sessionKey);
-
-        const user = await this.userService.findEntityByDi(sessionData.di);
+        const isPasswordMatch = await compare(password, user.password);
+        if (isPasswordMatch) {
+            throw new ServiceException(MESSAGE_CODE.USER_PASSWORD_SAME);
+        }
         user.password = this.hashPassword(password);
         await this.userService.save(user);
         return true;
@@ -555,9 +561,10 @@ export class AuthService {
             jwtUuid: uuid,
             user: userDto,
         }
+        const user = await this.userService.findEntityById(userDto.id);
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role },
+            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, store: user.store },
             {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),
@@ -745,7 +752,7 @@ export class AuthService {
             iv,
             hmacKey,
             reqNo,
-            purposeType: authNiceDecodingTokenIssueDto.purposeType,
+            purpose: authNiceDecodingTokenIssueDto.purpose,
         }
         await this.cacheManager.set(
             tokenVersionId,
@@ -796,7 +803,7 @@ export class AuthService {
         }
 
         // 회원가입 중복 확인
-        if (encryptionKeys.purposeType === AuthRequestHistoryPurposeType.Join) {
+        if (encryptionKeys.purpose === NiceAuthRequestPurpose.Register) {
             // 중복 사용자 확인
             const isDuplicateDi = await this.userService.existsByDi(decryptData.di);
             if (isDuplicateDi) {

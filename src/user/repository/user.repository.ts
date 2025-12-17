@@ -17,10 +17,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findById(id: number): Promise<User> {
+    async findEntityByLoginId(loginId: string): Promise<User> {
         const user = await this.findOne({
             where: {
-                id,
+                loginId,
             },
         });
         if (!user) {
@@ -29,9 +29,21 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async deleteById(id: number): Promise<boolean> {
+    async findById(id: string): Promise<User> {
+        const user = await this.findOne({
+            where: {
+                publicId: id,
+            },
+        });
+        if (!user) {
+            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+        }
+        return user;
+    }
+
+    async deleteById(id: string): Promise<boolean> {
         const rtn: DeleteResult = await this.softDelete({
-            id,
+            publicId: id,
         });
         return rtn.affected > 0;
     }
@@ -53,6 +65,24 @@ export class UserRepository extends Repository<User> {
         return await this.exists({
             where: {
                 loginId,
+            },
+            withDeleted: true,
+        });
+    }
+
+    async existsByNicknameWithDeleted(nickname: string): Promise<boolean> {
+        return await this.exists({
+            where: {
+                nickname,
+            },
+            withDeleted: true,
+        });
+    }
+
+    async existsByEmailWithDeleted(email: string): Promise<boolean> {
+        return await this.exists({
+            where: {
+                email,
             },
             withDeleted: true,
         });

@@ -13,7 +13,12 @@ export class UserOauthRepository extends Repository<UserOauth> {
     }
 
     async createUserOauth(userOauthCreateDto: UserOauthCreateDto): Promise<UserOauth> {
-        const userOauth = this.create(userOauthCreateDto);
+        const userOauth = this.create({
+            ...userOauthCreateDto,
+            user: {
+                publicId: userOauthCreateDto.user.id,
+            },
+        });
         await this.save(userOauth);
         return userOauth;
     }
@@ -41,22 +46,18 @@ export class UserOauthRepository extends Repository<UserOauth> {
         return userOauth;
     }
 
-    async findAllByUserId(userId: number): Promise<UserOauth[]> {
+    async findAllByUserId(userId: string): Promise<UserOauth[]> {
         return await this.find({
             where: {
-                user: {
-                    id: userId,
-                },
+                user: { publicId: userId },
             },
         });
     }
 
-    async findByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
+    async findByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
         const userOauth = await this.findOne({
             where: {
-                user: {
-                    id: userId,
-                },
+                user: { publicId: userId },
                 type,
             },
         });
@@ -73,11 +74,11 @@ export class UserOauthRepository extends Repository<UserOauth> {
         return rtn.affected === 0 ? false : true;
     }
 
-    async findAllByUserIdWithDeleted(userId: number): Promise<UserOauth[]> {
+    async findAllByUserIdWithDeleted(userId: string): Promise<UserOauth[]> {
         return await this.find({
             where: {
                 user: {
-                    id: userId,
+                    publicId: userId,
                 },
             },
             withDeleted: true,

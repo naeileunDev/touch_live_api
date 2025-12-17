@@ -10,16 +10,21 @@ export class UserDeviceRepository extends Repository<UserDevice> {
     }
 
     async createUserDevice(userDeviceCreateDto: UserDeviceCreateDto): Promise<UserDevice> {
-        const userDevice = this.create(userDeviceCreateDto);
+        const userDevice = this.create({
+            ...userDeviceCreateDto,
+            user: {
+                publicId: userDeviceCreateDto.user.id,
+            },
+        });
         await this.save(userDevice);
         return userDevice;
     }
 
-    async findAllByUserId(userId: number): Promise<UserDevice[]> {
+    async findAllByUserId(userId: string): Promise<UserDevice[]> {
         return await this.find({
             where: {
                 user: {
-                    id: userId,
+                    publicId: userId,
                 },
             },
             order: {
@@ -71,11 +76,9 @@ export class UserDeviceRepository extends Repository<UserDevice> {
         return rtn.affected > 0;
     }
 
-    async deleteAllByUserId(userId: number): Promise<boolean> {
+    async deleteAllByUserId(userId: string): Promise<boolean> {
         const rtn: DeleteResult = await this.softDelete({
-            user: {
-                id: userId,
-            },
+            user: { publicId: userId },
         });
         return rtn.affected > 0;
     }

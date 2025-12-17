@@ -1,0 +1,33 @@
+import { Controller, Post, Body, Param, Get} from '@nestjs/common';
+import { StoreService } from './store.service';
+import { StoreCreateDto } from './dto/store-create.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from 'src/common/decorator/role.decorator';
+import { USER_PERMISSION } from 'src/common/permission/permission';
+import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { User } from 'src/user/entity/user.entity';
+
+@Controller('store')
+export class StoreController {
+  constructor(private readonly storeService: StoreService) {
+  }
+
+  @Post()
+  @Role(USER_PERMISSION)
+  @NonStoreOwner()
+  @ApiBearerAuth('access-token')
+  create(@Body() storeCreateDto: StoreCreateDto, @GetUser() user: User) {
+    const store = this.storeService.create(storeCreateDto, user);
+    return store;
+  }
+
+  @Get()
+  @Role(USER_PERMISSION)
+  @StoreOwner()
+  @ApiBearerAuth('access-token')
+  get(@GetUser() user: User) {
+    return 'This action returns a store';
+  }
+}
+
