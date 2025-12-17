@@ -59,7 +59,6 @@ export class FileService {
 
         const savedFile = await this.fileRepository.saveFile(fileDto);
         fileDto.id = savedFile.id;
-        // 클라이언트용 URL을 돌려줄 경우
         return fileDto;
     }
 
@@ -70,7 +69,7 @@ export class FileService {
    */
     generatePath(dto: FileCreateDto, mimeType: string): string {
         const extension = path.extname(mimeType); // 예: ".png"
-        return path.join(this.basePath, dto.contentCategory.toString(), dto.usageType.toString(), dto.contentId?.toString() || 'null', `${uuidv4()}${extension}`);
+        return path.join(this.basePath, dto.contentCategory.toString(), dto.usageType.toString(), dto.contentId?.toString() || 'default', `${uuidv4()}${extension}`);
     }
 
     /**

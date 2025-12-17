@@ -91,7 +91,6 @@ export class UserService {
     const year = parseInt(birth.substring(0, 4), 10);
     const month = parseInt(birth.substring(4, 6), 10) - 1; // 월은 0부터 시작 실제로는 1월
     const day = parseInt(birth.substring(6, 8), 10);
-    const birthDate = new Date(year, month, day);
     
     // 19세가 되는 날 계산
     const adultDate = new Date(year + 19, month, day);
