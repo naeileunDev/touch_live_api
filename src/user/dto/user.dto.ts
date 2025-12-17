@@ -52,7 +52,6 @@ export class UserDto {
         enum: StoreRegisterStatus 
     })
     @IsOptional()
-    @IsEnum(StoreRegisterStatus)
     storeRegisterStatus?: StoreRegisterStatus | null;
 
     constructor(user: User, encryptionUtil?: EncryptionUtil) {
