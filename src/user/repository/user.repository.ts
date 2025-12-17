@@ -17,10 +17,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findEntityByLoginIdWithStore(loginId: string, includeStore: boolean): Promise<User> {
+    async findEntityByLoginIdWithStore(encryptedLoginId: string, includeStore: boolean): Promise<User> {
         const user = await this.findOne({
             where: {
-                loginId,
+                loginId: encryptedLoginId,
             },
             relations: includeStore ? ['store'] : [],
         });
