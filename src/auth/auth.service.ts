@@ -136,8 +136,7 @@ export class AuthService {
         if (loginFailedCount >= 5) {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        const user = await this.userService.findEntityByLoginId(encryptedLoginId, true);
+        const user = await this.userService.findEntityByLoginId(loginId, true);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
             await this.cacheManager.set(`login_failed_count:${loginId}`, loginFailedCount + 1, 10 * 60 * 1000);
@@ -253,11 +252,10 @@ export class AuthService {
         await this.cacheManager.del(sessionKey);
 
         const userOauth = await this.userService.findUserOauthBySnsUserIdAndType(snsProfile.snsUserId, snsProfile.type);
-
-        const userDto = await this.userService.findById(userOauth.userId);
-        const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
-        const refreshToken = await this.generateRefreshToken(userDto, uuid);
-        return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
+        const user = await this.userService.findEntityById(userOauth.userId, true);
+        const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
+        const refreshToken = await this.generateRefreshToken(user, uuid);
+        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
     }
 
 
