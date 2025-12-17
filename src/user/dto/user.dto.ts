@@ -45,14 +45,6 @@ export class UserDto {
     @ApiProperty({ description: '사용자 성인여부', example: true })
     isAdult: boolean;
 
-    @ApiProperty({ 
-        description: '사용자 가게 등록 상태', 
-        example: StoreRegisterStatus.Pending, 
-        nullable: true, 
-        enum: StoreRegisterStatus 
-    })
-    @IsOptional()
-    storeRegisterStatus?: StoreRegisterStatus | null;
 
     constructor(user: User, encryptionUtil?: EncryptionUtil) {
         this.id = user.publicId;
@@ -66,6 +58,5 @@ export class UserDto {
         this.gender = encryptionUtil ? encryptionUtil.decryptDeterministic(user.gender) as UserGender : user.gender as UserGender;
         this.birth = encryptionUtil ? encryptionUtil.decryptDeterministic(user.birth) : user.birth.toString();
         this.isAdult = user.isAdult;
-        this.storeRegisterStatus = user.storeRegisterStatus;
     }
 }

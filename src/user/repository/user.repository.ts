@@ -17,11 +17,12 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findEntityByLoginId(loginId: string): Promise<User> {
+    async findEntityByLoginIdWithStore(loginId: string, includeStore: boolean): Promise<User> {
         const user = await this.findOne({
             where: {
                 loginId,
             },
+            relations: includeStore ? ['store'] : [],
         });
         if (!user) {
             throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
@@ -29,11 +30,12 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findById(id: string): Promise<User> {
+    async findById(id: string, includeStore: boolean = false): Promise<User> {
         const user = await this.findOne({
             where: {
                 publicId: id,
             },
+            relations: includeStore ? ['store'] : [],
         });
         if (!user) {
             throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
