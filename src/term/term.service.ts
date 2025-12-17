@@ -2,7 +2,7 @@ import * as path from "path";
 import { ConvertHtmlToMarkdownDto } from "./dto/convert-html-to-markdown.dto";
 import { TermTemplateCreateDto } from "./dto/term-template-create.dto";
 import { TermsTemplate } from "./entity/terms-template.entity";
-import { TermsType } from "./enum/terms-type.enum";
+import { TermsType } from "./enum/term-type.enum";
 import { TermsTemplateRepository } from "./repository/terms-template.repository";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import * as TurndownService from 'turndown';

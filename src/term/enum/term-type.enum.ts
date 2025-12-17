@@ -1,4 +1,4 @@
-export enum TermsType {
+export enum TermType {
     // 필수 서비스 이용약관
     Commercial = 'COMMERCIAL',
     Service = 'SERVICE', // ', //서비스 이용 및 수익 모델 정책 이용약관

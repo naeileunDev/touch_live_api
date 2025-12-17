@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { TermsType } from "../enum/terms-type.enum";
+import { TermsType } from "../enum/term-type.enum";
 
 export class ConvertHtmlToMarkdownDto {
     @ApiProperty({ 

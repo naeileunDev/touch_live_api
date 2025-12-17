@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEnum, IsString, ValidateNested } from "class-validator";
-import { TermsType } from "../enum/terms-type.enum";
+import { TermsType } from "../enum/term-type.enum";
 import { ConvertHtmlToMarkdownDto } from "./convert-html-to-markdown.dto";
 import { Type } from "class-transformer";
 
