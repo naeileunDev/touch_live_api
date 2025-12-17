@@ -3,7 +3,7 @@ import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
-import { IsString, Matches } from "class-validator";
+import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
 import { User } from "../entity/user.entity";
 import { EncryptionUtil } from "src/common/util/encryption.util";
 
@@ -29,9 +29,7 @@ export class UserDto {
     @ApiProperty({ description: '사용자 이름', example: '홍길동' })
     name: string;
 
-    @ApiProperty({ description: '사용자 전화번호', example: '010-1234-5678', format: 'phone' })
-    @IsString({ always: true })
-    @Matches(/^01[0-9]\d{7,8}$/, { message: '전화번호는 하이픈 없이 11자리 숫자여야 합니다.', always: true })
+    @ApiProperty({ description: '사용자 전화번호', example: '01012345678', format: 'phone' })
     phone: string;
 
     @ApiProperty({ description: '사용자 성별', enum: UserGender, example: UserGender.Male })
@@ -53,6 +51,8 @@ export class UserDto {
         nullable: true, 
         enum: StoreRegisterStatus 
     })
+    @IsOptional()
+    @IsEnum(StoreRegisterStatus)
     storeRegisterStatus?: StoreRegisterStatus | null;
 
     constructor(user: User, encryptionUtil?: EncryptionUtil) {

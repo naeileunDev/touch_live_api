@@ -461,17 +461,17 @@ export class AuthService {
         // await this.cacheManager.del(sessionKey);
 
         const authFindIdResponseDto = new AuthFindIdResponseDto();
-
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(sessionKey);
         // 삭제된 회원인지 확인
         //const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
-        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionKey);
-        const user = await this.userService.findEntityByDi(sessionKey);
+        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(encryptedDi);
+        const user = await this.userService.findEntityByDi(encryptedDi);
         // 사용자 조회
         //const user = await this.userService.findByDi(sessionData.di);
         if (!user && isExistRemovedDi) {
             throw new ServiceException(MESSAGE_CODE.USER_REMOVED_STATUS);
         }
-        authFindIdResponseDto.loginId = user.loginId;
+        authFindIdResponseDto.loginId = this.encryptionUtil.decryptDeterministic(user.loginId);
         return authFindIdResponseDto;
     }
 
