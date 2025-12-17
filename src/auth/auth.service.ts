@@ -129,8 +129,7 @@ export class AuthService {
         const existsOperationUser = await this.userService.existsOperationUserByUserId(user.publicId);
         let operatorRole: UserRole | null = null;
         if (existsOperationUser) {
-            const encryptedLoginId = this.encryptionUtil.encryptDeterministic(user.loginId);
-            const userOperation = await this.userService.findOperationUserEntityByEncryptedLoginId(encryptedLoginId);
+            const userOperation = await this.userService.findOperationUserEntityByLoginId(user.loginId);
             operatorRole = userOperation.role;
         }
         return operatorRole;
@@ -147,8 +146,7 @@ export class AuthService {
         if (loginFailedCount >= 5) {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        const user = await this.userService.findEntityByLoginId(encryptedLoginId, true);
+        const user = await this.userService.findEntityByLoginId(loginId, true);
         const operatorRole = await this.getOperatorRoleByUserId(user);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {

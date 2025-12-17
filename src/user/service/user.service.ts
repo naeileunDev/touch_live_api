@@ -83,7 +83,8 @@ export class UserService {
         return new UserOperationDto(userDto, userOperation.role);
     }
 
-    async findOperationUserEntityByEncryptedLoginId(encryptedLoginId: string): Promise<UserOperation> {
+    async findOperationUserEntityByLoginId(loginId: string): Promise<UserOperation> {
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
         return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
     }
 
@@ -123,7 +124,8 @@ export class UserService {
      * @param id 사용자 식별자
      */
     async findEntityById(id: string, includeStore: boolean = false): Promise<User> {
-        return await this.userRepository.findById(id, includeStore);
+        const encryptedId = this.encryptionUtil.encryptDeterministic(id);
+        return await this.userRepository.findById(encryptedId, includeStore);
     }
 
     /**
@@ -150,7 +152,8 @@ export class UserService {
      * @param loginId 아이디
      */
     async findEntityByLoginId(loginId: string, includeStore: boolean = false): Promise<User> {
-        return await this.userRepository.findEntityByLoginIdWithStore(loginId, includeStore);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.findEntityByLoginIdWithStore(encryptedLoginId, includeStore);
     }
 
     /**
