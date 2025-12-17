@@ -119,10 +119,20 @@ export class AuthService {
 
         // 사용자 생성
         const userDto = await this.userService.create(dto);
-        const user = await this.userService.findEntityByLoginId(userDto.loginId, true);
+        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(userDto.loginId);        const user = await this.userService.findEntityByLoginId(userDto.loginId, true);
         const accessToken = await this.generateAccessToken(user, uuid, userInfo.fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+    }
+
+    async getOperatorRoleByUserId(user: User): Promise<UserRole | null> {
+        const existsOperationUser = await this.userService.existsOperationUserByUserId(user.publicId);
+        let operatorRole: UserRole | null = null;
+        if (existsOperationUser) {
+            const userOperation = await this.userService.findOperationUserEntityByLoginId(user.loginId);
+            operatorRole = userOperation.role;
+        }
+        return operatorRole;
     }
 
     /**
@@ -137,6 +147,7 @@ export class AuthService {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
         const user = await this.userService.findEntityByLoginId(loginId, true);
+        const operatorRole = await this.getOperatorRoleByUserId(user);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
             await this.cacheManager.set(`login_failed_count:${loginId}`, loginFailedCount + 1, 10 * 60 * 1000);
@@ -144,7 +155,7 @@ export class AuthService {
         }
 
         const uuid = uuidv4();
-        const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
+        const accessToken = await this.generateAccessToken(user, uuid, fcmToken, operatorRole);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
     }
@@ -253,7 +264,8 @@ export class AuthService {
 
         const userOauth = await this.userService.findUserOauthBySnsUserIdAndType(snsProfile.snsUserId, snsProfile.type);
         const user = await this.userService.findEntityById(userOauth.userId, true);
-        const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
+        const operatorRole = await this.getOperatorRoleByUserId(user);
+        const accessToken = await this.generateAccessToken(user, uuid, fcmToken, operatorRole);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
     }
@@ -552,7 +564,7 @@ export class AuthService {
      * Access Token 생성
      * @param userDto 사용자 정보
      */
-    private async generateAccessToken(user: User, uuid: string, fcmToken: string): Promise<string> {
+    private async generateAccessToken(user: User, uuid: string, fcmToken: string, operatorRole: UserRole | null = null): Promise<string> {
         const userDto = new UserDto(user, this.encryptionUtil);
         // 디바이스 등록
         const createUserDeviceDto: UserDeviceCreateDto = {
@@ -562,7 +574,14 @@ export class AuthService {
         }
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, storeId: user.store?.id ?? null },
+            { 
+                id: user.id, 
+                uuid, 
+                role: userDto.role, 
+                userRegisterStatus: user.storeRegisterStatus, 
+                storeId: user.store?.id ?? null,
+                operatorRole: operatorRole,
+            },
             {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),
@@ -576,9 +595,8 @@ export class AuthService {
      * @param userDto 사용자 정보
      */
     private async generateRefreshToken(user: User, uuid: string): Promise<string> {
-        const userDto = new UserDto(user, this.encryptionUtil);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role },
+            { id: user.id, uuid },
             {
                 secret: this.configService.get('JWT_REFRESH_SECRET'),
                 expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
@@ -605,7 +623,7 @@ export class AuthService {
      */
     async reissueAccessToken(userDto: UserDto, refreshToken: string): Promise<AuthLoginResponseDto> {
         const user = await this.userService.findEntityById(userDto.id, true);
-        
+        const operatorRole = await this.getOperatorRoleByUserId(user);
         // 토큰 유효기간 확인
         const decoded = this.jwtService.decode(refreshToken);
         const exp = decoded.exp;
@@ -620,12 +638,12 @@ export class AuthService {
 
         if (remainingDays < 3) {
             // 유효기간이 7일 미만인 경우 재발급
-            const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
+            const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken, operatorRole);
             const refreshToken = await this.generateRefreshToken(user, userDevice.jwtUuid);
             return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
         } else {
             // 유효기간이 충분한 경우 기존 토큰 반환
-            const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
+            const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken, operatorRole);
             return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
         }
     }
