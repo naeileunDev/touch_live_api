@@ -20,6 +20,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserOperationRepository } from '../repository/user-operation-repository';
 import { UserOperationDto } from '../dto/user-operaion.dto';
 import { UserOperationRequestDto } from '../dto/user-operation-request.dto';
+import { UserOperation } from '../entity/user-operation.entity';
 
 
 @Injectable()
@@ -82,6 +83,14 @@ export class UserService {
         return new UserOperationDto(userDto, userOperation.role);
     }
 
+    async findOperationUserEntityByEncryptedLoginId(encryptedLoginId: string): Promise<UserOperation> {
+        return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
+    }
+
+    async existsOperationUserByUserId(userId: string): Promise<boolean> {
+        return await this.userOperationRepository.existsOperationUserByUserId(userId);
+    }
+
 
     private checkAdult(birth: string): boolean {
         const today = new Date();
@@ -141,8 +150,7 @@ export class UserService {
      * @param loginId 아이디
      */
     async findEntityByLoginId(loginId: string, includeStore: boolean = false): Promise<User> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        return await this.userRepository.findEntityByLoginIdWithStore(encryptedLoginId, includeStore);
+        return await this.userRepository.findEntityByLoginIdWithStore(loginId, includeStore);
     }
 
     /**

@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        const { id, uuid, role, storeRegisterStatus, storeId } = payload;
+        const { id, uuid, role, storeRegisterStatus, storeId, operatorRole } = payload;
 
         if (!id || !uuid || !role) {
             throw new UnauthorizedException();
@@ -30,6 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException();
         }
 
-        return { id, uuid, role, storeRegisterStatus, storeId };
+        return { id, uuid, role, storeRegisterStatus, storeId, operatorRole };
     }
 }
