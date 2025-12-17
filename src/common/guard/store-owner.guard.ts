@@ -32,7 +32,7 @@ export class StoreOwnerGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         // @ts-ignore
         const { user } = request;
-        const hasStore =  user.store != null;
+        const hasStore =  user.storeId != null;
         const storeRegisterStatus = (
         user.storeRegisterStatus === StoreRegisterStatus.Pending || 
         user.storeRegisterStatus === StoreRegisterStatus.Approved

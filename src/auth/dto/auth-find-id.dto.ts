@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsRequiredString } from "src/common/validator/is-required-string";
 
 export class AuthFindIdDto {
     @ApiProperty({ description: 'NICE 세션 키', example: 'test' })
-    @IsString({ always: true })
+    @IsRequiredString()
     sessionKey: string;
 }

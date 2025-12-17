@@ -42,6 +42,7 @@ import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
 import { domainToASCII } from "url";
 import { UserGender } from "src/user/enum/user-gender.enum";
 import { EncryptionUtil } from "src/common/util/encryption.util";
+import { User } from "src/user/entity/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -118,10 +119,10 @@ export class AuthService {
 
         // 사용자 생성
         const userDto = await this.userService.create(dto);
-
-        const accessToken = await this.generateAccessToken(userDto, uuid, userInfo.fcmToken);
-        const refreshToken = await this.generateRefreshToken(userDto, uuid);
-        return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
+        const user = await this.userService.findEntityByLoginId(userDto.loginId, true);
+        const accessToken = await this.generateAccessToken(user, uuid, userInfo.fcmToken);
+        const refreshToken = await this.generateRefreshToken(user, uuid);
+        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
     }
 
     /**
@@ -136,7 +137,7 @@ export class AuthService {
             throw new ServiceException(MESSAGE_CODE.AUTH_LOGIN_FAILED_LIMIT);
         }
         const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        const user = await this.userService.findEntityByLoginId(encryptedLoginId);
+        const user = await this.userService.findEntityByLoginId(encryptedLoginId, true);
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
             await this.cacheManager.set(`login_failed_count:${loginId}`, loginFailedCount + 1, 10 * 60 * 1000);
@@ -144,10 +145,9 @@ export class AuthService {
         }
 
         const uuid = uuidv4();
-        const userDto = new UserDto(user, this.encryptionUtil);
-        const accessToken = await this.generateAccessToken(userDto, uuid, fcmToken);
-        const refreshToken = await this.generateRefreshToken(userDto, uuid);
-        return new AuthLoginResponseDto(userDto, accessToken, refreshToken);
+        const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
+        const refreshToken = await this.generateRefreshToken(user, uuid);
+        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
     }
 
     // /**
@@ -461,17 +461,17 @@ export class AuthService {
         // await this.cacheManager.del(sessionKey);
 
         const authFindIdResponseDto = new AuthFindIdResponseDto();
-
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(sessionKey);
         // 삭제된 회원인지 확인
         //const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionData.di);
-        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(sessionKey);
-        const user = await this.userService.findEntityByDi(sessionKey);
+        const isExistRemovedDi = await this.userService.existsByDiWithDeleted(encryptedDi);
+        const user = await this.userService.findEntityByDi(encryptedDi);
         // 사용자 조회
         //const user = await this.userService.findByDi(sessionData.di);
         if (!user && isExistRemovedDi) {
             throw new ServiceException(MESSAGE_CODE.USER_REMOVED_STATUS);
         }
-        authFindIdResponseDto.loginId = user.loginId;
+        authFindIdResponseDto.loginId = this.encryptionUtil.decryptDeterministic(user.loginId);
         return authFindIdResponseDto;
     }
 
@@ -554,17 +554,17 @@ export class AuthService {
      * Access Token 생성
      * @param userDto 사용자 정보
      */
-    private async generateAccessToken(userDto: UserDto, uuid: string, fcmToken: string): Promise<string> {
+    private async generateAccessToken(user: User, uuid: string, fcmToken: string): Promise<string> {
+        const userDto = new UserDto(user, this.encryptionUtil);
         // 디바이스 등록
         const createUserDeviceDto: UserDeviceCreateDto = {
             fcmToken,
             jwtUuid: uuid,
             user: userDto,
         }
-        const user = await this.userService.findEntityById(userDto.id);
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
-            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, store: user.store },
+            { id: userDto.id, uuid, role: userDto.role, userRegisterStatus: user.storeRegisterStatus, storeId: user.store?.id ?? null },
             {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),
@@ -577,7 +577,8 @@ export class AuthService {
      * Refresh Token 생성
      * @param userDto 사용자 정보
      */
-    private async generateRefreshToken(userDto: UserDto, uuid: string): Promise<string> {
+    private async generateRefreshToken(user: User, uuid: string): Promise<string> {
+        const userDto = new UserDto(user, this.encryptionUtil);
         return this.jwtService.sign(
             { id: userDto.id, uuid, role: userDto.role },
             {
@@ -605,8 +606,8 @@ export class AuthService {
      * @param userDto 사용자 정보
      */
     async reissueAccessToken(userDto: UserDto, refreshToken: string): Promise<AuthLoginResponseDto> {
-        const user = await this.userService.findById(userDto.id);
-
+        const user = await this.userService.findEntityById(userDto.id, true);
+        
         // 토큰 유효기간 확인
         const decoded = this.jwtService.decode(refreshToken);
         const exp = decoded.exp;
@@ -623,11 +624,11 @@ export class AuthService {
             // 유효기간이 7일 미만인 경우 재발급
             const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
             const refreshToken = await this.generateRefreshToken(user, userDevice.jwtUuid);
-            return new AuthLoginResponseDto(user, accessToken, refreshToken);
+            return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
         } else {
             // 유효기간이 충분한 경우 기존 토큰 반환
             const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
-            return new AuthLoginResponseDto(user, accessToken, refreshToken);
+            return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
         }
     }
 
