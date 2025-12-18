@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { promises as fs } from 'fs'
+import { createReadStream, promises as fs } from 'fs'
 import * as ffmpeg from 'fluent-ffmpeg';
 import { ServiceException } from 'src/common/filter/exception/service.exception';
 import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
@@ -112,7 +112,19 @@ export class FileService {
         const file = await this.fileRepository.findOneById(id);
         return new FileDto(file);
     }
-  
     
-  
+    async serveFile(id: number): Promise<StreamableFile> {
+        const file = await this.findOne(id);
+        try {
+            await fs.access(file.fileUrl);
+        } catch {
+            throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
+        }
+
+        const stream = createReadStream(file.fileUrl);
+        return new StreamableFile(stream, {
+            type: file.mimeType,
+            disposition: `inline; filename="${file.originalName}"`,
+        });
+    }
 }

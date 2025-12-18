@@ -82,19 +82,7 @@ export class FileController {
         }
     })
     async serveFile(@Param('id') id: number): Promise<StreamableFile> {
-    const file = await this.fileService.findOne(id);
-    try {
-        await fs.access(file.fileUrl);
-    } catch {
-        throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
-    }
-
-    const stream = createReadStream(file.fileUrl);
-
-    return new StreamableFile(stream, {
-        type: file.mimeType,
-        disposition: `inline; filename="${file.originalName}"`,
-    });
+        return await this.fileService.serveFile(id);
     }
 //   @Patch(':id')
 //   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
