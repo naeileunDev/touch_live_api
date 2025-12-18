@@ -16,6 +16,7 @@ import { PaymentMethodModule } from './payment-method/payment-method.module';
 import { EncryptionUtil } from './common/util/encryption.util';
 import { KeywordModule } from './keyword/keyword.module';
 import { FileModule } from './file/file.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { FileModule } from './file/file.module';
         PaymentMethodModule,
         KeywordModule,
         FileModule,
+        TagModule,
     ],
     controllers: [],
     providers: [

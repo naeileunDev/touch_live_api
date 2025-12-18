@@ -1,7 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
+import { TagUsageLog } from "src/tag/entity/tag-usage-log";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -55,4 +56,8 @@ export class Store extends BaseEntity{
     @OneToOne(() => User, user => user.store)
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    // @OneToMany(() => TagUsageLog, tagUsageLog => tagUsageLog.store)
+    // @JoinColumn({ name: 'tagUsageLogId' })
+    // tagUsageLog: TagUsageLog[];
 }
