@@ -39,17 +39,12 @@ export class TagService {
     }
     async findTagListGroupedByUsage(tagFindDto: TagFindDto): Promise<TagFindResponseDto[]> {
         const { category, usage } = tagFindDto;
-        console.log("category", category)
-        console.log("usage", usage)
         const tags = await this.tagRepository.findTagList(category, usage);
-        for (const tag of tags) {
-            console.log("tag", tag)
-        }
         // 사용처별로 그룹화
         const grouped = new Map<UsageType, Map<CategoryType, string[]>>();
         
         tags.forEach(tag => {
-            // ✅ Entity의 boolean 필드 직접 체크
+            // boolean 필드 직접 체크
             Object.entries(USAGE_FIELD_MAP).forEach(([usageType, usageFieldName]) => {
                 if (tag[usageFieldName as keyof Tag] && tagFindDto.usage.includes(usageType as UsageType)) {
                     const uType = usageType as UsageType;
