@@ -37,10 +37,6 @@ export class StoreCreateDto {
     @IsRequiredString()
     eCommerceLicenseNumber: string;
 
-    // @ApiProperty({ description: '통신판매업 신고증 이미지' })
-    // @IsRequiredString()
-    // eCommerceLicenseImage: string;
-
     @ApiProperty({ description: '사업자 은행명', example: '은행명' })
     @IsRequiredString()
     bankName: string;
@@ -60,29 +56,5 @@ export class StoreCreateDto {
     @ApiProperty({ description: '서브태그', example: '태그1,태그2,태그3' })
     @IsRequiredString()
     subTag: string;
-
-    // @ApiProperty({ type: 'string', format: 'binary', isArray: true })
-    // files: any[];
-
-    // @ApiProperty({ description: '사업자 등록증 이미지' })
-    // businessRegistrationImage: Express.Multer.File;
-
-    // @ApiProperty({ description: '통신판매업 신고증 이미지' })
-    // @Exclude()
-    // eCommerceLicenseImage: Express.Multer.File;
-
-    // @ApiProperty({ description: '사업자 계좌번호 이미지' })
-    // @Exclude()
-    // accountImage: Express.Multer.File;
-
-    // @ApiPropertyOptional({ description: '사업자 프로필 이미지' })
-    // @Exclude()
-    // @IsOptional()
-    // profileImage?: Express.Multer.File;
-
-    // @ApiPropertyOptional({ description: '사업자 배너 이미지' })
-    // @Exclude()
-    // @IsOptional()
-    // bannerImage?: Express.Multer.File;
 
 }

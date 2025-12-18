@@ -7,7 +7,8 @@ import { StoreRepository } from './repository/store.respository';
 export class StoreService {
   constructor(private readonly storeRepository: StoreRepository) {
   }
-  create(storeCreateDto: StoreCreateDto, user: User) {
+  create(storeCreateDto: StoreCreateDto, user: User, files: any) {
+    console.log(files);
     return ;
   }
 }

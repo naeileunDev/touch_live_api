@@ -8,6 +8,7 @@ import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.deco
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 
 @Controller('store')
 export class StoreController {
@@ -48,18 +49,18 @@ export class StoreController {
   create(
     @Body() storeCreateDto: StoreCreateDto,
     @GetUser() user: User, 
-    @UploadedFiles() files: {
+    @UploadedFiles(MediaValidationPipeArray) files: {
         businessRegistrationImage: Express.Multer.File[],
         eCommerceLicenseImage: Express.Multer.File[],
         accountImage: Express.Multer.File[],
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
     }) {
-        console.log(storeCreateDto);
-        console.log(files);
+        //console.log(storeCreateDto);
+        //console.log(files);
         
-        //const store = this.storeService.create(storeCreateDto, user);
-        return;
+        const store = this.storeService.create(storeCreateDto, user, files);
+        return store;
     }
 
   @Get()
