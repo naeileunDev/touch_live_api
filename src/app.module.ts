@@ -14,7 +14,6 @@ import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
 import { PaymentMethodModule } from './payment-method/payment-method.module';
 import { EncryptionUtil } from './common/util/encryption.util';
-import { KeywordModule } from './keyword/keyword.module';
 import { FileModule } from './file/file.module';
 import { TagModule } from './tag/tag.module';
 
@@ -38,7 +37,6 @@ import { TagModule } from './tag/tag.module';
         StoreModule,
         ProductModule,
         PaymentMethodModule,
-        KeywordModule,
         FileModule,
         TagModule,
     ],
