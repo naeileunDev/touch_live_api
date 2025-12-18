@@ -6,10 +6,8 @@ import { TagDto } from "./dto/tag.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { TagFindDto } from "./dto/tag-find.dto";
-import { TagFindResponseDto } from "./dto/tag-find-response.dto";
 import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
-import { TagFindCategoryDto } from "./dto/tag-find-category.dto";
 import { Tag } from "./entity/tag.entity";
 
 @Injectable()
