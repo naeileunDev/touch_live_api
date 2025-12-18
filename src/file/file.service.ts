@@ -112,6 +112,7 @@ export class FileService {
         const file = await this.fileRepository.findOneById(id);
         return new FileDto(file);
     }
-
+  
+    
   
 }

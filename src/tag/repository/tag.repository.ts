@@ -12,4 +12,12 @@ export class TagRepository extends Repository<Tag> {
     async createTag(tag: TagCreateDto): Promise<Tag> {
         return await this.save(tag);
     }
+
+    async existsByTagName(name: string): Promise<boolean> {
+        return await this.exists({
+            where: {
+                name,
+            },
+        });
+    }
 }
