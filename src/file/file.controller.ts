@@ -9,10 +9,6 @@ import { FileDto } from './dto/file.dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ApiResponse } from '@nestjs/swagger';
 import { StreamableFile } from '@nestjs/common';
-import { createReadStream } from 'fs';
-import { ServiceException } from 'src/common/filter/exception/service.exception';
-import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
-import { promises as fs } from 'fs';
 
 @ApiTags('File')
 @Controller('file')
@@ -82,19 +78,7 @@ export class FileController {
         }
     })
     async serveFile(@Param('id') id: number): Promise<StreamableFile> {
-    const file = await this.fileService.findOne(id);
-    try {
-        await fs.access(file.fileUrl);
-    } catch {
-        throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
-    }
-
-    const stream = createReadStream(file.fileUrl);
-
-    return new StreamableFile(stream, {
-        type: file.mimeType,
-        disposition: `inline; filename="${file.originalName}"`,
-    });
+        return await this.fileService.serveFile(id);
     }
 //   @Patch(':id')
 //   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
