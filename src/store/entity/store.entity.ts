@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
 import { TagUsageLog } from "src/tag/entity/tag-usage-log";
+import { Tag } from "src/tag/entity/tag.entity";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -15,12 +16,14 @@ export class Store extends BaseEntity{
     @Column({ type: 'varchar', length: 255, comment: '가게 이메일' })
     email: string;
 
-
     @Column({ type: 'boolean', comment: '가게 노출 여부', default: false })
     isVisible: boolean;
 
-    @Column({ type: 'varchar', length: 255, comment: '해시태그' })
-    hashTag: string;
+    // @Column({ type: 'array', length: 3, comment: '메인태그(3개까지)' })
+    // MainTag: Array<Tag>;
+
+    // @Column({ type: 'array', length: 5, comment: '최대 서브태그(5개까지)' })
+    // SubTag: Array<Tag>;
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;
@@ -48,7 +51,7 @@ export class Store extends BaseEntity{
     @Column({ type: 'varchar', length: 255, comment: '사업자 계좌번호' })
     accountNumber: string;
     @Column({ type: 'varchar', length: 255, comment: '사업자 예금주' })
-    accountHolder: string;
+    accountOwner: string;
 
     @Column({ type: 'enum', enum: StoreStatusType, comment: '가게 상태', default: StoreStatusType.Active })
     status: StoreStatusType;
@@ -56,6 +59,9 @@ export class Store extends BaseEntity{
     @OneToOne(() => User, user => user.store)
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    @Column({ type: 'int', comment: '가게 등록 비용', default: 11 })
+    storeEntryFee: number;
 
     // @OneToMany(() => TagUsageLog, tagUsageLog => tagUsageLog.store)
     // @JoinColumn({ name: 'tagUsageLogId' })

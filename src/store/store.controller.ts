@@ -1,12 +1,14 @@
-import { Controller, Post, Body, Param, Get} from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles} from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreCreateDto } from './dto/store-create.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
-import { USER_PERMISSION } from 'src/common/permission/permission';
+import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
+import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 
 @Controller('store')
 export class StoreController {
@@ -14,13 +16,52 @@ export class StoreController {
   }
 
   @Post()
-  @Role(USER_PERMISSION)
+  @Role(ALL_PERMISSION)
   @NonStoreOwner()
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'businessRegistrationImage', maxCount: 1 },
+    { name: 'eCommerceLicenseImage', maxCount: 1 },
+    { name: 'accountImage', maxCount: 1 },
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+  ]))
+  @ApiExtraModels(StoreCreateDto)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+        type: 'object',
+        allOf: [
+            { $ref: getSchemaPath(StoreCreateDto) },
+            {
+                type: 'object',
+                properties: {
+                    businessRegistrationImage: { type: 'string', format: 'binary' },
+                    eCommerceLicenseImage: { type: 'string', format: 'binary' },
+                    accountImage: { type: 'string', format: 'binary' },
+                    profileImage: { type: 'string', format: 'binary' },
+                    bannerImage: { type: 'string', format: 'binary' },
+                },
+            },
+        ],
+    },
+  })
   @ApiBearerAuth('access-token')
-  create(@Body() storeCreateDto: StoreCreateDto, @GetUser() user: User) {
-    const store = this.storeService.create(storeCreateDto, user);
-    return store;
-  }
+  create(
+    @Body() storeCreateDto: StoreCreateDto,
+    @GetUser() user: User, 
+    @UploadedFiles(MediaValidationPipeArray) files: {
+        businessRegistrationImage: Express.Multer.File[],
+        eCommerceLicenseImage: Express.Multer.File[],
+        accountImage: Express.Multer.File[],
+        profileImage: Express.Multer.File[],
+        bannerImage: Express.Multer.File[],
+    }) {
+        //console.log(storeCreateDto);
+        //console.log(files);
+        
+        const store = this.storeService.create(storeCreateDto, user, files);
+        return store;
+    }
 
   @Get()
   @Role(USER_PERMISSION)

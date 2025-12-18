@@ -6,5 +6,6 @@ import { FileRepository } from './repository/file.repository';
 @Module({
   controllers: [FileController],
   providers: [FileService, FileRepository],
+  exports: [FileService],
 })
 export class FileModule {}
