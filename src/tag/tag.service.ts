@@ -9,6 +9,7 @@ import { TagFindDto } from "./dto/tag-find.dto";
 import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
 import { Tag } from "./entity/tag.entity";
+import { TagFindResponseDto } from "./dto/tag-find-response.dto";
 
 @Injectable()
 export class TagService {
@@ -38,25 +39,28 @@ export class TagService {
     async findTagListGroupedByUsage(tagFindDto: TagFindDto): Promise<TagFindResponseDto[]> {
         const { category, usage } = tagFindDto;
         const tags = await this.tagRepository.findTagList(category, usage);
-        // 사용처별로 그룹화
+        
+        // 필터링할 usage와 category 결정
+        const targetUsages = usage?.length ? usage : Object.values(UsageType);
+        const targetCategories = category?.length ? category : Object.values(CategoryType);
+        
         const grouped = new Map<UsageType, Map<CategoryType, string[]>>();
         
         tags.forEach(tag => {
-            // boolean 필드 직접 체크
             Object.entries(USAGE_FIELD_MAP).forEach(([usageType, usageFieldName]) => {
-                if (tag[usageFieldName as keyof Tag] && tagFindDto.usage.includes(usageType as UsageType)) {
-                    const uType = usageType as UsageType;
-                    
+                const uType = usageType as UsageType;
+                
+                if (tag[usageFieldName as keyof Tag] && targetUsages.includes(uType)) {
                     Object.entries(CATEGORY_FIELD_MAP).forEach(([categoryType, categoryFieldName]) => {
-                        if (tag[categoryFieldName as keyof Tag] && tagFindDto.category.includes(categoryType as CategoryType)) {
-                            const cType = categoryType as CategoryType;
-                            
+                        const cType = categoryType as CategoryType;
+                        
+                        if (tag[categoryFieldName as keyof Tag] && targetCategories.includes(cType)) {
                             if (!grouped.has(uType)) {
                                 grouped.set(uType, new Map());
                             }
                             const categoryMap = grouped.get(uType)!;
                             
-                            if (!categoryMap.has(cType) && tag) {
+                            if (!categoryMap.has(cType)) {
                                 categoryMap.set(cType, []);
                             }
                             
@@ -70,10 +74,9 @@ export class TagService {
             });
         });
         
-        // TagFindResponseDto 배열로 변환
         return Array.from(grouped.entries()).map(([usageType, categoryMap]) => ({
             usage: usageType,
-            tagFindCategoryDtoList: Array.from(categoryMap.entries()).map(([categoryType, tagList]) => ({
+            tagList: Array.from(categoryMap.entries()).map(([categoryType, tagList]) => ({
                 category: categoryType,
                 tagList
             }))
