@@ -8,6 +8,6 @@ export class StoreService {
   constructor(private readonly storeRepository: StoreRepository) {
   }
   create(storeCreateDto: StoreCreateDto, user: User) {
-    return 'This action adds a new store';
+    return ;
   }
 }
