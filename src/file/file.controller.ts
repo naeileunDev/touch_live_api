@@ -9,10 +9,6 @@ import { FileDto } from './dto/file.dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ApiResponse } from '@nestjs/swagger';
 import { StreamableFile } from '@nestjs/common';
-import { createReadStream } from 'fs';
-import { ServiceException } from 'src/common/filter/exception/service.exception';
-import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
-import { promises as fs } from 'fs';
 
 @ApiTags('File')
 @Controller('file')
