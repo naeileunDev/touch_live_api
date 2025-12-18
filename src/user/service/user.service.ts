@@ -83,10 +83,18 @@ export class UserService {
         return new UserOperationDto(userDto, userOperation.role);
     }
 
-    async findOperationUserEntityByLoginId(loginId: string): Promise<UserOperation> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+    /**
+     * 암호화된 loginId로 운영자 조회
+     * @param encryptedLoginId 암호화된 로그인 ID (User Entity의 loginId 필드)
+     */
+    async findOperationUserEntityByEncryptedLoginId(encryptedLoginId: string): Promise<UserOperation> {
         return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
     }
+
+    // async findOperationUserEntityByLoginId(loginId: string): Promise<UserOperation> {
+    //     const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+    //     return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
+    // }
 
     async existsOperationUserByUserId(userId: string): Promise<boolean> {
         return await this.userOperationRepository.existsOperationUserByUserId(userId);
@@ -115,7 +123,7 @@ export class UserService {
      * @param id 사용자 식별자
      */
     async findById(id: string): Promise<UserDto> {
-        const user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findByPublicId(id);
         return new UserDto(user, this.encryptionUtil);
     }
 
@@ -124,8 +132,7 @@ export class UserService {
      * @param id 사용자 식별자
      */
     async findEntityById(id: string, includeStore: boolean = false): Promise<User> {
-        const encryptedId = this.encryptionUtil.encryptDeterministic(id);
-        return await this.userRepository.findById(encryptedId, includeStore);
+        return await this.userRepository.findByPublicId(id, includeStore);
     }
 
     /**
@@ -171,7 +178,7 @@ export class UserService {
      */
     async leave(userDto: UserDto): Promise<boolean> {
         // 사용자 상태를 탈퇴로 변경
-        const user = await this.userRepository.findById(userDto.id);
+        const user = await this.userRepository.findByPublicId(userDto.id);
         user.status = UserStatus.Withdrawn;
         await this.save(user);
 

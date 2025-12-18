@@ -16,7 +16,7 @@ export class UserAddressService {
     }
 
     async registerAddress(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
-        const user = await this.userRepository.findById(userDto.id);
+        const user = await this.userRepository.findByPublicId(userDto.id);
         const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, user);
         return new UserAddressDto(userAddress);
     }
@@ -32,9 +32,9 @@ export class UserAddressService {
     }
 
     async checkAuthAddress(id: number, userDto: UserDto): Promise<boolean> {
-        const user = await this.userRepository.findById(userDto.id);
+        const user = await this.userRepository.findByPublicId(userDto.id);
         const userAddress = await this.userAddressRepository.findByAddressId(id);
-        if (userAddress.user.id !== user.id) {
+        if (userAddress.user.publicId !== user.publicId) {
             return false;
         }
         return true;

@@ -119,7 +119,7 @@ export class AuthService {
 
         // 사용자 생성
         const userDto = await this.userService.create(dto);
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(userDto.loginId);        const user = await this.userService.findEntityByLoginId(userDto.loginId, true);
+        const user = await this.userService.findEntityByLoginId(userInfo.loginId, true);
         const accessToken = await this.generateAccessToken(user, uuid, userInfo.fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
@@ -129,7 +129,8 @@ export class AuthService {
         const existsOperationUser = await this.userService.existsOperationUserByUserId(user.publicId);
         let operatorRole: UserRole | null = null;
         if (existsOperationUser) {
-            const userOperation = await this.userService.findOperationUserEntityByLoginId(user.loginId);
+            const encryptedLoginId = this.encryptionUtil.encryptDeterministic(user.loginId);
+            const userOperation = await this.userService.findOperationUserEntityByEncryptedLoginId(encryptedLoginId);
             operatorRole = userOperation.role;
         }
         return operatorRole;
@@ -575,7 +576,7 @@ export class AuthService {
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
             { 
-                id: user.id, 
+                id: user.publicId, 
                 uuid, 
                 role: userDto.role, 
                 userRegisterStatus: user.storeRegisterStatus, 
@@ -596,7 +597,7 @@ export class AuthService {
      */
     private async generateRefreshToken(user: User, uuid: string): Promise<string> {
         return this.jwtService.sign(
-            { id: user.id, uuid },
+            { id: user.publicId, uuid },
             {
                 secret: this.configService.get('JWT_REFRESH_SECRET'),
                 expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),

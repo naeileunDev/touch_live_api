@@ -30,10 +30,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findById(id: string, includeStore: boolean = false): Promise<User> {
+    async findByPublicId(publicId: string, includeStore: boolean = false): Promise<User> {
         const user = await this.findOne({
             where: {
-                publicId: id,
+                publicId: publicId,
             },
             relations: includeStore ? ['store'] : [],
         });
