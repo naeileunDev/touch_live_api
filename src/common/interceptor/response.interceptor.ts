@@ -3,6 +3,7 @@ import {
     NestInterceptor,
     ExecutionContext,
     CallHandler,
+    StreamableFile,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,7 +19,7 @@ export interface IResponse<T> {
 
 @Injectable()
 export class ResponseInterceptor<T>
-    implements NestInterceptor<T, IResponse<T>> {
+    implements NestInterceptor<T, IResponse<T> | StreamableFile> {
     private statusCode: number;
 
     constructor(private readonly reflector: Reflector) {}
@@ -26,7 +27,7 @@ export class ResponseInterceptor<T>
     async intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Promise<Observable<IResponse<T>>> {
+    ): Promise<Observable<IResponse<T> | StreamableFile>> {
 
         this.statusCode = context.switchToHttp().getResponse<Response>().statusCode;
 
@@ -38,6 +39,11 @@ export class ResponseInterceptor<T>
 
         return next.handle().pipe(
             map((data) => {
+                // StreamableFile인 경우 그대로 반환 (JSON 래핑 안 함)
+                if (data instanceof StreamableFile) {
+                    return data;
+                }
+                
                 return {
                     statusCode: this.statusCode,
                     message,
