@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles, UsePipes, ValidationPipe} from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles, UsePipes, ValidationPipe, ClassSerializerInterceptor} from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreCreateDto } from './dto/store-create.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
@@ -10,6 +10,7 @@ import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('store')
 export class StoreController {
@@ -58,6 +59,7 @@ export class StoreController {
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
     }) {
+        //console.log( "plainToInstance(StoreCreateDto, storeCreateDto)", plainToInstance(StoreCreateDto, storeCreateDto));
         //console.log(storeCreateDto);
         //console.log(files);
         

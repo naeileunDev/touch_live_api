@@ -11,6 +11,7 @@ import { StoreFilesDto } from './dto/store-files.dto';
 import { FileDto } from 'src/file/dto/file.dto';
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class StoreService {
@@ -20,6 +21,7 @@ export class StoreService {
     private readonly FileService: FileService,
   ) {
   }
+  @Transactional()
   async create(storeCreateDto: StoreCreateDto, user: User, files: any) {
     console.log(storeCreateDto, user.id);
     console.log(storeCreateDto.mainTag, storeCreateDto.subTag);

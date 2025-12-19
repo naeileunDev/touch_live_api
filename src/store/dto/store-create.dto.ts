@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { ApiProperty } from "@nestjs/swagger";
+import { Transform, Type } from "class-transformer";
 import { ArrayMaxSize, ArrayMinSize, ArrayNotEmpty, IsArray, IsDefined, IsInstance, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { TagCommonDto } from "src/tag/dto/tag-common.dto";
@@ -51,70 +51,88 @@ export class StoreCreateDto {
     @IsRequiredString()
     accountOwner: string;
 
-    @ApiProperty({ description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}], type: [TagCommonDto] })
+    @ApiProperty({ description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}], type: TagCommonDto, isArray: true })
     @Transform(({ value }) => {
-    if (!value) return [];
-    
-    // 1. 이미 배열인 경우
-    if (Array.isArray(value)) return value;
-    
-    // 2. JSON 문자열인 경우: '[{"id":1,"name":"태그1"}]'
-    if (typeof value === 'string') {
-        try {
-            const parsed = JSON.parse(value);
-            return Array.isArray(parsed) ? parsed : [parsed];
-        } catch {
+        if (!value) return [];
+        
+        let array: any[];
+        
+        // 1. 이미 배열인 경우
+        if (Array.isArray(value)) {
+            array = value;
+        }
+        // 2. JSON 문자열인 경우
+        else if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                array = Array.isArray(parsed) ? parsed : [parsed];
+            } catch {
+                return [];
+            }
+        }
+        // 3. 객체인 경우 배열로 변환
+        else if (typeof value === 'object' && value !== null) {
+            array = Object.entries(value).map(([key, val]) => ({
+                id: Number(key),
+                name: String(val),
+            }));
+        } else {
             return [];
         }
-    }
-    
-    // 3. 객체인 경우 배열로 변환
-    if (typeof value === 'object') {
-        return Object.entries(value).map(([key, val]) => ({
-            id: Number(key),
-            name: String(val),
-        }));
-    }
-    
-    return [];
+        
+        // 각 요소를 TagCommonDto 인스턴스로 변환
+        return array.map(item => {
+            const dto = new TagCommonDto();
+            dto.id = item.id;
+            dto.name = item.name;
+            return dto;
+        });
     })
-    @IsArray()
-    // @ValidateNested({ each: true })
-    @Type(() => TagCommonDto)
+    @IsArray()  // ✅ 주석 해제 필수
+    @Type(() => TagCommonDto)  // ✅ @IsArray() 다음에 위치
+    @ValidateNested({ each: true })  // ✅ @Type() 다음에 위치
     mainTag: TagCommonDto[];
 
     @ApiProperty({ description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}], type: [TagCommonDto] })
     @Transform(({ value }) => {
         if (!value) return [];
         
-        // 1. 이미 배열인 경우
-        if (Array.isArray(value)) return value;
+        let array: any[];
         
-        // 2. JSON 문자열인 경우: '[{"id":1,"name":"태그1"}]'
-        if (typeof value === 'string') {
+        // 1. 이미 배열인 경우
+        if (Array.isArray(value)) {
+            array = value;
+        }
+        // 2. JSON 문자열인 경우
+        else if (typeof value === 'string') {
             try {
                 const parsed = JSON.parse(value);
-                return Array.isArray(parsed) ? parsed : [parsed];
+                array = Array.isArray(parsed) ? parsed : [parsed];
             } catch {
                 return [];
             }
         }
-        
         // 3. 객체인 경우 배열로 변환
-        if (typeof value === 'object') {
-            return Object.entries(value).map(([key, val]) => ({
+        else if (typeof value === 'object' && value !== null) {
+            array = Object.entries(value).map(([key, val]) => ({
                 id: Number(key),
                 name: String(val),
             }));
+        } else {
+            return [];
         }
-        if (typeof value) {
-            return [value];
-        }
-        return [];
+        
+        // 각 요소를 TagCommonDto 인스턴스로 변환
+        return array.map(item => {
+            const dto = new TagCommonDto();
+            dto.id = item.id;
+            dto.name = item.name;
+            return dto;
+        });
     })
-    @IsArray()
-    @Type(() => TagCommonDto) // ✅ @ValidateNested 전에 위치
-    // @ValidateNested({ each: true })
+    @IsArray() 
+    @Type(() => TagCommonDto)  // @IsArray() 다음에 위치
+    @ValidateNested({ each: true })  //  @Type() 다음에 위치
     subTag: TagCommonDto[];
 
 }
