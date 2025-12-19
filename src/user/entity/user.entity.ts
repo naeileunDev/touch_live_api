@@ -10,6 +10,7 @@ import { PaymentMethod } from "src/payment-method/entity/payment-method.entity";
 import { Store } from "src/store/entity/store.entity";
 import { UserRole } from "../enum/user-role.enum";
 import { UserOperation } from "./user-operation.entity";
+import { StoreRegisterLog } from "src/store/entity/store-register-log.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -84,4 +85,7 @@ export class User extends BaseEntity {
 
     @OneToOne(() => UserOperation, userOperation => userOperation.user)
     userOperation: UserOperation;
+
+    @OneToMany(() => StoreRegisterLog, storeRegisterLog => storeRegisterLog.user)
+    storeRegisterLog: StoreRegisterLog[];
 }

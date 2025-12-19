@@ -10,6 +10,7 @@ import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
 import { Tag } from "./entity/tag.entity";
 import { TagFindResponseDto } from "./dto/tag-find-response.dto";
+import { TagCommonDto } from "./dto/tag-common.dto";
 
 @Injectable()
 export class TagService {
@@ -44,7 +45,7 @@ export class TagService {
         const targetUsages = usage?.length ? usage : Object.values(UsageType);
         const targetCategories = category?.length ? category : Object.values(CategoryType);
         
-        const grouped = new Map<UsageType, Map<CategoryType, string[]>>();
+        const grouped = new Map<UsageType, Map<CategoryType, TagCommonDto[]>>();
         
         tags.forEach(tag => {
             Object.entries(USAGE_FIELD_MAP).forEach(([usageType, usageFieldName]) => {
@@ -65,8 +66,8 @@ export class TagService {
                             }
                             
                             const tagList = categoryMap.get(cType)!;
-                            if (!tagList.includes(tag.name)) {
-                                tagList.push(tag.name);
+                            if (!tagList.some(t => t.id === tag.id)) {
+                                tagList.push(tag);
                             }
                         }
                     });
@@ -78,7 +79,12 @@ export class TagService {
             usage: usageType,
             tagList: Array.from(categoryMap.entries()).map(([categoryType, tagList]) => ({
                 category: categoryType,
-                tagList
+                tagList: tagList.map(tag => { 
+                    const dto = new TagCommonDto();
+                    dto.id = tag.id;
+                    dto.name = tag.name;
+                    return dto;
+                })
             }))
         }));
     }

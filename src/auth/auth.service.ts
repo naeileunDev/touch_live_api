@@ -576,7 +576,7 @@ export class AuthService {
         await this.userService.createUserDevice(createUserDeviceDto);
         return this.jwtService.sign(
             { 
-                id: user.publicId, 
+                id: user.id, 
                 uuid, 
                 role: userDto.role, 
                 userRegisterStatus: user.storeRegisterStatus, 
@@ -597,7 +597,7 @@ export class AuthService {
      */
     private async generateRefreshToken(user: User, uuid: string): Promise<string> {
         return this.jwtService.sign(
-            { id: user.publicId, uuid },
+            { id: user.id, uuid },
             {
                 secret: this.configService.get('JWT_REFRESH_SECRET'),
                 expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),

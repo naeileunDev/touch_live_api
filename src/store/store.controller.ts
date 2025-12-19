@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles} from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles, UsePipes, ValidationPipe} from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreCreateDto } from './dto/store-create.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
@@ -9,6 +9,7 @@ import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
+import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
 
 @Controller('store')
 export class StoreController {
@@ -46,7 +47,8 @@ export class StoreController {
     },
   })
   @ApiBearerAuth('access-token')
-  create(
+  @ApiExtraModels(TagCommonDto)
+  async create(
     @Body() storeCreateDto: StoreCreateDto,
     @GetUser() user: User, 
     @UploadedFiles(MediaValidationPipeArray) files: {
@@ -59,7 +61,7 @@ export class StoreController {
         //console.log(storeCreateDto);
         //console.log(files);
         
-        const store = this.storeService.create(storeCreateDto, user, files);
+        const store = await this.storeService.create(storeCreateDto, user, files);
         return store;
     }
 

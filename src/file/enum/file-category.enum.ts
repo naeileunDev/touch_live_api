@@ -29,5 +29,8 @@ export enum UsageType {
     ColorImage = 'COLOR_IMAGE',
     MainVideo = 'MAIN_VIDEO',
     WhiteVideo = 'WHITE_VIDEO',
+    BusinessRegistrationImage = 'BUSINESS_REGISTRATION_IMAGE',
+    eCommerceLicenseImage = 'ECOMMERCE_LICENSE_IMAGE',
+    AccountImage = 'ACCOUNT_IMAGE',
     Etc = 'ETC',
 }

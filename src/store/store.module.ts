@@ -3,10 +3,12 @@ import { StoreService } from './store.service';
 import { StoreController } from './store.controller';
 import { StoreRepository } from './repository/store.respository';
 import { FileModule } from 'src/file/file.module';
+import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
+import { TagModule } from 'src/tag/tag.module';
 
 @Module({
   controllers: [StoreController],
-  providers: [StoreService, StoreRepository],
-  imports: [FileModule],
+  providers: [StoreService, StoreRepository, StoreRegisterLogRepository],
+  imports: [FileModule, TagModule],
 })
 export class StoreModule {}
