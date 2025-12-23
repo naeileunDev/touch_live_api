@@ -73,15 +73,13 @@ export class StoreRegisterLogDto {
     accountImage: FileCommonDto;
 
 
-    @ApiProperty({ description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}] })
-    @ValidateNested()
-    @Type(() => TagCommonDto)
-    mainTag: TagCommonDto[];
+    @ApiProperty({ type: Number, isArray: true, description: '메인태그 리스트', example: [1, 2, 3] })
+    @IsNumber({}, { each: true })
+    mainTag: number[];
 
-    @ApiProperty({ description: '서브태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}] })
-    @ValidateNested()
-    @Type(() => TagCommonDto)
-    subTag: TagCommonDto[];
+    @ApiProperty({ type: Number, isArray: true, description: '서브태그 리스트', example: [1, 2, 3] })
+    @IsNumber({}, { each: true })
+    subTag: number[];
 
     @ApiProperty({ description: '가게 등록 일시', example: '2025-01-01 12:00:00' })
     @IsDate()
@@ -112,27 +110,27 @@ export class StoreRegisterLogDto {
 
 
     constructor(private readonly storeRegisterLog: StoreRegisterLog) {
-        this.id = storeRegisterLog.id;
-        this.name = storeRegisterLog.name;
-        this.phone = storeRegisterLog.phone;
-        this.email = storeRegisterLog.email;
-        this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
-        this.businessRegistrationImage = storeRegisterLog.businessRegistrationImage;
-        this.ceoName = storeRegisterLog.ceoName;
-        this.businessType = storeRegisterLog.businessType;
-        this.businessCategory = storeRegisterLog.businessCategory;
-        this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
-        this.eCommerceLicenseImage = storeRegisterLog.eCommerceLicenseImage;
-        this.bankName = storeRegisterLog.bankName;
-        this.accountNumber = storeRegisterLog.accountNumber;
-        this.accountOwner = storeRegisterLog.accountOwner;
-        this.accountImage = storeRegisterLog.accountImage;
-        this.registerAt = storeRegisterLog.registerAt ? new Date(storeRegisterLog.registerAt) : null;
-        this.registerFailedAt = storeRegisterLog.registerFailedAt ? new Date(storeRegisterLog.registerFailedAt) : null;
-        this.status = storeRegisterLog.status;
-        this.storeProfileImage = storeRegisterLog.storeProfileImage? {id: storeRegisterLog.storeProfileImage.id, fileUrl: storeRegisterLog.storeProfileImage.fileUrl} : null;
-        this.storeBannerImage = storeRegisterLog.storeBannerImage? {id: storeRegisterLog.storeBannerImage.id, fileUrl: storeRegisterLog.storeBannerImage.fileUrl} : null;
-        this.mainTag = storeRegisterLog.mainTag;
-        this.subTag = storeRegisterLog.subTag;
+        // this.id = storeRegisterLog.id;
+        // this.name = storeRegisterLog.name;
+        // this.phone = storeRegisterLog.phone;
+        // this.email = storeRegisterLog.email;
+        // this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
+        // this.businessRegistrationImage = storeRegisterLog.businessRegistrationImage;
+        // this.ceoName = storeRegisterLog.ceoName;
+        // this.businessType = storeRegisterLog.businessType;
+        // this.businessCategory = storeRegisterLog.businessCategory;
+        // this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
+        // this.eCommerceLicenseImage = storeRegisterLog.eCommerceLicenseImage;
+        // this.bankName = storeRegisterLog.bankName;
+        // this.accountNumber = storeRegisterLog.accountNumber;
+        // this.accountOwner = storeRegisterLog.accountOwner;
+        // this.accountImage = storeRegisterLog.accountImage;
+        // this.registerAt = storeRegisterLog.registerAt ? new Date(storeRegisterLog.registerAt) : null;
+        // this.registerFailedAt = storeRegisterLog.registerFailedAt ? new Date(storeRegisterLog.registerFailedAt) : null;
+        // this.status = storeRegisterLog.status;
+        // this.storeProfileImage = storeRegisterLog.storeProfileImage ? new FileCommonDto(storeRegisterLog.storeProfileImage) : null;
+        // this.storeBannerImage = storeRegisterLog.storeBannerImage ? new FileCommonDto(storeRegisterLog.storeBannerImage) : null;
+        // this.mainTag = storeRegisterLog.mainTag;
+        // this.subTag = storeRegisterLog.subTag;
     }
 }

@@ -10,7 +10,7 @@ import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
-import { plainToInstance } from 'class-transformer';
+import { instanceToInstance, plainToInstance } from 'class-transformer';
 
 @Controller('store')
 export class StoreController {
@@ -59,9 +59,16 @@ export class StoreController {
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
     }) {
-        //console.log( "plainToInstance(StoreCreateDto, storeCreateDto)", plainToInstance(StoreCreateDto, storeCreateDto));
-        //console.log(storeCreateDto);
-        //console.log(files);
+        // if (storeCreateDto instanceof StoreCreateDto) {
+        //     console.log('이 객체는 CreateUserDto의 인스턴스입니다.')
+        //     for (const o of Object.keys(storeCreateDto)) {
+        //         console.log(o, storeCreateDto[o]);
+        //     }
+        //     return  ;
+        // }   else {
+        //    return console.log('이 객체는 StoreCreateDto의 인스턴스가 아닙니다.');
+        // }
+        
         
         const store = await this.storeService.create(storeCreateDto, user, files);
         return store;

@@ -20,23 +20,23 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
         storeRegisterLog.phone = storeCreateDto.phone;
         storeRegisterLog.email = storeCreateDto.email;
         storeRegisterLog.businessRegistrationNumber = storeCreateDto.businessRegistrationNumber;
-        storeRegisterLog.businessRegistrationImage = filesDto.businessRegistrationImage;
+        storeRegisterLog.businessRegistrationImageId = filesDto.businessRegistrationImageId;
         storeRegisterLog.ceoName = storeCreateDto.ceoName;
         storeRegisterLog.businessType = storeCreateDto.businessType;
         storeRegisterLog.businessCategory = storeCreateDto.businessCategory;
         storeRegisterLog.eCommerceLicenseNumber = storeCreateDto.eCommerceLicenseNumber;
-        storeRegisterLog.eCommerceLicenseImage = {id: filesDto.eCommerceLicenseImage.id, fileUrl: filesDto.eCommerceLicenseImage.fileUrl};
+        storeRegisterLog.eCommerceLicenseImageId = filesDto.eCommerceLicenseImageId;
         storeRegisterLog.bankName = storeCreateDto.bankName;
         storeRegisterLog.accountNumber = storeCreateDto.accountNumber;
         storeRegisterLog.accountOwner = storeCreateDto.accountOwner;
-        storeRegisterLog.accountImage = {id: filesDto.accountImage.id, fileUrl: filesDto.accountImage.fileUrl};
+        storeRegisterLog.accountImageId = filesDto.accountImageId;
         storeRegisterLog.status = StoreRegisterStatus.Pending;
         storeRegisterLog.registerAt = null;
         storeRegisterLog.registerFailedAt = null;
-        storeRegisterLog.storeProfileImage = filesDto.profileImage ? {id: filesDto.profileImage.id, fileUrl: filesDto.profileImage.fileUrl} : null;
-        storeRegisterLog.storeBannerImage = filesDto.bannerImage ? {id: filesDto.bannerImage.id, fileUrl: filesDto.bannerImage.fileUrl} : null;
-        storeRegisterLog.mainTag = storeCreateDto.mainTag;
-        storeRegisterLog.subTag = storeCreateDto.subTag;
+        storeRegisterLog.storeProfileImageId = filesDto.profileImageId ?? null;
+        storeRegisterLog.storeBannerImageId = filesDto.bannerImageId ?? null;
+        storeRegisterLog.mainTagIds = storeCreateDto.mainTag.map(tag => tag.id);
+        storeRegisterLog.subTagIds = storeCreateDto.subTag.map(tag => tag.id);
         return await this.save(storeRegisterLog);
     }
 }

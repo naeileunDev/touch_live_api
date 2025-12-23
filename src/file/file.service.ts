@@ -63,13 +63,13 @@ export class FileService {
     }
 
     /**
-   * category: 'post', 'user', 'comment' 등 미디어를 사용하는 도메인 종류
-   * entityId: 게시글 ID, 유저 ID 등
+   * category: 'store', 'user', 'product' 등 미디어를 사용하는 도메인 종류
+   * entityId: 가게 ID, 유저 ID, 상품 ID 등
    * originalName: 원본 파일명
    */
     generatePath(dto: FileCreateDto, mimeType: string): string {
         const extension = path.extname(mimeType); // 예: ".png"
-        return path.join(this.basePath, dto.contentCategory.toString(), dto.usageType.toString(), dto.contentId?.toString() || 'default', `${uuidv4()}${extension}`);
+        return path.join(this.basePath, dto.contentCategory.toString(), dto.contentId?.toString(), `${uuidv4()}${extension}`);
     }
 
     /**

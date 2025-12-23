@@ -40,6 +40,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.FILE_NOT_FOUND]: '파일을 찾을 수 없습니다.',
     [MESSAGE_CODE.FILE_INVALID_MIME_TYPE]: '파일 형식이 올바르지 않습니다.',
     [MESSAGE_CODE.FILE_INVALID_MEDIA_DURATION]: '영상 길이가 올바르지 않습니다.',
+    [MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND]: '필수 파일이 누락되었습니다.',
 
     // Tag
     [MESSAGE_CODE.TAG_NAME_ALREADY_EXISTS]: '태그 이름이 이미 존재합니다.',

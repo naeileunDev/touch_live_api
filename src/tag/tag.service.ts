@@ -88,4 +88,9 @@ export class TagService {
             }))
         }));
     }
+
+    async findByIds(ids: number[]): Promise<TagDto[]> {
+        const tags = await this.tagRepository.findByIds(ids);
+        return tags.map(tag => new TagDto(tag));
+    }
 }

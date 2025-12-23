@@ -12,6 +12,9 @@ import { FileDto } from 'src/file/dto/file.dto';
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
 import { Transactional } from 'typeorm-transactional';
+import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
+import { ServiceException } from 'src/common/filter/exception/service.exception';
+import { FileCreateDto } from 'src/file/dto/file-create.dto';
 
 @Injectable()
 export class StoreService {
@@ -22,48 +25,51 @@ export class StoreService {
   ) {
   }
   @Transactional()
-  async create(storeCreateDto: StoreCreateDto, user: User, files: any) {
-    console.log(storeCreateDto, user.id);
-    console.log(storeCreateDto.mainTag, storeCreateDto.subTag);
-    const filesDto: Record<string, FileDto> = {};
+  async create(storeCreateDto: StoreCreateDto, user: User, files: {
+    businessRegistrationImage: Express.Multer.File[],
+    eCommerceLicenseImage: Express.Multer.File[],
+    accountImage: Express.Multer.File[],
+    profileImage: Express.Multer.File[],
+    bannerImage: Express.Multer.File[],
+  }) {
     
-    // ✅ 파일 필드와 UsageType 매핑
     const fileMappings = [
-        { field: 'businessRegistrationImage', usageType: UsageType.BusinessRegistrationImage },
-        { field: 'eCommerceLicenseImage', usageType: UsageType.eCommerceLicenseImage },
-        { field: 'accountImage', usageType: UsageType.AccountImage },
-        { field: 'profileImage', usageType: UsageType.Profile },
-        { field: 'bannerImage', usageType: UsageType.Banner },
-    ];
+        { field: 'businessRegistrationImage', usageType: UsageType.BusinessRegistrationImage, required: true },
+        { field: 'eCommerceLicenseImage', usageType: UsageType.eCommerceLicenseImage, required: true },
+        { field: 'accountImage', usageType: UsageType.AccountImage, required: true },
+        { field: 'profileImage', usageType: UsageType.Profile, required: false },
+        { field: 'bannerImage', usageType: UsageType.Banner, required: false },
+    ] as const;
     
-    for (const mapping of fileMappings) {
-        const fileArray = files[mapping.field];
-        if (fileArray?.[0]) {
-            filesDto[mapping.field] = await this.FileService.saveLocalToUploads(
-                fileArray[0],
-                {
-                    contentCategory: ContentCategory.User,
-                    usageType: mapping.usageType,
-                    contentId: user.id,
-                }
-            );
-        }
+    // 필수 파일 검증
+    const requiredFiles = fileMappings.filter(m => m.required);
+    if (requiredFiles.some(m => !files[m.field])) {
+        throw new ServiceException(MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND);
     }
     
-    storeCreateDto.mainTag = storeCreateDto.mainTag.map(tag => {
-        const dto = new TagCommonDto();
-        dto.id = tag.id;
-        dto.name = tag.name;
-        return dto;
-    });
-    storeCreateDto.subTag = storeCreateDto.subTag.map(tag => {
-        const dto = new TagCommonDto();
-        dto.id = tag.id;
-        dto.name = tag.name;
-        return dto;
-    });
-    console.log(filesDto);
-    const storeRegisterLog = await this.storeRegisterLogRepository.saveStoreRegisterLog(storeCreateDto, user, new StoreFilesDto(filesDto));
+    // 병렬 처리
+    const fileResults = await Promise.all(
+        fileMappings
+            .filter(m => files[m.field])  // 파일이 있는 것만 처리
+            .map(async (m) => {
+                const fileArray = files[m.field] as Express.Multer.File[];
+                const file = await this.FileService.saveLocalToUploads(
+                    fileArray[0],
+                    {   
+                        contentCategory: ContentCategory.User,
+                        usageType: m.usageType,
+                        contentId: user.id,
+                    } as FileCreateDto
+                );
+                return { usageType: m.usageType, id: file.id };
+            })
+    );
+    const fileIds = new Map<UsageType, number>(
+        fileResults.map(r => [r.usageType, r.id])
+    );
+    
+    const storeFilesDto = new StoreFilesDto(fileIds);
+    const storeRegisterLog = await this.storeRegisterLogRepository.saveStoreRegisterLog(storeCreateDto, user, storeFilesDto);
     return storeRegisterLog;
   }
 }
