@@ -71,4 +71,7 @@ export class StoreCreateDto {
     @ValidateNested({ each: true })  //  @Type() 다음에 위치
     subTag: TagCommonDto[];
 
+    @ApiProperty({ description: 'FCM 토큰', example: 'FCM_TOKEN' })
+    @IsRequiredString()
+    fcmToken: string;
 }

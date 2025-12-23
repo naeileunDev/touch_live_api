@@ -51,7 +51,7 @@ export class UserOauthService {
      * @param userId 사용자 식별자
      * @param type OAuth 타입
      */
-    async findUserOauthEntityByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
+    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
         return await this.userOauthRepository.findByUserIdAndType(userId, type);
     }
 

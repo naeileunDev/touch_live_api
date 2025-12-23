@@ -11,6 +11,8 @@ import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-expres
 import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
 import { instanceToInstance, plainToInstance } from 'class-transformer';
+import { StoreCreateResponseDto } from './dto/store-create-response.dto';
+import { ApiCreatedSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 
 @Controller('store')
 export class StoreController {
@@ -48,8 +50,9 @@ export class StoreController {
     },
   })
   @ApiBearerAuth('access-token')
-  @ApiExtraModels(TagCommonDto)
-  async create(
+  @ApiExtraModels(TagCommonDto, StoreCreateResponseDto, )
+  @ApiCreatedSuccessResponse(StoreCreateResponseDto, '가게 등록 성공')
+  async applyStoreCreate(
     @Body() storeCreateDto: StoreCreateDto,
     @GetUser() user: User, 
     @UploadedFiles(MediaValidationPipeArray) files: {
@@ -58,20 +61,8 @@ export class StoreController {
         accountImage: Express.Multer.File[],
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
-    }) {
-        // if (storeCreateDto instanceof StoreCreateDto) {
-        //     console.log('이 객체는 CreateUserDto의 인스턴스입니다.')
-        //     for (const o of Object.keys(storeCreateDto)) {
-        //         console.log(o, storeCreateDto[o]);
-        //     }
-        //     return  ;
-        // }   else {
-        //    return console.log('이 객체는 StoreCreateDto의 인스턴스가 아닙니다.');
-        // }
-        
-        
-        const store = await this.storeService.create(storeCreateDto, user, files);
-        return store;
+    }): Promise<StoreCreateResponseDto> {
+        return await this.storeService.create(storeCreateDto, user, files);
     }
 
   @Get()
@@ -82,4 +73,5 @@ export class StoreController {
     return 'This action returns a store';
   }
 }
+
 

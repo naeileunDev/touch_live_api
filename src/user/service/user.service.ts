@@ -22,7 +22,6 @@ import { UserOperationDto } from '../dto/user-operaion.dto';
 import { UserOperationRequestDto } from '../dto/user-operation-request.dto';
 import { UserOperation } from '../entity/user-operation.entity';
 
-
 @Injectable()
 export class UserService {
     constructor(
@@ -117,12 +116,16 @@ export class UserService {
     return adultDate <= thisYearJan1;
     }
 
+    async findEntityById(id: number, includeStore: boolean = false): Promise<User> {
+        return await this.userRepository.findEntityById(id, includeStore);
+    }
+
 
     /**
      * 사용자 단일 조회
      * @param id 사용자 식별자
      */
-    async findById(id: string): Promise<UserDto> {
+    async findBPublicId(id: string): Promise<UserDto> {
         const user = await this.userRepository.findByPublicId(id);
         return new UserDto(user, this.encryptionUtil);
     }
@@ -131,9 +134,19 @@ export class UserService {
      * 식별자로 사용자 조회 (비밀번호 재확인 패스워드 비교용)
      * @param id 사용자 식별자
      */
-    async findEntityById(id: string, includeStore: boolean = false): Promise<User> {
+    async findEntityByPublicId(id: string, includeStore: boolean = false): Promise<User> {
         return await this.userRepository.findByPublicId(id, includeStore);
     }
+
+        /**
+     * DI로 사용자 조회
+     * @param di DI
+     */
+    async findEntityByDi(di: string): Promise<User> {
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        return await this.userRepository.findEntityByEncryptedDi(encryptedDi);
+    }
+    
 
     /**
      * DI로 사용자 조회
@@ -141,19 +154,9 @@ export class UserService {
      */
     async findByDi(di: string): Promise<UserDto> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        const user = await this.userRepository.findByDi(encryptedDi);
+        const user = await this.userRepository.findEntityByEncryptedDi(encryptedDi);
         return new UserDto(user, this.encryptionUtil);
     }
-
-    /**
-     * DI로 사용자 조회
-     * @param di DI
-     */
-    async findEntityByDi(di: string): Promise<User> {
-        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        return await this.userRepository.findByDi(encryptedDi);
-    }
-
     /**
      * 아이디로 사용자 조회
      * @param loginId 아이디
@@ -168,8 +171,12 @@ export class UserService {
      * @param user 사용자 엔티티
      */
     async save(user: User): Promise<UserDto> {
-        const savedUser = await this.userRepository.save(user);
+        const savedUser = await this.saveEntity(user);
         return new UserDto(savedUser, this.encryptionUtil);
+    }
+
+    async saveEntity(user: User): Promise<User> {  
+        return await this.userRepository.save(user);
     }
 
     /**
@@ -283,7 +290,7 @@ export class UserService {
         return this.userOauthService.findUserOauthBySnsUserIdAndType(snsUserId, type);
     }
 
-    async findUserOauthEntityByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
+    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
         return this.userOauthService.findUserOauthEntityByUserIdAndType(userId, type);
     }
 

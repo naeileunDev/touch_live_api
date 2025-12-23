@@ -54,10 +54,10 @@ export class UserOauthRepository extends Repository<UserOauth> {
         });
     }
 
-    async findByUserIdAndType(userId: string, type: UserOauthType): Promise<UserOauth> {
+    async findByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
         const userOauth = await this.findOne({
             where: {
-                user: { publicId: userId },
+                user: { id: userId },
                 type,
             },
         });

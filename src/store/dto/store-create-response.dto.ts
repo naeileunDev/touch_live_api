@@ -1,0 +1,22 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { StoreRegisterLogDto } from "./store-register-log.dto";
+import { Type } from "class-transformer";
+import { ValidateNested } from "class-validator";
+import { AuthTokenDto } from "src/auth/dto/auth-token.dto";
+
+export class StoreCreateResponseDto {
+    @ApiProperty({ description: '가게 등록 로그 정보', type: StoreRegisterLogDto })
+    @ValidateNested()
+    @Type(() => StoreRegisterLogDto)
+    storeRegisterLogDto: StoreRegisterLogDto;
+
+    @ApiProperty({ description: '토큰 정보', type: AuthTokenDto })
+    @ValidateNested()
+    @Type(()=>AuthTokenDto)
+    token: AuthTokenDto;
+
+    constructor(storeRegisterLogDto: StoreRegisterLogDto, token: AuthTokenDto) {
+        this.storeRegisterLogDto = storeRegisterLogDto;
+        this.token = token;
+    }
+}

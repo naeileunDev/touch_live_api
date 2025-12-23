@@ -30,9 +30,8 @@ export class StoreRegisterLogDto {
     businessRegistrationNumber: string;
 
     @ApiProperty({ description: '사업자 등록증 이미지', example: 'https://example.com/businessRegistrationImage.jpg' })
-    @ValidateNested()
-    @Type(() => FileCommonDto)
-    businessRegistrationImage: FileCommonDto;
+    @IsNumber()
+    businessRegistrationImageId: number;
 
     @ApiProperty({ description: '대표자 이름', example: '홍길동' })
     @IsRequiredString()
@@ -51,9 +50,8 @@ export class StoreRegisterLogDto {
     eCommerceLicenseNumber: string;
 
     @ApiProperty({ description: '통신판매업 신고증 이미지', example: 'https://example.com/eCommerceLicenseImage.jpg' })
-    @ValidateNested()
-    @Type(() => FileCommonDto)
-    eCommerceLicenseImage: FileCommonDto;
+    @IsNumber()
+    eCommerceLicenseImageId: number;
 
     @ApiProperty({ description: '사업자 은행명', example: '은행명' })
     @IsRequiredString()
@@ -70,16 +68,16 @@ export class StoreRegisterLogDto {
     @ApiProperty({ description: '사업자 정산계좌 이미지', example: 'https://example.com/accountImage.jpg' })
     @ValidateNested()
     @Type(() => FileCommonDto)
-    accountImage: FileCommonDto;
+    accountImageId: number;
 
 
     @ApiProperty({ type: Number, isArray: true, description: '메인태그 리스트', example: [1, 2, 3] })
     @IsNumber({}, { each: true })
-    mainTag: number[];
+    mainTagIds: number[];
 
     @ApiProperty({ type: Number, isArray: true, description: '서브태그 리스트', example: [1, 2, 3] })
     @IsNumber({}, { each: true })
-    subTag: number[];
+    subTagIds: number[];
 
     @ApiProperty({ description: '가게 등록 일시', example: '2025-01-01 12:00:00' })
     @IsDate()
@@ -94,14 +92,12 @@ export class StoreRegisterLogDto {
     status: StoreRegisterStatus;
 
     @ApiProperty({ description: '가게 프로필 이미지', example: 'https://example.com/storeProfileImage.jpg' })
-    @ValidateNested()
-    @Type(() => FileCommonDto)
-    storeProfileImage: FileCommonDto;
+    @IsNumber()
+    storeProfileImageId: number;
 
     @ApiProperty({ description: '가게 배너 이미지', example: 'https://example.com/storeBannerImage.jpg' })
-    @ValidateNested()
-    @Type(() => FileCommonDto)
-    storeBannerImage: FileCommonDto;
+    @IsNumber()
+    storeBannerImageId: number;
 
     @ApiProperty({ description: '가게 등록 사용자', example: {id: 1, name: '홍길동'} })
     @ValidateNested()
@@ -110,27 +106,27 @@ export class StoreRegisterLogDto {
 
 
     constructor(private readonly storeRegisterLog: StoreRegisterLog) {
-        // this.id = storeRegisterLog.id;
-        // this.name = storeRegisterLog.name;
-        // this.phone = storeRegisterLog.phone;
-        // this.email = storeRegisterLog.email;
-        // this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
-        // this.businessRegistrationImage = storeRegisterLog.businessRegistrationImage;
-        // this.ceoName = storeRegisterLog.ceoName;
-        // this.businessType = storeRegisterLog.businessType;
-        // this.businessCategory = storeRegisterLog.businessCategory;
-        // this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
-        // this.eCommerceLicenseImage = storeRegisterLog.eCommerceLicenseImage;
-        // this.bankName = storeRegisterLog.bankName;
-        // this.accountNumber = storeRegisterLog.accountNumber;
-        // this.accountOwner = storeRegisterLog.accountOwner;
-        // this.accountImage = storeRegisterLog.accountImage;
-        // this.registerAt = storeRegisterLog.registerAt ? new Date(storeRegisterLog.registerAt) : null;
-        // this.registerFailedAt = storeRegisterLog.registerFailedAt ? new Date(storeRegisterLog.registerFailedAt) : null;
-        // this.status = storeRegisterLog.status;
-        // this.storeProfileImage = storeRegisterLog.storeProfileImage ? new FileCommonDto(storeRegisterLog.storeProfileImage) : null;
-        // this.storeBannerImage = storeRegisterLog.storeBannerImage ? new FileCommonDto(storeRegisterLog.storeBannerImage) : null;
-        // this.mainTag = storeRegisterLog.mainTag;
-        // this.subTag = storeRegisterLog.subTag;
+        this.id = storeRegisterLog.id;
+        this.name = storeRegisterLog.name;
+        this.phone = storeRegisterLog.phone;
+        this.email = storeRegisterLog.email;
+        this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
+        this.businessRegistrationImageId = storeRegisterLog.businessRegistrationImageId;
+        this.ceoName = storeRegisterLog.ceoName;
+        this.businessType = storeRegisterLog.businessType;
+        this.businessCategory = storeRegisterLog.businessCategory;
+        this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
+        this.eCommerceLicenseImageId = storeRegisterLog.eCommerceLicenseImageId;
+        this.bankName = storeRegisterLog.bankName;
+        this.accountNumber = storeRegisterLog.accountNumber;
+        this.accountOwner = storeRegisterLog.accountOwner;
+        this.accountImageId = storeRegisterLog.accountImageId;
+        this.registerAt = storeRegisterLog.registerAt ? new Date(storeRegisterLog.registerAt) : null;
+        this.registerFailedAt = storeRegisterLog.registerFailedAt ? new Date(storeRegisterLog.registerFailedAt) : null;
+        this.status = storeRegisterLog.status;
+        this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
+        this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
+        this.mainTagIds = storeRegisterLog.mainTagIds;
+        this.subTagIds = storeRegisterLog.subTagIds;
     }
 }
