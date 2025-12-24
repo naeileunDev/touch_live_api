@@ -44,4 +44,10 @@ export const MESSAGE_TEXT = {
 
     // Tag
     [MESSAGE_CODE.TAG_NAME_ALREADY_EXISTS]: '태그 이름이 이미 존재합니다.',
+
+    // Store
+    [MESSAGE_CODE.STORE_OWNER_ONLY]: '스토어 소유자만 접근 가능합니다.',
+    [MESSAGE_CODE.STORE_NON_OWNER_ONLY]: '스토어 미소유자만 접근 가능합니다.',
+    [MESSAGE_CODE.STORE_REGISTER_STATUS_PENDING]: '스토어 등록 대기 중입니다.',
+    [MESSAGE_CODE.STORE_REGISTER_STATUS_APPROVED]: '스토어 등록 승인 중입니다.',
 };
