@@ -4,6 +4,7 @@ import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
 import { TagUsageLog } from "src/tag/entity/tag-usage-log";
 import { Tag } from "src/tag/entity/tag.entity";
+import { CategoryType } from "src/tag/enum/category-type.enum";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -63,7 +64,7 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '가게 등록 비용', default: 11 })
     storeEntryFee: number;
 
-    // @OneToMany(() => TagUsageLog, tagUsageLog => tagUsageLog.store)
-    // @JoinColumn({ name: 'tagUsageLogId' })
-    // tagUsageLog: TagUsageLog[];
+    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default:[]})
+    category: CategoryType[];
+
 }

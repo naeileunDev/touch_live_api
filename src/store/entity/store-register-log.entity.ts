@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { User } from "src/user/entity/user.entity";
 import { FileCommonDto } from "src/file/dto/file-common-dto";
+import { CategoryType } from "src/tag/enum/category-type.enum";
 
 @Entity()
 export class StoreRegisterLog extends BaseEntity {
@@ -72,5 +73,6 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'int', array: true, comment: '서브태그 번호 리스트'})
     subTagIds: number[];
 
-
+    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default: [] })
+    category: CategoryType[];
 }
