@@ -1,9 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { StoreRegisterStatus } from "../enum/store-register-status.enum";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { User } from "src/user/entity/user.entity";
-import { FileCommonDto } from "src/file/dto/file-common-dto";
 import { CategoryType } from "src/tag/enum/category-type.enum";
+import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 
 @Entity()
 export class StoreRegisterLog extends BaseEntity {
@@ -52,15 +51,6 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'int', comment: '사업자 정산계좌 이미지 id' })
     accountImageId: number;
 
-    @Column({ type: 'timestamptz', comment: '가게 등록 일시', nullable: true })
-    registerAt: Date;
-
-    @Column({  type: 'timestamptz', comment: '가게 등록 실패 일시', nullable: true })
-    registerFailedAt: Date;
-    
-    @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })
-    status: StoreRegisterStatus;
-
     @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
     storeProfileImageId?: number | null;
 
@@ -75,4 +65,7 @@ export class StoreRegisterLog extends BaseEntity {
 
     @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default: [] })
     category: CategoryType[];
+
+    @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })
+    status: StoreRegisterStatus = StoreRegisterStatus.Pending;
 }

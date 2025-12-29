@@ -21,6 +21,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
 import { StoreCreateResponseDto } from './dto/store-create-response.dto';
 import { AuthTokenDto } from 'src/auth/dto/auth-token.dto';
+import { EncryptionUtil } from 'src/common/util/encryption.util';
+import { UserRole } from 'src/user/enum/user-role.enum';
 
 @Injectable()
 export class StoreService {
@@ -69,19 +71,24 @@ export class StoreService {
                         contentId: user.id,
                     } as FileCreateDto
                 );
-                return { usageType: m.usageType, id: file.id };
+                return { usageType: m.usageType, id: file.id, url: file.fileUrl };
             })
     );
-    const fileIds = new Map<UsageType, number>(
-        fileResults.map(r => [r.usageType, r.id])
-    );
     const uuid = uuidv4();
-    const storeFilesDto = new StoreFilesDto(fileIds);
+    const storeFilesDto = new StoreFilesDto(new Map(fileResults.map(r => [r.usageType, {id: r.id, url: r.url}])));
     const storeRegisterLog = await this.storeRegisterLogRepository.saveStoreRegisterLog(storeCreateDto, user, storeFilesDto);
     userEntity.storeRegisterStatus = StoreRegisterStatus.Pending;
     const savedUser = await this.userService.saveEntity(userEntity);
     const accessToken = await this.authService.createAccessToken(savedUser, uuid, storeCreateDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
-    return new StoreCreateResponseDto(new StoreRegisterLogDto(storeRegisterLog), new AuthTokenDto(accessToken, refreshToken));
+    return new StoreCreateResponseDto(new StoreRegisterLogDto(storeRegisterLog), storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
+  }
+
+  async getRegisterLog(id: number, user: User) {
+    const log = await this.storeRegisterLogRepository.findEntityById(id);
+    if (log.user.id !== user.id && user.userOperation.role === null && user.role === UserRole.User) {
+        throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
+    }
+    return new StoreRegisterLogDto(log);
   }
 }

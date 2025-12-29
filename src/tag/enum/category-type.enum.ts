@@ -7,7 +7,7 @@ export enum CategoryType {
     Tech = 'TECH',               // 테크
     Interior = 'INTERIOR',       // 인테리어
     Travel = 'TRAVEL',           // 여행
-    HobbyLeisure = 'HOBBY_LEISURE', // 취미/레저
+    HobbyLeisure = 'HOBBY_LEISURE', //취미/레저
     Kids = 'KIDS',               // 키즈
     Pet = 'PET',                 // 펫
     Car = 'CAR',                 // 자동차

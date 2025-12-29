@@ -6,6 +6,8 @@ import { User } from "src/user/entity/user.entity";
 import { StoreFilesDto } from "../dto/store-files.dto";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { FileCommonDto } from "src/file/dto/file-common-dto";
+import { ServiceException } from "src/common/filter/exception/service.exception";
+import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 
 @Injectable()
 export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
@@ -14,29 +16,32 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
     }
 
     async saveStoreRegisterLog(storeCreateDto: StoreCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
-        const storeRegisterLog = new StoreRegisterLog();
-        storeRegisterLog.user = user;
-        storeRegisterLog.name = storeCreateDto.name;
-        storeRegisterLog.phone = storeCreateDto.phone;
-        storeRegisterLog.email = storeCreateDto.email;
-        storeRegisterLog.businessRegistrationNumber = storeCreateDto.businessRegistrationNumber;
-        storeRegisterLog.businessRegistrationImageId = filesDto.businessRegistrationImageId;
-        storeRegisterLog.ceoName = storeCreateDto.ceoName;
-        storeRegisterLog.businessType = storeCreateDto.businessType;
-        storeRegisterLog.businessCategory = storeCreateDto.businessCategory;
-        storeRegisterLog.eCommerceLicenseNumber = storeCreateDto.eCommerceLicenseNumber;
-        storeRegisterLog.eCommerceLicenseImageId = filesDto.eCommerceLicenseImageId;
-        storeRegisterLog.bankName = storeCreateDto.bankName;
-        storeRegisterLog.accountNumber = storeCreateDto.accountNumber;
-        storeRegisterLog.accountOwner = storeCreateDto.accountOwner;
-        storeRegisterLog.accountImageId = filesDto.accountImageId;
-        storeRegisterLog.status = StoreRegisterStatus.Pending;
-        storeRegisterLog.registerAt = null;
-        storeRegisterLog.registerFailedAt = null;
-        storeRegisterLog.storeProfileImageId = filesDto.profileImageId ?? null;
-        storeRegisterLog.storeBannerImageId = filesDto.bannerImageId ?? null;
-        storeRegisterLog.mainTagIds = storeCreateDto.mainTag.map(tag => tag.id);
-        storeRegisterLog.subTagIds = storeCreateDto.subTag.map(tag => tag.id);
-        return await this.save(storeRegisterLog);
+        const { mainTag, subTag, fcmToken, ...storeData } = storeCreateDto;
+        return await this.save(
+            this.create({
+                ...storeData, 
+                user,
+                businessRegistrationImageId: filesDto.businessRegistrationImage.id,
+                eCommerceLicenseImageId: filesDto.eCommerceLicenseImage.id,
+                accountImageId: filesDto.accountImage.id,
+                storeProfileImageId: filesDto.profileImage?.id ?? null,
+                storeBannerImageId: filesDto.bannerImage?.id ?? null,
+                mainTagIds: mainTag.map(tag => tag.id),
+                subTagIds: subTag.map(tag => tag.id),
+            })
+        );
+    }
+
+    async findEntityById(id: number): Promise<StoreRegisterLog> {
+        const log = await this.findOne({
+            where:{ 
+                id,
+            },
+            relations: ['user'],
+        });
+        if (!log) {
+            throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND);
+        }
+        return log;
     }
 }

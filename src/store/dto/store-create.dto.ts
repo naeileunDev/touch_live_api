@@ -1,9 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { plainToInstance, Transform, Type } from "class-transformer";
-import { ArrayMaxSize, ArrayMinSize, ArrayNotEmpty, IsArray, IsDefined, IsEnum, IsInstance, IsNumber, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { TagCommonDto } from "src/tag/dto/tag-common.dto";
-import { Tag } from "src/tag/entity/tag.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 
 export class StoreCreateDto {
@@ -78,13 +77,13 @@ export class StoreCreateDto {
 
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     @IsArray()
+    @ArrayMinSize(1)
+    @ArrayMaxSize(3)
     @IsEnum(CategoryType, { each: true })
     @Transform(({ value }) => 
         typeof value === 'string' 
             ? value.split(',').map(v => v.trim() as CategoryType)
             : value
     )
-    @MinLength(1)
-    @MaxLength(3)
     category: CategoryType[];
 }
