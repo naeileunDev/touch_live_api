@@ -7,5 +7,6 @@ import { TagUsageLogRepository } from "./repository/tag-usage-log.repository";
 @Module({
     controllers: [TagController],
     providers: [TagService, TagRepository, TagUsageLogRepository],
+    exports: [TagService],
 })
 export class TagModule { }

@@ -1,10 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
-import { IsDate, IsEnum, IsNumber } from "class-validator";
+import { IsArray, IsDate, IsEnum, IsNumber, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { UserRole } from "src/user/enum/user-role.enum";
+import { Type } from "class-transformer";
+import { TagCommonDto } from "src/tag/dto/tag-common.dto";
 
 export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 등록 로그 식별자', example: 1, type: Number })
@@ -60,13 +62,17 @@ export class StoreRegisterLogDto {
     accountImageId: number;
 
 
-    @ApiProperty({ type: Number, isArray: true, description: '메인태그 리스트', example: [1, 2, 3] })
-    @IsNumber({}, { each: true })
-    mainTagIds: number[];
+    @ApiProperty({ type: TagCommonDto, isArray: true, description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}] })
+    @IsArray() 
+    @Type(() => TagCommonDto)
+    @ValidateNested({ each: true })
+    mainTag: TagCommonDto[];
 
-    @ApiProperty({ type: Number, isArray: true, description: '서브태그 리스트', example: [1, 2, 3] })
-    @IsNumber({}, { each: true })
-    subTagIds: number[];
+    @ApiProperty({ type: TagCommonDto, isArray: true, description: '서브태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}] })
+    @IsArray() 
+    @Type(() => TagCommonDto)
+    @ValidateNested({ each: true })
+    subTag: TagCommonDto[];
 
     @ApiProperty({ description: '가게 등록 상태', example: 'PENDING' })
     @IsEnum(StoreRegisterStatus)
@@ -81,7 +87,7 @@ export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     category: CategoryType[];
 
-    constructor(storeRegisterLog: StoreRegisterLog) {
+    constructor(storeRegisterLog: StoreRegisterLog, mainTag: TagCommonDto[], subTag: TagCommonDto[]) {
         this.id = storeRegisterLog.id;
         this.name = storeRegisterLog.name;
         this.phone = storeRegisterLog.phone;
@@ -95,10 +101,10 @@ export class StoreRegisterLogDto {
         this.accountNumber = storeRegisterLog.accountNumber;
         this.accountOwner = storeRegisterLog.accountOwner;
         this.accountImageId = storeRegisterLog.accountImageId;
-        this.mainTagIds = storeRegisterLog.mainTagIds;
-        this.subTagIds = storeRegisterLog.subTagIds;
         this.category = storeRegisterLog.category;
         this.status = storeRegisterLog.status;
+        this.mainTag = mainTag;
+        this.subTag = subTag;
         this.user = {
             id: storeRegisterLog.user.publicId,
             role: storeRegisterLog.user.role as UserRole,

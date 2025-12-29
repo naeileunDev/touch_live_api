@@ -23,6 +23,8 @@ import { StoreCreateResponseDto } from './dto/store-create-response.dto';
 import { AuthTokenDto } from 'src/auth/dto/auth-token.dto';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { UserRole } from 'src/user/enum/user-role.enum';
+import { TagService } from 'src/tag/tag.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class StoreService {
@@ -32,6 +34,7 @@ export class StoreService {
     private readonly FileService: FileService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly tagService: TagService,
   ) {
   }
   @Transactional()
@@ -81,14 +84,16 @@ export class StoreService {
     const savedUser = await this.userService.saveEntity(userEntity);
     const accessToken = await this.authService.createAccessToken(savedUser, uuid, storeCreateDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
-    return new StoreCreateResponseDto(new StoreRegisterLogDto(storeRegisterLog), storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
+    return new StoreCreateResponseDto(new StoreRegisterLogDto(storeRegisterLog, storeCreateDto.mainTag, storeCreateDto.subTag), storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
   }
 
   async getRegisterLog(id: number, user: User) {
     const log = await this.storeRegisterLogRepository.findEntityById(id);
-    if (log.user.id !== user.id && user.userOperation.role === null && user.role === UserRole.User) {
+    if (log.user.id !== user.id && user.userOperation == null && user.role === UserRole.User) {
         throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
     }
-    return new StoreRegisterLogDto(log);
+    const mainTag = await this.tagService.findByIds(log.mainTagIds).then(tags => tags.map(tag => new TagCommonDto(tag)));
+    const subTag = await this.tagService.findByIds(log.subTagIds).then(tags => tags.map(tag => new TagCommonDto(tag)));
+    return new StoreRegisterLogDto(log, mainTag, subTag);
   }
 }

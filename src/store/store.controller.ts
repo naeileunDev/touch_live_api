@@ -10,7 +10,8 @@ import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 import { StoreCreateResponseDto } from './dto/store-create-response.dto';
-import { ApiCreatedSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
+import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
+import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 
 @Controller('store')
 export class StoreController {
@@ -69,7 +70,8 @@ export class StoreController {
   @Role(ALL_PERMISSION)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-  async get(@GetUser() user: User, @Param('id') id: number) {
+  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
+  async getRegisterLog(@GetUser() user: User, @Param('id') id: number): Promise<StoreRegisterLogDto> {
     return await this.storeService.getRegisterLog(id, user);
   }
 }

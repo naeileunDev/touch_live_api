@@ -80,10 +80,7 @@ export class TagService {
             tagList: Array.from(categoryMap.entries()).map(([categoryType, tagList]) => ({
                 category: categoryType,
                 tagList: tagList.map(tag => { 
-                    const dto = new TagCommonDto();
-                    dto.id = tag.id;
-                    dto.name = tag.name;
-                    return dto;
+                    return new TagCommonDto(new TagDto(tag as Tag));
                 })
             }))
         }));
