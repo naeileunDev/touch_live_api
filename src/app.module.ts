@@ -12,10 +12,10 @@ import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
 import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
-import { PaymentMethodModule } from './payment-method/payment-method.module';
 import { EncryptionUtil } from './common/util/encryption.util';
 import { FileModule } from './file/file.module';
 import { TagModule } from './tag/tag.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
     imports: [
@@ -36,7 +36,7 @@ import { TagModule } from './tag/tag.module';
         AuthModule,
         StoreModule,
         ProductModule,
-        PaymentMethodModule,
+        PaymentModule,
         FileModule,
         TagModule,
     ],

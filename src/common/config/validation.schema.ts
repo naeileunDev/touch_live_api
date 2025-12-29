@@ -71,10 +71,9 @@ export const validationSchema = Joi.object({
     MAX_LOGIN_DEVICE_COUNT: Joi.number().required(),
     // Term 
     TERM_HTML_FILE_BASE_PATH: Joi.string().required(),
-    // KG Inicis
-    /* INICIS_MID: Joi.string().required(),
-    INICIS_HASH_KEY: Joi.string().required(),
-    INICIS_API_KEY: Joi.string().required(),
-    INICIS_IV: Joi.string().required(), */
+    // Toss payments
+    TOSS_MID: Joi.string().required(),
+    TOSS_TEST_SECRET_KEY: Joi.string().required(),
+    TOSS_TEST_PROTECT_KEY: Joi.string().required(),
 });
 
