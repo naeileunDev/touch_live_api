@@ -1,7 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity } from "typeorm";
 
-@Entity()
+@Entity()   
 export class Tag extends BaseEntity {
     @Column({ type: 'varchar', length: 30, comment: '태그 이름', unique: true })
     name: string;
@@ -53,6 +53,5 @@ export class Tag extends BaseEntity {
 
     @Column({ type: 'boolean', comment: '상품 태그 여부', default: false })
     isProductTag: boolean;
-
 
 }

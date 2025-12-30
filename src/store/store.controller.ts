@@ -1,14 +1,17 @@
-import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles} from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreCreateDto } from './dto/store-create.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, ApiOperation, getSchemaPath } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
-import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { MediaValidationPipe, MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
+import { StoreCreateResponseDto } from './dto/store-create-response.dto';
+import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
+import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 
 @Controller('store')
 export class StoreController {
@@ -46,7 +49,11 @@ export class StoreController {
     },
   })
   @ApiBearerAuth('access-token')
-  create(
+  @ApiExtraModels(StoreCreateResponseDto)
+  @Role(USER_PERMISSION)
+  @ApiOperation({ summary: '[유저 role] 가게 등록, 아직 가게를 등록하지 않았고, 로그상태가 null 또는 rejected인 경우 가게 등록 가능' })
+  @ApiCreatedSuccessResponse(StoreCreateResponseDto, '가게 등록 성공')
+  async applyStoreCreate(
     @Body() storeCreateDto: StoreCreateDto,
     @GetUser() user: User, 
     @UploadedFiles(MediaValidationPipeArray) files: {
@@ -55,20 +62,18 @@ export class StoreController {
         accountImage: Express.Multer.File[],
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
-    }) {
-        //console.log(storeCreateDto);
-        //console.log(files);
-        
-        const store = this.storeService.create(storeCreateDto, user, files);
-        return store;
+    }): Promise<StoreCreateResponseDto> {
+        return await this.storeService.create(storeCreateDto, user, files);
     }
 
-  @Get()
-  @Role(USER_PERMISSION)
-  @StoreOwner()
+  @Get('register-log/:id')
+  @Role(ALL_PERMISSION)
   @ApiBearerAuth('access-token')
-  get(@GetUser() user: User) {
-    return 'This action returns a store';
+  @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
+  async getRegisterLog(@GetUser() user: User, @Param('id') id: number): Promise<StoreRegisterLogDto> {
+    return await this.storeService.getRegisterLog(id, user);
   }
 }
+
 

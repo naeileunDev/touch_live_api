@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Tag } from "../entity/tag.entity";
 import { CATEGORY_FIELD_MAP, CategoryType } from "../enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "../enum/usage-type.enum";
-import { IsArray, IsEnum } from "class-validator";
+import { IsArray, IsDate, IsEnum } from "class-validator";
 
 export class TagDto {
     @ApiProperty({ description: '태그 ID', example: 1 })
@@ -21,6 +21,14 @@ export class TagDto {
     @IsEnum(UsageType, { each: true })
     usage: UsageType[];
 
+    @ApiProperty({ description: '태그 생성 일시', example: '2025-01-01 12:00:00' })
+    @IsDate()
+    createdAt: Date;
+
+    @ApiProperty({ description: '태그 수정 일시', example: '2025-01-01 12:00:00' })
+    @IsDate()
+    updatedAt: Date;
+
     constructor(tag: Tag) {
         this.id = tag.id;
         this.name = tag.name;
@@ -30,5 +38,7 @@ export class TagDto {
         this.usage =Object.entries(USAGE_FIELD_MAP)
         .filter(([usage, fieldName]) => tag[fieldName as keyof Tag] === true)
         .map(([usage]) => usage as UsageType);
+        this.createdAt = tag.createdAt;
+        this.updatedAt = tag.updatedAt;
     }
 }

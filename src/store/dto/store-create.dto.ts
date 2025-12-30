@@ -1,7 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Exclude, Expose } from "class-transformer";
-import { IsOptional, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { plainToInstance, Transform, Type } from "class-transformer";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
+import { TagCommonDto } from "src/tag/dto/tag-common.dto";
+import { CategoryType } from "src/tag/enum/category-type.enum";
 
 export class StoreCreateDto {
 
@@ -49,12 +51,39 @@ export class StoreCreateDto {
     @IsRequiredString()
     accountOwner: string;
 
-    @ApiProperty({ description: '메인태그', example: '태그1,태그2,태그3' })
-    @IsRequiredString()
-    mainTag: string;
+    @ApiProperty({ type: TagCommonDto, isArray: true, description: '메인태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}]})
+    @Transform(({ value }) => {
+        const rawArray = typeof value === 'string' ? JSON.parse(value) : value;
+        return plainToInstance(TagCommonDto, rawArray);
+      }) 
+    @IsArray() 
+    @Type(() => TagCommonDto)
+    @ValidateNested({ each: true })
+    mainTag: TagCommonDto[];
 
-    @ApiProperty({ description: '서브태그', example: '태그1,태그2,태그3' })
-    @IsRequiredString()
-    subTag: string;
+    @ApiProperty({ description: '서브태그 리스트', example: [{id: 1, name: '태그1'}, {id: 2, name: '태그2'}, {id: 3, name: '태그3'}], type: [TagCommonDto] })
+    @Transform(({ value }) => {
+        const rawArray = typeof value === 'string' ? JSON.parse(value) : value;
+        return plainToInstance(TagCommonDto, rawArray);
+      })
+    @IsArray() 
+    @Type(() => TagCommonDto)  // @IsArray() 다음에 위치
+    @ValidateNested({ each: true })  //  @Type() 다음에 위치
+    subTag: TagCommonDto[];
 
+    @ApiProperty({ description: 'FCM 토큰', example: 'FCM_TOKEN' })
+    @IsRequiredString()
+    fcmToken: string;
+
+    @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
+    @IsArray()
+    @ArrayMinSize(1)
+    @ArrayMaxSize(3)
+    @IsEnum(CategoryType, { each: true })
+    @Transform(({ value }) => 
+        typeof value === 'string' 
+            ? value.split(',').map(v => v.trim() as CategoryType)
+            : value
+    )
+    category: CategoryType[];
 }

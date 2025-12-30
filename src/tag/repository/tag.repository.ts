@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Brackets, DataSource, Repository } from "typeorm";
+import { DataSource, DeleteResult, Equal, In, Repository } from "typeorm";
 import { Tag } from "../entity/tag.entity";
 import { TagCreateDto } from "../dto/tag-create.dto";
 import { CATEGORY_FIELD_MAP, CategoryType } from "../enum/category-type.enum";
@@ -11,14 +11,30 @@ export class TagRepository extends Repository<Tag> {
         super(Tag, dataSource.createEntityManager());
     }
 
-    async createTag(tag: TagCreateDto): Promise<Tag> {
+    async createTag(createDto: TagCreateDto): Promise<Tag> {
+        const tag = this.create(createDto);
         return await this.save(tag);
     }
 
+    async findById(id: number): Promise<Tag> {
+        return await this.findOne({
+            where: {
+                id
+            },
+        });
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+        const rtn: DeleteResult = await this.softDelete({
+            id,
+        });
+        return rtn.affected > 0;
+    }
+    
     async existsByTagName(name: string): Promise<boolean> {
         return await this.exists({
             where: {
-                name,
+                name
             },
         });
     }
@@ -57,5 +73,21 @@ export class TagRepository extends Repository<Tag> {
             );
         }
         return await queryBuilder.getMany();
+    }
+
+    async findByIds(ids: number[]): Promise<Tag[]> {
+        return await this.find({
+            where: {
+                id: In(ids),
+            },
+        });
+    }
+
+    async findByTagName(name: string): Promise<Tag> {
+        return await this.findOne({
+            where: {
+                name
+            },
+        });
     }
 }

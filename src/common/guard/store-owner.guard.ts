@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { StoreRegisterStatus } from 'src/store/enum/store-register-status.enum';
+import { ServiceException } from '../filter/exception/service.exception';
+import { MESSAGE_CODE } from '../filter/config/message-code.config';
 
 @Injectable()
 export class StoreOwnerGuard implements CanActivate {
@@ -30,25 +32,27 @@ export class StoreOwnerGuard implements CanActivate {
         }
 
         const request = context.switchToHttp().getRequest();
-        // @ts-ignore
-        const { user } = request;
-        const hasStore =  user.storeId != null;
-        const storeRegisterStatus = (
-        user.storeRegisterStatus === StoreRegisterStatus.Pending || 
-        user.storeRegisterStatus === StoreRegisterStatus.Approved
-        );
+        const user = request.user as {
+            storeId?: number | null;
+            storeRegisterStatus?: StoreRegisterStatus | null;
+        };
 
-        if (requireStore && !hasStore) {
-            throw new ForbiddenException('스토어 소유자만 접근 가능합니다.');
+        if (requireStore) {
+            if (!user.storeId) {
+                throw new ServiceException(MESSAGE_CODE.STORE_OWNER_ONLY);
+            }        
         }
-
-        if (requireNoStore && hasStore) {
-            throw new ForbiddenException('스토어 미소유자만 접근 가능합니다.');
+        else if (requireNoStore) {
+            if (user.storeId) {
+                throw new ServiceException(MESSAGE_CODE.STORE_NON_OWNER_ONLY);
+            }
+            else if (user.storeRegisterStatus && user.storeRegisterStatus === StoreRegisterStatus.Pending) {
+                throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_STATUS_PENDING);
+            }
+            else if (user.storeRegisterStatus && user.storeRegisterStatus === StoreRegisterStatus.Approved) {
+                throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_STATUS_APPROVED);
+            }
         }
-        else if (requireNoStore && !hasStore && storeRegisterStatus && user.storeRegisterStatus === StoreRegisterStatus.Pending) {
-            throw new ForbiddenException('스토어 등록 대기 중입니다');
-        }
-
         return true;
     }
 }

@@ -40,7 +40,17 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.FILE_NOT_FOUND]: '파일을 찾을 수 없습니다.',
     [MESSAGE_CODE.FILE_INVALID_MIME_TYPE]: '파일 형식이 올바르지 않습니다.',
     [MESSAGE_CODE.FILE_INVALID_MEDIA_DURATION]: '영상 길이가 올바르지 않습니다.',
+    [MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND]: '필수 파일이 누락되었습니다.',
 
     // Tag
     [MESSAGE_CODE.TAG_NAME_ALREADY_EXISTS]: '태그 이름이 이미 존재합니다.',
+    [MESSAGE_CODE.TAG_NOT_FOUND]: '태그를 찾을 수 없습니다.',
+
+    // Store
+    [MESSAGE_CODE.STORE_OWNER_ONLY]: '스토어 소유자만 접근 가능합니다.',
+    [MESSAGE_CODE.STORE_NON_OWNER_ONLY]: '스토어 미소유자만 접근 가능합니다.',
+    [MESSAGE_CODE.STORE_REGISTER_STATUS_PENDING]: '스토어 등록 대기 중입니다.',
+    [MESSAGE_CODE.STORE_REGISTER_STATUS_APPROVED]: '스토어 등록 승인 중입니다.',
+    [MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND]: '해당 가게 등록 로그를 찾을 수 없습니다.',
+    [MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED]: '해당 가게 등록 로그에 접근할 수 없습니다.',
 };

@@ -1,14 +1,14 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
-import { StoreStatusType } from "../enum/store-status-type.enum";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { User } from "src/user/entity/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { Tag } from "src/tag/entity/tag.entity";
-import { File } from "src/file/entitiy/file.entity";
-import { UsageType } from "src/file/enum/file-category.enum";
+import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 
 @Entity()
-export class Store extends BaseEntity{
+export class StoreRegisterLog extends BaseEntity {
+    @ManyToOne(() => User, user => user.storeRegisterLog)
+    user: User;
+
     @Column({ type: 'varchar', length: 255, comment: '가게 이름' })
     name: string;
 
@@ -17,9 +17,6 @@ export class Store extends BaseEntity{
 
     @Column({ type: 'varchar', length: 255, comment: '가게 이메일' })
     email: string;
-
-    @Column({ type: 'boolean', comment: '가게 노출 여부', default: false })
-    isVisible: boolean;
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;
@@ -47,30 +44,28 @@ export class Store extends BaseEntity{
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 계좌번호' })
     accountNumber: string;
-    
+
     @Column({ type: 'varchar', length: 255, comment: '사업자 예금주' })
     accountOwner: string;
 
     @Column({ type: 'int', comment: '사업자 정산계좌 이미지 id' })
     accountImageId: number;
 
-    // @Column({ type: 'array', length: 3, comment: '메인태그(3개까지)' })
-    // MainTag: Array<Tag>;
+    @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
+    storeProfileImageId?: number | null;
 
-    // @Column({ type: 'array', length: 5, comment: '최대 서브태그(5개까지)' })
-    // SubTag: Array<Tag>;
+    @Column({ type: 'int', comment: '가게 배너 이미지 id', nullable: true })
+    storeBannerImageId?: number | null;
 
-    @Column({ type: 'enum', enum: StoreStatusType, comment: '가게 상태', default: StoreStatusType.Active })
-    status: StoreStatusType;
+    @Column({ type: 'int', array: true, comment: '메인태그 번호 리스트' })
+    mainTagIds: number[];
 
-    @OneToOne(() => User, user => user.store)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    @Column({ type: 'int', array: true, comment: '서브태그 번호 리스트'})
+    subTagIds: number[];
 
-    @Column({ type: 'int', comment: '가게 등록 비용', default: 11 })
-    storeEntryFee: number;
-
-    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default:[]})
+    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default: [] })
     category: CategoryType[];
 
+    @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })
+    status: StoreRegisterStatus = StoreRegisterStatus.Pending;
 }

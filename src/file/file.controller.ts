@@ -67,6 +67,7 @@ export class FileController {
     async findOne(@Param('id') id: number) {
     return await this.fileService.findOne(id);
     }
+    
     @Get('serve/:id')
     @ApiOperation({ summary: '파일 조회 및 표시 (브라우저에서 열기)' })
     @ApiResponse({ 

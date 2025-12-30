@@ -30,6 +30,19 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
+    async findEntityById(id: number, includeStore: boolean = false): Promise<User> {
+        const user = await this.findOne({
+            where: {
+                id,
+            },
+            relations: includeStore ? ['store'] : [],
+        });
+        if (!user) {
+            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+        }
+        return user;
+    }
+
     async findByPublicId(publicId: string, includeStore: boolean = false): Promise<User> {
         const user = await this.findOne({
             where: {
@@ -106,7 +119,7 @@ export class UserRepository extends Repository<User> {
         });
     }
 
-    async findByDi(di: string): Promise<User> {
+    async findEntityByEncryptedDi(di: string): Promise<User> {
         const user = await this.findOne({
             where: {
                 di,
@@ -114,7 +127,7 @@ export class UserRepository extends Repository<User> {
         });
         if (!user) {
             throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
-        }
+        };
         return user;
     }
 }
