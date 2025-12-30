@@ -1,37 +1,25 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { CategoryType } from "../enum/category-type.enum";
-import { IsArray, IsEnum, IsOptional } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 import { UsageType } from "../enum/usage-type.enum";
-import { Transform } from "class-transformer";
+import { CategoryType } from "../enum/category-type.enum";
+import { TagFindCategoryDto } from "./tag-find-category.dto";
+import { IsEnum, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class TagFindDto {
-    @ApiPropertyOptional({ 
-        description: '태그 카테고리 타입', 
-        example: [CategoryType.Food, CategoryType.Lifestyle], 
-        enum: CategoryType,
-        isArray: true
-    })
-    @IsArray()
-    @IsEnum(CategoryType, { each: true })
-    @IsOptional()
-    @Transform(({ value }) => {
-        if (!value) return undefined;
-        return Array.isArray(value) ? value : [value];
-    })
-    category?: CategoryType[];
+    @ApiProperty({ description: '태그 용도', example: UsageType.Store, enum: UsageType })
+    @IsEnum(UsageType)
+    usage: UsageType;
 
-    @ApiPropertyOptional({
-        description: '태그 용도 ',
-        example: [UsageType.Store, UsageType.Product],
-        enum: UsageType,
-        isArray: true
-    })
-    @IsArray()
-    @IsEnum(UsageType, { each: true })
-    @IsOptional()
-    @Transform(({ value }) => {
-        if (!value) return undefined;
-        return Array.isArray(value) ? value : [value];
-    })
-    usage?: UsageType[];
+    @ApiProperty({ description: '태그 카테고리 리스트', type: [TagFindCategoryDto] })
+    @ValidateNested({ each: true })
+    @Type(() => TagFindCategoryDto)
+    tagList: TagFindCategoryDto[];
+
+    constructor(usage: UsageType, category: CategoryType[]) {
+        this.usage = usage;
+        this.tagList = category.map(category => ({
+            category: category,
+            tagList: []
+        }));
+    }
 }

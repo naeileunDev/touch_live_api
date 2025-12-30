@@ -43,6 +43,7 @@ export const MESSAGE_CODE = {
 
     // Tag
     TAG_NAME_ALREADY_EXISTS: 1400,
+    TAG_NOT_FOUND: 1401,
 
     // Store
     STORE_NOT_FOUND: 1500,

@@ -51,6 +51,28 @@ export class PaymentService {
         try {
             const response = await axios.post(url, body, { headers });
             console.log(response.data);
+            const accessToken = await this.getAccessToken(response.data.code, auth_key, findUser.publicId);
+            return accessToken;
+        } catch (error) {
+            console.error('Toss Payments API Error:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    async getAccessToken(code: string, auth_key: string, publicId: string) {
+        const url = `https://api.tosspayments.com/v1/brandpay/access-token`
+        const headers = {
+            'Authorization': `Basic ${auth_key}`,
+            'Content-Type': 'application/json',
+        }
+        const body = {
+            grantType: 'AuthorizationCode',
+            code: code,
+            customerKey: publicId
+        }
+        try{
+            const response = await axios.post(url, body, { headers });
+            console.log(response.data);
             return response.data;
         } catch (error) {
             console.error('Toss Payments API Error:', error.response?.data || error.message);

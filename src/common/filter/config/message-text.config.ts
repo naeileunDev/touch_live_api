@@ -44,6 +44,7 @@ export const MESSAGE_TEXT = {
 
     // Tag
     [MESSAGE_CODE.TAG_NAME_ALREADY_EXISTS]: '태그 이름이 이미 존재합니다.',
+    [MESSAGE_CODE.TAG_NOT_FOUND]: '태그를 찾을 수 없습니다.',
 
     // Store
     [MESSAGE_CODE.STORE_OWNER_ONLY]: '스토어 소유자만 접근 가능합니다.',
