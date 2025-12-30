@@ -54,11 +54,11 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '사업자 정산계좌 이미지 id' })
     accountImageId: number;
 
-    // @Column({ type: 'array', length: 3, comment: '메인태그(3개까지)' })
-    // MainTag: Array<Tag>;
+    @Column({ type: 'varchar', array: true, length: 3, comment: '메인태그(3개까지)' })
+    mainTags: string[];
 
-    // @Column({ type: 'array', length: 5, comment: '최대 서브태그(5개까지)' })
-    // SubTag: Array<Tag>;
+    @Column({ type: 'varchar', array: true, length: 5, comment: '최대 서브태그(5개까지)' })
+    subTags: string[];
 
     @Column({ type: 'enum', enum: StoreStatusType, comment: '가게 상태', default: StoreStatusType.Active })
     status: StoreStatusType;

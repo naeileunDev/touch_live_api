@@ -9,7 +9,6 @@ import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
 import { Tag } from "./entity/tag.entity";
 import { TagFindDto } from "./dto/tag-find.dto";
-import { TagCommonDto } from "./dto/tag-common.dto";
 
 @Injectable()
 export class TagService {
@@ -52,7 +51,7 @@ export class TagService {
         const tags = await this.tagRepository.findTagList(category, usage);
         return tags.map(tag => new TagDto(tag));
     }
-    async findTagListGroupedByUsage(requestDto: TagFindRequestDto): Promise<TagFindDto[]> {
+    async findTagListGroupedByUsage(requestDto: TagFindRequestDto): Promise<string[]> {
         const { category, usage } = requestDto;
         const tags = await this.tagRepository.findTagList(category, usage);
         
@@ -60,7 +59,7 @@ export class TagService {
         const targetUsages = usage?.length ? usage : Object.values(UsageType);
         const targetCategories = category?.length ? category : Object.values(CategoryType);
         
-        const grouped = new Map<UsageType, Map<CategoryType, TagCommonDto[]>>();
+        const grouped = new Map<UsageType, Map<CategoryType, string[]>>();
         
         tags.forEach(tag => {
             Object.entries(USAGE_FIELD_MAP).forEach(([usageType, usageFieldName]) => {
@@ -81,8 +80,8 @@ export class TagService {
                             }
                             
                             const tagList = categoryMap.get(cType)!;
-                            if (!tagList.some(t => t.id === tag.id)) {
-                                tagList.push(tag);
+                            if (!tagList.some(t => t === tag.name)) {
+                                tagList.push(tag.name);
                             }
                         }
                     });
@@ -90,15 +89,9 @@ export class TagService {
             });
         });
         
-        return Array.from(grouped.entries()).map(([usageType, categoryMap]) => ({
-            usage: usageType,
-            tagList: Array.from(categoryMap.entries()).map(([categoryType, tagList]) => ({
-                category: categoryType,
-                tagList: tagList.map(tag => { 
-                    return new TagCommonDto(new TagDto(tag as Tag));
-                })
-            }))
-        }));
+        // 중복 제거하여 태그 이름 배열 반환
+        const tagNames = tags.map(tag => tag.name);
+        return [...new Set(tagNames)];
     }
 
     async findByIds(ids: number[]): Promise<TagDto[]> {
