@@ -18,6 +18,9 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'varchar', length: 255, comment: '가게 이메일' })
     email: string;
 
+    @Column({ type: 'varchar', length: 255, comment: '가게 정보' })
+    storeInfo: string;
+
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;
 

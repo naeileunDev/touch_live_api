@@ -1,7 +1,10 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
 import { Store } from "../entity/store.entity";
 import { Injectable } from "@nestjs/common";
-import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
+import { StoreRegisterLogDto } from "../dto/store-register-log.dto";
+import { User } from "src/user/entity/user.entity";
+import { StoreStatusType } from "../enum/store-status-type.enum";
+import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 
 @Injectable()
 export class StoreRepository extends Repository<Store> {
@@ -9,8 +12,35 @@ export class StoreRepository extends Repository<Store> {
         super(Store, dataSource.createEntityManager());
     }
     
-    async createStore(createDto: StoreRegisterLogCreateDto): Promise<Store> {
-        const store = this.create(createDto);
+    async createStore(createDto: StoreRegisterLogDto, user: User, fee: number): Promise<Store> {
+        const store = await this.create({
+            name: createDto.name,
+            phone: createDto.phone,
+            email: createDto.email,
+            storeInfo: createDto.storeInfo,
+            businessRegistrationNumber: createDto.businessRegistrationNumber,
+            businessRegistrationImageId: createDto.businessRegistrationImageId,
+            ceoName: createDto.ceoName,
+            businessType: createDto.businessType,
+            businessCategory: createDto.businessCategory,
+            eCommerceLicenseNumber: createDto.eCommerceLicenseNumber,
+            eCommerceLicenseImageId: createDto.eCommerceLicenseImageId,
+            bankName: createDto.bankName,
+            accountNumber: createDto.accountNumber,
+            accountOwner: createDto.accountOwner,
+            accountImageId: createDto.accountImageId,
+            category: createDto.category,
+            mainTags: createDto.mainTags,
+            subTags: createDto.subTags,
+            storeBannerImageId: createDto.storeBannerImageId ?? null,
+            storeProfileImageId: createDto.storeProfileImageId ?? null,
+            saleChageRate: fee,
+            status: createDto.status === StoreRegisterStatus.Approved 
+                ? StoreStatusType.Active 
+                : StoreStatusType.Inactive,
+            user: user,
+            isVisible: createDto.status === StoreRegisterStatus.Approved,
+        });
         return await this.save(store);
     }
     async findById(id: number): Promise<Store> {
@@ -18,6 +48,7 @@ export class StoreRepository extends Repository<Store> {
             where: {
                 id,
             },
+            relations: ['user'],
         });
         return store;
     }

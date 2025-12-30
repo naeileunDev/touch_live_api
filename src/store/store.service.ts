@@ -22,6 +22,7 @@ import { plainToInstance } from 'class-transformer';
 import { StoreDto } from './dto/store.dto';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
+import { Store } from './entity/store.entity';
 
 @Injectable()
 export class StoreService {
@@ -33,6 +34,22 @@ export class StoreService {
     private readonly authService: AuthService,
     private readonly tagService: TagService,
   ) {
+  }
+  async createStore(createDto: StoreRegisterLogDto, user: User): Promise<StoreDto> {
+    const store = await this.storeRepository.createStore(createDto, user, 11);
+    const savedStore = await this.saveStore(store);
+    return plainToInstance(StoreDto, savedStore);
+  }
+
+  
+
+  async saveStore(store: Store): Promise<Store> {
+    return await this.storeRepository.save(store);
+  }
+
+  async findStore(id: number): Promise<StoreDto> {
+    const store = await this.storeRepository.findById(id);
+    return plainToInstance(StoreDto, store);
   }
 
 //   async createStore(createDto: any, user: User): Promise<StoreDto> {

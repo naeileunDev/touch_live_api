@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
-import { IsArray, IsEnum, IsNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
@@ -23,6 +23,14 @@ export class StoreRegisterLogDto {
     @IsRequiredString()
     email: string;
 
+    @ApiProperty({ description: '가게 정보', example: '가게 정보' })
+    @IsRequiredString()
+    storeInfo: string;
+
+    @ApiProperty({ description: '사업자 등록증 이미지 id', example: 1, type: Number })
+    @IsNumber()
+    businessRegistrationImageId: number;
+
     @ApiProperty({ description: '사업자 등록번호', example: '1234567890123' })
     @IsRequiredString()
     businessRegistrationNumber: string;
@@ -42,6 +50,10 @@ export class StoreRegisterLogDto {
     @ApiProperty({ description: '통신판매업 신고번호', example: '1234567890123' })
     @IsRequiredString()
     eCommerceLicenseNumber: string;
+
+    @ApiProperty({ description: '통신판매업 신고증 이미지 id', example: 1, type: Number })
+    @IsNumber()
+    eCommerceLicenseImageId: number;
 
     @ApiProperty({ description: '사업자 은행명', example: '은행명' })
     @IsRequiredString()
@@ -87,12 +99,25 @@ export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     category: CategoryType[];
 
+    @ApiPropertyOptional({ description: '가게 배너 이미지 id', example: 1, type: Number })
+    @IsOptional()
+    @IsNumber()
+    storeBannerImageId: number;
+
+    @ApiPropertyOptional({ description: '가게 프로필 이미지 id', example: 1, type: Number })
+    @IsOptional()
+    @IsNumber()
+    storeProfileImageId: number;
+
     constructor(storeRegisterLog: StoreRegisterLog) {
         this.id = storeRegisterLog.id;
         this.name = storeRegisterLog.name;
         this.phone = storeRegisterLog.phone;
         this.email = storeRegisterLog.email;
+        this.storeInfo = storeRegisterLog.storeInfo;
+        this.businessRegistrationImageId = storeRegisterLog.businessRegistrationImageId;
         this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
+        this.eCommerceLicenseImageId = storeRegisterLog.eCommerceLicenseImageId;
         this.ceoName = storeRegisterLog.ceoName;
         this.businessType = storeRegisterLog.businessType;
         this.businessCategory = storeRegisterLog.businessCategory;
@@ -109,6 +134,9 @@ export class StoreRegisterLogDto {
             id: storeRegisterLog.user.publicId,
             role: storeRegisterLog.user.role as UserRole,
         };
+        this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
+        this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
+        this.storeInfo = storeRegisterLog.storeInfo;
     }
     
 }

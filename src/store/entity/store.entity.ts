@@ -1,11 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { Tag } from "src/tag/entity/tag.entity";
-import { File } from "src/file/entitiy/file.entity";
-import { UsageType } from "src/file/enum/file-category.enum";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -26,6 +23,9 @@ export class Store extends BaseEntity{
 
     @Column({ type: 'int', comment: '사업자 등록증 이미지 id' })
     businessRegistrationImageId: number;
+
+    @Column({ type: 'int', comment: '가게 배너 이미지 id', nullable: true })
+    storeBannerImageId?: number | null;
 
     @Column({ type: 'varchar', length: 255, comment: '대표자 이름' })
     ceoName: string;
@@ -67,10 +67,18 @@ export class Store extends BaseEntity{
     @JoinColumn({ name: 'userId' })
     user: User;
 
-    @Column({ type: 'int', comment: '가게 등록 비용', default: 11 })
-    storeEntryFee: number;
+    @Column({ type: 'int', comment: '판매 수수료 비율', default: 11 })
+    saleChageRate: number;
 
     @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default:[]})
     category: CategoryType[];
 
+    @Column({ type: 'varchar', length: 255, comment: '가게 정보' })
+    storeInfo: string;
+
+    @Column({ type: 'int', comment: '가게 배너 이미지 id', nullable: true })
+    storebannerImageId?: number | null;
+
+    @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
+    storeProfileImageId?: number | null;
 }
