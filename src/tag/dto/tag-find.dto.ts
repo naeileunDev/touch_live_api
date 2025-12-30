@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { UsageType } from "../enum/usage-type.enum";
 import { CategoryType } from "../enum/category-type.enum";
 import { TagFindCategoryDto } from "./tag-find-category.dto";
-import { IsEnum, ValidateNested } from "class-validator";
+import { IsEnum, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class TagFindDto {
@@ -10,16 +10,17 @@ export class TagFindDto {
     @IsEnum(UsageType)
     usage: UsageType;
 
-    @ApiProperty({ description: '태그 카테고리 리스트', type: [TagFindCategoryDto] })
-    @ValidateNested({ each: true })
-    @Type(() => TagFindCategoryDto)
-    tagList: TagFindCategoryDto[];
+    @ApiProperty({ description: '태그 카테고리 타입', example: CategoryType.Food, enum: CategoryType })
+    @IsEnum(CategoryType)
+    category: CategoryType;
 
-    constructor(usage: UsageType, category: CategoryType[]) {
+    @ApiProperty({ description: '태그 리스트', example: ['태그1', '태그2', '태그3'], isArray: true })
+    @IsString({ each: true })
+    tagList: string[];
+
+    constructor(usage: UsageType, category: CategoryType, tagList:string[]) {
         this.usage = usage;
-        this.tagList = category.map(category => ({
-            category: category,
-            tagList: []
-        }));
+        this.category = category;
+        this.tagList = tagList;
     }
 }

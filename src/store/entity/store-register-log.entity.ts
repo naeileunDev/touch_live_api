@@ -57,11 +57,11 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'int', comment: '가게 배너 이미지 id', nullable: true })
     storeBannerImageId?: number | null;
 
-    @Column({ type: 'int', array: true, comment: '메인태그 번호 리스트' })
-    mainTagIds: number[];
+    @Column({ type: 'varchar', array: true, comment: '메인태그 리스트' })
+    mainTags: string[];
 
-    @Column({ type: 'int', array: true, comment: '서브태그 번호 리스트'})
-    subTagIds: number[];
+    @Column({ type: 'varchar', array: true, comment: '서브태그 리스트'})
+    subTags: string[];
 
     @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default: [] })
     category: CategoryType[];

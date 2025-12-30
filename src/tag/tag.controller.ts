@@ -44,7 +44,7 @@ export class TagController {
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 태그 목록 조회 (사용처별 그룹화)' })
     @ApiOkSuccessResponse(TagFindDto, '태그 목록 조회 성공', true)
-    async findTagList(@Query() requestDto: TagFindRequestDto): Promise<TagFindDto[]> {
+    async findTagList(@Query() requestDto: TagFindRequestDto): Promise<string[]> {
         return await this.tagService.findTagListGroupedByUsage(requestDto);
     }
 }

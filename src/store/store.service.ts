@@ -1,16 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { StoreCreateDto } from './dto/store-create.dto';
 import { User } from 'src/user/entity/user.entity';
 import { StoreRepository } from './repository/store.respository';
 import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
 import { FileService } from 'src/file/file.service';
 import { ContentCategory, UsageType } from 'src/file/enum/file-category.enum';
-import { FileCommonDto } from 'src/file/dto/file-common-dto';
-import { StoreRegisterLog } from './entity/store-register-log.entity';
 import { StoreFilesDto } from './dto/store-files.dto';
-import { FileDto } from 'src/file/dto/file.dto';
-import { StoreRegisterLogDto } from './dto/store-register-log.dto';
-import { TagCommonDto } from 'src/tag/dto/tag-common.dto';
 import { Transactional } from 'typeorm-transactional';
 import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 import { ServiceException } from 'src/common/filter/exception/service.exception';
@@ -19,12 +13,15 @@ import { UserService } from 'src/user/service/user.service';
 import { StoreRegisterStatus } from './enum/store-register-status.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
-import { StoreCreateResponseDto } from './dto/store-create-response.dto';
+import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { AuthTokenDto } from 'src/auth/dto/auth-token.dto';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { TagService } from 'src/tag/tag.service';
 import { plainToInstance } from 'class-transformer';
+import { StoreDto } from './dto/store.dto';
+import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
+import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
 
 @Injectable()
 export class StoreService {
@@ -37,8 +34,12 @@ export class StoreService {
     private readonly tagService: TagService,
   ) {
   }
+
+//   async createStore(createDto: any, user: User): Promise<StoreDto> {
+//     const userEntity = await this.userService.findEntityById(user.id, true);
+//   }
   @Transactional()
-  async create(storeCreateDto: StoreCreateDto, user: User, files: {
+  async createStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, files: {
     businessRegistrationImage: Express.Multer.File[],
     eCommerceLicenseImage: Express.Multer.File[],
     accountImage: Express.Multer.File[],
@@ -79,21 +80,24 @@ export class StoreService {
     );
     const uuid = uuidv4();
     const storeFilesDto = new StoreFilesDto(new Map(fileResults.map(r => [r.usageType, {id: r.id, url: r.url}])));
-    const storeRegisterLog = await this.storeRegisterLogRepository.saveStoreRegisterLog(storeCreateDto, user, storeFilesDto);
+    const storeRegisterLog = await this.storeRegisterLogRepository.saveStoreRegisterLog(createDto, user, storeFilesDto);
     userEntity.storeRegisterStatus = StoreRegisterStatus.Pending;
     const savedUser = await this.userService.saveEntity(userEntity);
-    const accessToken = await this.authService.createAccessToken(savedUser, uuid, storeCreateDto.fcmToken);
+    const accessToken = await this.authService.createAccessToken(savedUser, uuid, createDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
-    return new StoreCreateResponseDto(new StoreRegisterLogDto(storeRegisterLog, storeCreateDto.mainTag, storeCreateDto.subTag), storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
+    return new StoreRegisterLogCreateResponseDto(storeRegisterLog, storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
   }
 
-  async getRegisterLog(id: number, user: User) {
+//   async findById(id: number): Promise<StoreDto> {
+//     const store = await this.storeRepository.findById(id);
+//     return new StoreDto(store);
+//   }
+
+  async getRegisterLog(id: number, user: User): Promise<StoreRegisterLogDto> {
     const log = await this.storeRegisterLogRepository.findEntityById(id);
     if (log.user.id !== user.id && user.userOperation == null && user.role === UserRole.User) {
         throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
     }
-    const mainTag = await this.tagService.findByIds(log.mainTagIds).then(tags => tags.map(tag => new TagCommonDto(tag)));
-    const subTag = await this.tagService.findByIds(log.subTagIds).then(tags => tags.map(tag => new TagCommonDto(tag)));
-    return new StoreRegisterLogDto(log, mainTag, subTag);
+    return new StoreRegisterLogDto(log);
   }
 }

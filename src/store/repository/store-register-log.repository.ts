@@ -1,11 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
-import { StoreCreateDto } from "../dto/store-create.dto";
+import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
 import { User } from "src/user/entity/user.entity";
 import { StoreFilesDto } from "../dto/store-files.dto";
-import { StoreRegisterStatus } from "../enum/store-register-status.enum";
-import { FileCommonDto } from "src/file/dto/file-common-dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 
@@ -15,8 +13,8 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
         super(StoreRegisterLog, dataSource.createEntityManager());
     }
 
-    async saveStoreRegisterLog(storeCreateDto: StoreCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
-        const { mainTag, subTag, fcmToken, ...storeData } = storeCreateDto;
+    async saveStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
+        const {  fcmToken, ...storeData } = createDto;
         return await this.save(
             this.create({
                 ...storeData, 
@@ -26,8 +24,8 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
                 accountImageId: filesDto.accountImage.id,
                 storeProfileImageId: filesDto.profileImage?.id ?? null,
                 storeBannerImageId: filesDto.bannerImage?.id ?? null,
-                mainTagIds: mainTag.map(tag => tag.id),
-                subTagIds: subTag.map(tag => tag.id),
+                mainTags: createDto.mainTags,
+                subTags: createDto.subTags,
             })
         );
     }
