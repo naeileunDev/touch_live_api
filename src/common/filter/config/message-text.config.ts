@@ -47,6 +47,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.TAG_NOT_FOUND]: '태그를 찾을 수 없습니다.',
 
     // Store
+    [MESSAGE_CODE.STORE_NOT_FOUND]: '스토어를 찾을 수 없습니다.',
     [MESSAGE_CODE.STORE_OWNER_ONLY]: '스토어 소유자만 접근 가능합니다.',
     [MESSAGE_CODE.STORE_NON_OWNER_ONLY]: '스토어 미소유자만 접근 가능합니다.',
     [MESSAGE_CODE.STORE_REGISTER_STATUS_PENDING]: '스토어 등록 대기 중입니다.',

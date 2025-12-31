@@ -5,6 +5,8 @@ import { StoreRegisterLogDto } from "../dto/store-register-log.dto";
 import { User } from "src/user/entity/user.entity";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
+import { ServiceException } from "src/common/filter/exception/service.exception";
+import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 
 @Injectable()
 export class StoreRepository extends Repository<Store> {
@@ -53,6 +55,10 @@ export class StoreRepository extends Repository<Store> {
         return store;
     }
     async deleteById(id: number): Promise<boolean> {
+        const store = await this.findById(id);
+        if (!store) {
+            throw new ServiceException(MESSAGE_CODE.STORE_NOT_FOUND);
+        }
         const rtn: DeleteResult = await this.softDelete({
             id,
         });

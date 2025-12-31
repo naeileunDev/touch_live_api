@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, DeleteResult, Repository } from "typeorm";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
 import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
 import { User } from "src/user/entity/user.entity";
@@ -13,33 +13,36 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
         super(StoreRegisterLog, dataSource.createEntityManager());
     }
 
-    async saveStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
+    async createStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
         const {  fcmToken, ...storeData } = createDto;
-        return await this.save(
-            this.create({
-                ...storeData, 
-                user,
-                businessRegistrationImageId: filesDto.businessRegistrationImage.id,
-                eCommerceLicenseImageId: filesDto.eCommerceLicenseImage.id,
-                accountImageId: filesDto.accountImage.id,
-                storeProfileImageId: filesDto.profileImage?.id ?? null,
-                storeBannerImageId: filesDto.bannerImage?.id ?? null,
-                mainTags: createDto.mainTags,
-                subTags: createDto.subTags,
-            })
-        );
+        const entity = this.create({
+            ...storeData, 
+            user,
+            businessRegistrationImageId: filesDto.businessRegistrationImage.id,
+            eCommerceLicenseImageId: filesDto.eCommerceLicenseImage.id,
+            accountImageId: filesDto.accountImage.id,
+            storeProfileImageId: filesDto.profileImage?.id ?? null,
+            storeBannerImageId: filesDto.bannerImage?.id ?? null,
+        });
+        await this.save(entity)
+        return entity;
     }
 
-    async findEntityById(id: number): Promise<StoreRegisterLog> {
-        const log = await this.findOne({
+    async findById(id: number): Promise<StoreRegisterLog> {
+        const entity = await this.findOne({
             where:{ 
                 id,
             },
             relations: ['user'],
         });
-        if (!log) {
+        if (!entity) {
             throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND);
         }
-        return log;
+        return entity;
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+        const rtn: DeleteResult = await this.softDelete({ id });
+        return rtn.affected > 0;
     }
 }

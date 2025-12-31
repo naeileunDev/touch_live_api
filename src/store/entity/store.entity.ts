@@ -1,8 +1,9 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
+import { StoreMedia } from "./store-media.entity";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -81,4 +82,7 @@ export class Store extends BaseEntity{
 
     @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
     storeProfileImageId?: number | null;
+
+    @OneToMany(() => StoreMedia, storeMedia => storeMedia.store)
+    medias: StoreMedia[];
 }

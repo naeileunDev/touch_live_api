@@ -3,7 +3,6 @@ import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsNumber, IsOpt
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { Store } from "../entity/store.entity";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 
