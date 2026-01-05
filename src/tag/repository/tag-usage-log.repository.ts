@@ -1,5 +1,5 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
-import { TagUsageLog } from "../entities/tag-usage-log.entity";
+import { TagUsageLog } from "../entity/tag-usage-log.entity";
 import { Injectable } from "@nestjs/common";
 import { TagUsageLogCreateDto } from "../dto/tag-usage-log-create.dto";
 

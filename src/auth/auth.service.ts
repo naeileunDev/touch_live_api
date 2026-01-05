@@ -42,7 +42,7 @@ import { AuthCheckRegisterFormDto } from "./dto/auth-check-register-form.dto";
 import { domainToASCII } from "url";
 import { UserGender } from "src/user/enum/user-gender.enum";
 import { EncryptionUtil } from "src/common/util/encryption.util";
-import { User } from "src/user/entities/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { UpdateQueryBuilder } from "typeorm";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserOperationService } from "src/user/service/user-operation.service";

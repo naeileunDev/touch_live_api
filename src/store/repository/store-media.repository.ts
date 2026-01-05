@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { StoreMedia } from "../entities/store-media.entity";
+import { StoreMedia } from "../entity/store-media.entity";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()

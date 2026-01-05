@@ -1,7 +1,7 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
-import { UserOperation } from "../entities/user-operation.entity";
+import { UserOperation } from "../entity/user-operation.entity";
 import { Injectable } from "@nestjs/common";
-import { User } from "../entities/user.entity";
+import { User } from "../entity/user.entity";
 import { UserRole } from "../enum/user-role.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";

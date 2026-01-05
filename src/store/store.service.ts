@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/user/entity/user.entity';
 import { StoreRepository } from './repository/store.respository';
 import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 import { ServiceException } from 'src/common/filter/exception/service.exception';
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { plainToInstance } from 'class-transformer';
 import { StoreDto } from './dto/store.dto';
-import { Store } from './entities/store.entity';
+import { Store } from './entity/store.entity';
 
 @Injectable()
 export class StoreService {

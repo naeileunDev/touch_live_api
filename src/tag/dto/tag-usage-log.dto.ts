@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { TagUsageLog } from "../entities/tag-usage-log.entity";
+import { TagUsageLog } from "../entity/tag-usage-log.entity";
 import { UsageType } from "../enum/usage-type.enum";
 import { IsDate, IsEnum, IsNumber } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";

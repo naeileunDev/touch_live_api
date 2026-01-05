@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { File } from "src/file/entities/file.entity";
+import { File } from "src/file/entity/file.entity";
 import { BannerPosition, BannerLinkType } from "src/common/enums";
 
 @Entity('banner')

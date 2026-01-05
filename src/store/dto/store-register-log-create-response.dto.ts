@@ -4,7 +4,7 @@ import { Type } from "class-transformer";
 import { ValidateNested } from "class-validator";
 import { AuthTokenDto } from "src/auth/dto/auth-token.dto";
 import { StoreFilesDto } from "./store-files.dto";
-import { StoreRegisterLog } from "../entities/store-register-log.entity";
+import { StoreRegisterLog } from "../entity/store-register-log.entity";
 
 export class StoreRegisterLogCreateResponseDto {
     @ApiProperty({ description: '가게 등록 로그 정보', type: StoreRegisterLogDto })

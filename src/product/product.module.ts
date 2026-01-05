@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Product } from './entities/product.entity';
-import { ProductImage } from './entities/product-image.entity';
-import { ProductOption } from './entities/product-option.entity';
-import { ProductRequiredInfo } from './entities/product-required-info.entity';
-import { ProductTag } from './entities/product-tag.entity';
+import { Product } from './entity/product.entity';
+import { ProductImage } from './entity/product-image.entity';
+import { ProductOption } from './entity/product-option.entity';
+import { ProductRequiredInfo } from './entity/product-required-info.entity';
+import { ProductTag } from './entity/product-tag.entity';
+
 
 @Module({
     imports: [

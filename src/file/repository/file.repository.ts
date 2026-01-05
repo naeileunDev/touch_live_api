@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
-import { File } from "../entities/file.entity";
+import { File } from "../entity/file.entity";
 import { FileDto } from "../dto/file.dto";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { ServiceException } from "src/common/filter/exception/service.exception";

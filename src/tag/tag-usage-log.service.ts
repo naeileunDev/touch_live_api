@@ -3,7 +3,7 @@ import { TagUsageLogRepository } from "./repository/tag-usage-log.repository";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { TagUsageLogCreateDto } from "./dto/tag-usage-log-create.dto";
-import { TagUsageLog } from "./entities/tag-usage-log.entity";
+import { TagUsageLog } from "./entity/tag-usage-log.entity";
 import { TagService } from "./tag.service";
 import { TagUsageLogDto } from "./dto/tag-usage-log.dto";
 

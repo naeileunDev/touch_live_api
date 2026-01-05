@@ -1,7 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
-import { User } from "src/user/entities/user.entity";
-import { Product } from "src/product/entities/product.entity";
+import { User } from "src/user/entity/user.entity";
+import { Product } from "src/product/entity/product.entity";
 import { ProductInquiryAnswer } from "./product-inquiry-answer.entity";
 
 @Entity('product_inquiry')

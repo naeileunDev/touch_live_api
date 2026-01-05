@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { VideoViewLog, VideoLike, VideoComment, VideoCommentLike } from './entities/video.entity';
+import { VideoViewLog, VideoLike, VideoComment, VideoCommentLike } from './entity/video.entity';
 import { CreateVideoViewLogDto, UpdateVideoViewLogDto, ToggleVideoLikeDto, CreateVideoCommentDto, UpdateVideoCommentDto } from './dto/video.dto';
 import { VideoTargetType } from 'src/common/enums';
 

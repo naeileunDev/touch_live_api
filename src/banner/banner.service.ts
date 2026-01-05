@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual, MoreThanOrEqual, IsNull, Or } from 'typeorm';
-import { Banner } from './entities/banner.entity';
+import { Banner } from './entity/banner.entity';
 import { CreateBannerDto, UpdateBannerDto } from './dto/banner.dto';
 import { BannerPosition } from 'src/common/enums';
 

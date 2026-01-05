@@ -1,7 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { ShortForm } from "./short-form.entity";
-import { Tag } from "src/tag/entities/tag.entity";
+import { Tag } from "src/tag/entity/tag.entity";
 
 @Entity('short_form_tag')
 @Unique(['shortFormId', 'tagId'])

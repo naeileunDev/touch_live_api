@@ -1,7 +1,7 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
-import { UserAddress } from "../entities/user-address.entity";
+import { UserAddress } from "../entity/user-address.entity";
 import { UserAddressCreateDto } from "../dto/user-address-create.dto";
-import { User } from "../entities/user.entity";
+import { User } from "../entity/user.entity";
 import { Injectable } from "@nestjs/common";
 import { UserAddressUpdateDto } from "../dto/user-address-update.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";

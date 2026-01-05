@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from "typeorm";
 import { Store } from "./store.entity";
-import { File } from "src/file/entities/file.entity";
+import { File } from "src/file/entity/file.entity";
 import { MediaPurpose } from "../enum/media-purpose.enum";
 import { MediaType } from "src/file/enum/file-category.enum";
 import { BaseEntity } from "src/common/base-entity/base.entity";

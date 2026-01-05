@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository/user.repository';
 import { UserOauthRepository } from '../repository/user-oauth.repository';
-import { User } from '../entities/user.entity';
+import { User } from '../entity/user.entity';
 import { UserRole } from '../enum/user-role.enum';
 import { UserStatus } from '../enum/user-status.enum';
 import { UserSignupSourceDataRepository } from '../repository/user-signup-source-data.repository';

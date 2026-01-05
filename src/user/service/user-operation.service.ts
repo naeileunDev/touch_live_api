@@ -1,7 +1,7 @@
 import { EncryptionUtil } from "src/common/util/encryption.util";
 import { UserDto } from "../dto";
 import { UserOperationDto } from "../dto/user-operaion.dto";
-import { UserOperation } from "../entities/user-operation.entity";
+import { UserOperation } from "../entity/user-operation.entity";
 import { UserOperationRepository } from "../repository/user-operation-repository";
 import { Injectable } from "@nestjs/common";
 import { UserOperationRequestDto } from "../dto/user-operation-request.dto";

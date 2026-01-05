@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, DeleteResult, Equal, In, Repository } from "typeorm";
-import { Tag } from "../entities/tag.entity";
+import { Tag } from "../entity/tag.entity";
 import { TagCreateDto } from "../dto/tag-create.dto";
 import { CATEGORY_FIELD_MAP, CategoryType } from "../enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "../enum/usage-type.enum";

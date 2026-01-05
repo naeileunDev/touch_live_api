@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { UserDeviceCreateDto } from "../dto/user-device-create.dto";
-import { UserDevice } from "../entities/user-device.entity";
+import { UserDevice } from "../entity/user-device.entity";
 import { UserDeviceRepository } from "../repository/user-device.repository";
 
 @Injectable()

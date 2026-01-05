@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/user/entity/user.entity';
 import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
 import { FileService } from 'src/file/file.service';
 import { ContentCategory, UsageType } from 'src/file/enum/file-category.enum';
@@ -17,9 +17,9 @@ import { AuthTokenDto } from 'src/auth/dto/auth-token.dto';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
-import { StoreRegisterLog } from './entities/store-register-log.entity';
+import { StoreRegisterLog } from './entity/store-register-log.entity';
 import { UserDto } from 'src/user/dto';
-import { Store } from './entities/store.entity';
+import { Store } from './entity/store.entity';
 
 @Injectable()
 export class StoreRegisterLogService {
@@ -94,8 +94,6 @@ export class StoreRegisterLogService {
   }
 
   async findById(id: number, user: UserDto): Promise<StoreRegisterLogDto> {
-    console.log("id", id);
-    console.log("user", user);
     const log = await this.storeRegisterLogRepository.findById(id);
     if (log.user.publicId !== user.id){
         const userEntity = await this.userService.findEntityByPublicId(user.id, true);

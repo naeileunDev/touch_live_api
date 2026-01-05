@@ -6,7 +6,7 @@ import { Role } from 'src/common/decorator/role.decorator';
 import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipeArray } from 'src/file/pipe/media-validation.pipe';
 import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';

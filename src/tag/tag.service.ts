@@ -7,7 +7,7 @@ import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { TagFindRequestDto } from "./dto/tag-find-request.dto";
 import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
-import { Tag } from "./entities/tag.entity";
+import { Tag } from "./entity/tag.entity";
 import { TagFindDto } from "./dto/tag-find.dto";
 
 @Injectable()

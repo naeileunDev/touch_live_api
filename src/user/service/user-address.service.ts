@@ -7,7 +7,7 @@ import { UserAddressRepository } from "../repository/user-address-repository";
 import { UserRepository } from "../repository/user.repository";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Injectable } from "@nestjs/common";
-import { UserAddress } from "../entities/user-address.entity";
+import { UserAddress } from "../entity/user-address.entity";
 
 @Injectable()
 export class UserAddressService {
