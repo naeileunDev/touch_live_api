@@ -109,6 +109,9 @@ export class StoreRegisterLogDto {
     @IsNumber()
     storeProfileImageId: number;
 
+    @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
+    catagory: CategoryType[];
+
     constructor(storeRegisterLog: StoreRegisterLog) {
         this.id = storeRegisterLog.id;
         this.name = storeRegisterLog.name;
@@ -137,6 +140,7 @@ export class StoreRegisterLogDto {
         this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
         this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
         this.storeInfo = storeRegisterLog.storeInfo;
+        this.catagory = storeRegisterLog.category;
     }
     
 }

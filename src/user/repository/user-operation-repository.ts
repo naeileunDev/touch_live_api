@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, DeleteResult, Repository } from "typeorm";
 import { UserOperation } from "../entity/user-operation.entity";
 import { Injectable } from "@nestjs/common";
 import { User } from "../entity/user.entity";
@@ -13,7 +13,7 @@ export class UserOperationRepository extends Repository<UserOperation> {
     }
 
     async createOperationUser(user: User, role: UserRole): Promise<UserOperation> {
-        if (await this.existsOperationUserByUserId(user.publicId)) {
+        if (await this.existsByUserId(user.publicId)) {
             throw new ServiceException(MESSAGE_CODE.USER_OPERATION_ALREADY_EXISTS);
         }
         const userOperation = this.create({
@@ -23,7 +23,19 @@ export class UserOperationRepository extends Repository<UserOperation> {
         return await this.save(userOperation);
     }
 
-    async existsOperationUserByUserId(userId: string): Promise<boolean> {
+    async findById(id: number): Promise<UserOperation> {
+        const userOperation = await this.findOne({
+            where: {
+                id,
+            },
+        });
+        if (!userOperation) {
+            throw new ServiceException(MESSAGE_CODE.USER_OPERATION_NOT_FOUND);
+        }
+        return userOperation;
+    }
+
+    async existsByUserId(userId: string): Promise<boolean> {
         return await this.exists({
             where: {
                 user: {
@@ -33,7 +45,7 @@ export class UserOperationRepository extends Repository<UserOperation> {
         });
     }
 
-    async findOperationUserByLoginId(loginId: string): Promise<UserOperation> {
+    async findByLoginId(loginId: string): Promise<UserOperation> {
         const userOperation = await this.findOne({
             where: {
                 user: {
@@ -43,8 +55,15 @@ export class UserOperationRepository extends Repository<UserOperation> {
           relations: ['user'],
         });
         if (!userOperation) {
-            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+            throw new ServiceException(MESSAGE_CODE.USER_OPERATION_NOT_FOUND);
         }
         return userOperation;
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+        const rtn: DeleteResult = await this.softDelete({
+            id,
+        });
+        return rtn.affected > 0;
     }
 }

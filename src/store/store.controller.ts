@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles, ParseIntPipe, Query } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
@@ -13,6 +13,7 @@ import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from 'src/common/deco
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { StoreRegisterLogService } from './store-register-log.service';
+import { UserDto } from 'src/user/dto';
 
 @ApiTags('Store')
 @Controller('store')
@@ -69,16 +70,26 @@ export class StoreController {
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
     }): Promise<StoreRegisterLogCreateResponseDto> {
-        return await this.storeRegisterLogService.createStoreRegisterLog(createDto, user, files);
+        return await this.storeRegisterLogService.create(createDto, user, files);
     }
 
-  @Get('register-log/:id')
+  @Get('register-log/search')
   @Role(ALL_PERMISSION)
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 로그 조회 성공')
-  async findByRegisterLogId(@GetUser() user: User, @Param('id') id: number): Promise<StoreRegisterLogDto> {
-    return await this.storeRegisterLogService.findByRegisterLogId(id, user);
+  async findById(@GetUser() user: UserDto, @Query('id') id: number): Promise<StoreRegisterLogDto> {
+    return await this.storeRegisterLogService.findById(id, user);
+  }
+
+  @Get('register-log/user')
+  @Role(ALL_PERMISSION)
+  @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공', true)
+  async findByRegisterLogUserId(@GetUser() user: UserDto, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
+    console.log("test3");
+    console.log("user", user);
+    console.log("userId", userId);
+    return await this.storeRegisterLogService.findByUserId(userId, user);
   }
 }
 

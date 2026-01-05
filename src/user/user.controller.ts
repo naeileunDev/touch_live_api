@@ -11,12 +11,18 @@ import { UserAddressDto } from './dto/user-address.dto';
 import { UserAddressUpdateDto } from './dto/user-address-update.dto';
 import { UserOperationDto } from './dto/user-operaion.dto';
 import { UserOperationRequestDto } from './dto/user-operation-request.dto';
+import { UserAddressService } from './service/user-address.service';
+import { UserOperationService } from './service/user-operation.service';
 
 @ApiTags('User')
 @Controller('user')
 @ApiBearerAuth('access-token')
 export class UserController {
-    constructor(private readonly userService: UserService) { 
+    constructor(
+        private readonly userService: UserService,
+        private readonly userAddressService: UserAddressService,
+        private readonly userOperationService: UserOperationService,
+    ) { 
     }
 
     @Get('exists/login-id')
@@ -48,7 +54,7 @@ export class UserController {
     @ApiOperation({ summary: '주소 등록' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 등록 성공')
     registerAddress(@Body() userAddressCreateDto: UserAddressCreateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
-        return this.userService.registerAddress(userAddressCreateDto, userDto);
+        return this.userAddressService.create(userAddressCreateDto, userDto);
     }
 
     @Put('update/address/:id')
@@ -56,7 +62,7 @@ export class UserController {
     @ApiOperation({ summary: '주소 수정' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 수정 성공')
     updateAddress(@Param('id') id: number, @Body() userAddressUpdateDto: UserAddressUpdateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
-        return this.userService.updateAddress(id, userAddressUpdateDto, userDto);
+        return this.userAddressService.save(id, userAddressUpdateDto, userDto);
     }
 
     @Get('address')
@@ -64,7 +70,7 @@ export class UserController {
     @ApiOperation({ summary: '주소 목록 조회' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 목록 조회 성공', true)
     findUserAddressAllByUserId(@GetUser() userDto: UserDto): Promise<UserAddressDto[]> {
-        return this.userService.findUserAddressAllByUserId(userDto.id);
+        return this.userAddressService.findAllByUserId(userDto.id);
     }
 
     @Post('operation/role')
@@ -72,7 +78,7 @@ export class UserController {
     @ApiOperation({ summary: '해당 사용자를 운영자(매니저, 어드민)로 설정' })
     @ApiOkSuccessResponse(UserOperationDto, '운영자(매니저, 어드민) 권한 설정 성공')
     setOperationRole(@Body() userOperationRequestDto: UserOperationRequestDto): Promise<UserOperationDto> {
-        return this.userService.setOperationRole(userOperationRequestDto);
+        return this.userOperationService.create(userOperationRequestDto);
     }
 
     @Put('operation/role/update')
@@ -80,7 +86,7 @@ export class UserController {
     @ApiOperation({ summary: '해당 사용자의 운영자(매니저, 어드민) 권한 업데이트' })
     @ApiOkSuccessResponse(UserOperationDto, '운영자(매니저, 어드민) 권한 업데이트 성공')
     modifyOperationRole(@Body() userOperationRequestDto: UserOperationRequestDto): Promise<UserOperationDto> {
-        return this.userService.modifyOperationRole(userOperationRequestDto);
+        return this.userOperationService.save(userOperationRequestDto);
     }
 
 }

@@ -18,6 +18,7 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
 import { StoreRegisterLog } from './entity/store-register-log.entity';
+import { UserDto } from 'src/user/dto';
 
 @Injectable()
 export class StoreRegisterLogService {
@@ -30,7 +31,7 @@ export class StoreRegisterLogService {
   }
 
   @Transactional()
-  async createStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, files: {
+  async create(createDto: StoreRegisterLogCreateDto, user: User, files: {
     businessRegistrationImage: Express.Multer.File[],
     eCommerceLicenseImage: Express.Multer.File[],
     accountImage: Express.Multer.File[],
@@ -63,31 +64,46 @@ export class StoreRegisterLogService {
                     {   
                         contentCategory: ContentCategory.User,
                         usageType: m.usageType,
-                        contentId: user.id,
+                        contentId: userEntity.id,  // userEntity.id 사용 (확실한 숫자 값)
                     } as FileCreateDto
                 );
                 return { usageType: m.usageType, id: file.id, url: file.fileUrl };
             })
     );
+    
+    // 필수 이미지 검증 (파일 업로드 후)
+    const requiredFileMappings = fileMappings.filter(m => m.required);
+    const missingRequiredFile = requiredFileMappings.find(m => {
+        const fileResult = fileResults.find(r => r.usageType === m.usageType);
+        return !fileResult || !fileResult.id;
+    });
+    
+    if (missingRequiredFile) {
+        throw new ServiceException(MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND);
+    }
+    
     const uuid = uuidv4();
     const storeFilesDto = new StoreFilesDto(new Map(fileResults.map(r => [r.usageType, {id: r.id, url: r.url}])));
     const storeRegisterLog = await this.storeRegisterLogRepository.createStoreRegisterLog(createDto, user, storeFilesDto);
     userEntity.storeRegisterStatus = StoreRegisterStatus.Pending;
-    const savedUser = await this.userService.saveEntity(userEntity);
+    const savedUser = await this.userService.save(userEntity);
     const accessToken = await this.authService.createAccessToken(savedUser, uuid, createDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
     return new StoreRegisterLogCreateResponseDto(storeRegisterLog, storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
   }
 
-  async findByRegisterLogId(id: number, user: User): Promise<StoreRegisterLogDto> {
+  async findById(id: number, user: UserDto): Promise<StoreRegisterLogDto> {
     const log = await this.storeRegisterLogRepository.findById(id);
-    if (log.user.id !== user.id && user.userOperation == null && user.role === UserRole.User) {
-        throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
+    if (log.user.publicId !== user.id){
+        const userEntity = await this.userService.findEntityByPublicId(user.id, true);
+        if (userEntity.userOperation == null && userEntity.role === UserRole.User) {
+            throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
+        }
     }
     return new StoreRegisterLogDto(log);
   }
 
-  async findEntityByRegisterLogId(id: number): Promise<StoreRegisterLog> {
+  async findEntityById(id: number): Promise<StoreRegisterLog> {
     const log = await this.storeRegisterLogRepository.findById(id);
     if (!log) {
       throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND);
@@ -95,11 +111,26 @@ export class StoreRegisterLogService {
     return log;
   }
 
-  async saveRegisterLog(log: StoreRegisterLog): Promise<StoreRegisterLog> {
+  async save(log: StoreRegisterLog): Promise<StoreRegisterLog> {
     return await this.storeRegisterLogRepository.save(log);
   }
 
-  async deleteByRegisterLogId(id: number): Promise<boolean> {
+  async deleteById(id: number): Promise<boolean> {
     return await this.storeRegisterLogRepository.deleteById(id);
+  }
+
+  async findByUserId(userId: string, dto: UserDto): Promise<StoreRegisterLogDto[]> {
+    if (userId !== dto.id){
+        const user = await this.userService.findEntityByPublicId(dto.id, true);
+        console.log("user", user);
+        if (user.userOperation === null && user.role === UserRole.User) {
+            throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
+        }
+    }
+    const logs = await this.storeRegisterLogRepository.findAllByUserId(userId);
+    if (logs[1] === 0 || logs[0].length === 0) {
+        return [];
+    }
+    return logs[0].map(l => new StoreRegisterLogDto(l));
   }
 }

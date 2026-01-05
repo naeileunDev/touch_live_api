@@ -23,7 +23,7 @@ export class UserOauthRepository extends Repository<UserOauth> {
         return userOauth;
     }
 
-    async existsBySnsUserIdAndTypeWithDeleted(snsUserId: string, type: UserOauthType): Promise<boolean> {
+    async existsOauthIdAndType(snsUserId: string, type: UserOauthType): Promise<boolean> {
         return await this.exists({
             where: {
                 snsUserId,
@@ -33,7 +33,7 @@ export class UserOauthRepository extends Repository<UserOauth> {
         });
     }
 
-    async findBySnsUserIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauth> {
+    async findByIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauth> {
         const userOauth = await this.findOne({
             where: {
                 snsUserId,

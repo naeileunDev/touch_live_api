@@ -1,5 +1,5 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "src/user/entity/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
@@ -7,6 +7,7 @@ import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 @Entity()
 export class StoreRegisterLog extends BaseEntity {
     @ManyToOne(() => User, user => user.storeRegisterLog)
+    // @JoinColumn({ name: 'userId' })
     user: User;
 
     @Column({ type: 'varchar', length: 255, comment: '가게 이름' })
@@ -18,8 +19,8 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'varchar', length: 255, comment: '가게 이메일' })
     email: string;
 
-    @Column({ type: 'varchar', length: 255, comment: '가게 정보' })
-    storeInfo: string;
+    @Column({ type: 'varchar', length: 255, comment: '가게 정보', nullable: true })
+    storeInfo?: string | null;
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;

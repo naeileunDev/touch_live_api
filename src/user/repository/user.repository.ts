@@ -17,10 +17,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findEntityByLoginIdWithStore(encryptedLoginId: string, includeStore: boolean): Promise<User> {
+    async findByLoginId(loginId: string, includeStore: boolean): Promise<User> {
         const user = await this.findOne({
             where: {
-                loginId: encryptedLoginId,
+                loginId,
             },
             relations: includeStore ? ['store'] : [],
         });
@@ -30,7 +30,7 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async findEntityById(id: number, includeStore: boolean = false): Promise<User> {
+    async findById(id: number, includeStore: boolean = false): Promise<User> {
         const user = await this.findOne({
             where: {
                 id,
@@ -46,7 +46,7 @@ export class UserRepository extends Repository<User> {
     async findByPublicId(publicId: string, includeStore: boolean = false): Promise<User> {
         const user = await this.findOne({
             where: {
-                publicId: publicId,
+                publicId,
             },
             relations: includeStore ? ['store'] : [],
         });
@@ -119,7 +119,7 @@ export class UserRepository extends Repository<User> {
         });
     }
 
-    async findEntityByEncryptedDi(di: string): Promise<User> {
+    async findByDi(di: string): Promise<User> {
         const user = await this.findOne({
             where: {
                 di,

@@ -3,9 +3,6 @@ import { UserRepository } from '../repository/user.repository';
 import { UserOauthRepository } from '../repository/user-oauth.repository';
 import { User } from '../entity/user.entity';
 import { UserRole } from '../enum/user-role.enum';
-import { UserOauthType } from '../enum/user-oauth-type.enum';
-import { UserOauth } from '../entity/user-oauth.entity';
-import { UserDevice } from '../entity/user-device.entity';
 import { UserStatus } from '../enum/user-status.enum';
 import { UserSignupSourceDataRepository } from '../repository/user-signup-source-data.repository';
 import { Transactional } from 'typeorm-transactional';
@@ -14,13 +11,10 @@ import { UserTermsAgreementRepository } from '../repository/user-terms-agreement
 import { UserDeviceService } from './user-device.service';
 import { UserAddressService } from './user-address.service';
 import { UserOauthService } from './user-oauth.service';
-import {UserDto, UserOauthDto, UserOauthCreateDto, UserDeviceCreateDto, UserAddressCreateDto, UserAddressDto, UserAddressUpdateDto} from '../dto/index';
+import {UserDto} from '../dto/index';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { v4 as uuidv4 } from 'uuid'; 
-import { UserOperationRepository } from '../repository/user-operation-repository';
-import { UserOperationDto } from '../dto/user-operaion.dto';
-import { UserOperationRequestDto } from '../dto/user-operation-request.dto';
-import { UserOperation } from '../entity/user-operation.entity';
+import { UserOperationService } from './user-operation.service';
 
 @Injectable()
 export class UserService {
@@ -29,11 +23,7 @@ export class UserService {
         private readonly userOauthRepository: UserOauthRepository,
         private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
         private readonly userTermsAgreementRepository: UserTermsAgreementRepository,
-        private readonly userDeviceService: UserDeviceService,
-        private readonly userAddressService: UserAddressService,
-        private readonly userOauthService: UserOauthService,
         private readonly encryptionUtil: EncryptionUtil,
-        private readonly userOperationRepository: UserOperationRepository,
     ) {}
     private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email'];
 
@@ -65,41 +55,6 @@ export class UserService {
         return new UserDto(savedUser, this.encryptionUtil);
     }
 
-    async setOperationRole(dto: UserOperationRequestDto): Promise<UserOperationDto> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(dto.loginId);
-        const user = await this.userRepository.findEntityByLoginIdWithStore(encryptedLoginId, true);
-        const userOperation = await this.userOperationRepository.createOperationUser(user, dto.role);
-        const userDto = new UserDto(user, this.encryptionUtil);
-        return new UserOperationDto(userDto, userOperation.role);
-    }
-
-    async modifyOperationRole(dto: UserOperationRequestDto): Promise<UserOperationDto> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(dto.loginId);
-        const userOperation = await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
-        userOperation.role = dto.role;
-        await this.userOperationRepository.save(userOperation);
-        const userDto = new UserDto(userOperation.user, this.encryptionUtil);
-        return new UserOperationDto(userDto, userOperation.role);
-    }
-
-    /**
-     * 암호화된 loginId로 운영자 조회
-     * @param encryptedLoginId 암호화된 로그인 ID (User Entity의 loginId 필드)
-     */
-    async findOperationUserEntityByEncryptedLoginId(encryptedLoginId: string): Promise<UserOperation> {
-        return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
-    }
-
-    // async findOperationUserEntityByLoginId(loginId: string): Promise<UserOperation> {
-    //     const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-    //     return await this.userOperationRepository.findOperationUserByLoginId(encryptedLoginId);
-    // }
-
-    async existsOperationUserByUserId(userId: string): Promise<boolean> {
-        return await this.userOperationRepository.existsOperationUserByUserId(userId);
-    }
-
-
     private checkAdult(birth: string): boolean {
         const today = new Date();
     const thisYearJan1 = new Date(today.getFullYear(), 0, 1); // 올해 1월 1일
@@ -116,17 +71,34 @@ export class UserService {
     return adultDate <= thisYearJan1;
     }
 
-    async findEntityById(id: number, includeStore: boolean = false): Promise<User> {
-        return await this.userRepository.findEntityById(id, includeStore);
-    }
 
+    /**
+     * 사용자DTO 단일 조회
+     * @param id 사용자 식별자
+     * @param includeStore 스토어 포함 여부
+     */
+    async findById(id: number, includeStore: boolean = false): Promise<UserDto> {
+        const user = await this.userRepository.findById(id, includeStore);
+        return new UserDto(user, this.encryptionUtil);
+    }
 
     /**
      * 사용자 단일 조회
      * @param id 사용자 식별자
+     * @param includeStore 스토어 포함 여부
      */
-    async findBPublicId(id: string): Promise<UserDto> {
-        const user = await this.userRepository.findByPublicId(id);
+    async findEntityById(id: number, includeStore: boolean = false): Promise<User> {
+        return await this.userRepository.findById(id, includeStore);
+    }
+
+
+    /**
+     * 사용자DTO 단일 조회
+     * @param publicId 사용자 공개 식별자
+     * @param includeStore 스토어 포함 여부
+     */
+    async findByPublicId(publicId: string, includeStore: boolean = false): Promise<UserDto> {
+        const user = await this.userRepository.findByPublicId(publicId, includeStore);
         return new UserDto(user, this.encryptionUtil);
     }
 
@@ -134,19 +106,9 @@ export class UserService {
      * 식별자로 사용자 조회 (비밀번호 재확인 패스워드 비교용)
      * @param id 사용자 식별자
      */
-    async findEntityByPublicId(id: string, includeStore: boolean = false): Promise<User> {
-        return await this.userRepository.findByPublicId(id, includeStore);
+    async findEntityByPublicId(publicId: string, includeStore: boolean = false): Promise<User> {
+        return await this.userRepository.findByPublicId(publicId, includeStore);
     }
-
-        /**
-     * DI로 사용자 조회
-     * @param di DI
-     */
-    async findEntityByDi(di: string): Promise<User> {
-        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        return await this.userRepository.findEntityByEncryptedDi(encryptedDi);
-    }
-    
 
     /**
      * DI로 사용자 조회
@@ -154,29 +116,35 @@ export class UserService {
      */
     async findByDi(di: string): Promise<UserDto> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        const user = await this.userRepository.findEntityByEncryptedDi(encryptedDi);
+        const user = await this.userRepository.findByDi(encryptedDi);
         return new UserDto(user, this.encryptionUtil);
     }
+
+     /**
+     * DI로 사용자 조회
+     * @param di DI
+     */
+    async findEntityByDi(di: string): Promise<User> {
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
+        return await this.userRepository.findByDi(encryptedDi);
+    }
+    
     /**
      * 아이디로 사용자 조회
      * @param loginId 아이디
      */
     async findEntityByLoginId(loginId: string, includeStore: boolean = false): Promise<User> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        return await this.userRepository.findEntityByLoginIdWithStore(encryptedLoginId, includeStore);
+        const encLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.findByLoginId(encLoginId, includeStore);
     }
 
     /**
      * 사용자 정보 저장
      * @param user 사용자 엔티티
      */
-    async save(user: User): Promise<UserDto> {
-        const savedUser = await this.saveEntity(user);
-        return new UserDto(savedUser, this.encryptionUtil);
-    }
-
-    async saveEntity(user: User): Promise<User> {  
-        return await this.userRepository.save(user);
+    async save(user: User): Promise<User> {
+        const savedUser = await this.userRepository.save(user);
+        return savedUser;
     }
 
     /**
@@ -201,8 +169,8 @@ export class UserService {
     }
 
     /**
-     * CI로 사용자가 존재하는지 확인
-     * @param ci CI
+     * DI로 사용자가 존재하는지 확인
+     * @param di DI
      */
     async existsByDi(di: string): Promise<boolean> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
@@ -223,8 +191,8 @@ export class UserService {
      * @param loginId 아이디
      */
     async existsByLoginIdWithDeleted(loginId: string): Promise<boolean> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        return await this.userRepository.existsByLoginIdWithDeleted(encryptedLoginId);
+        const encLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.existsByLoginIdWithDeleted(encLoginId);
     }
 
     /**
@@ -247,69 +215,11 @@ export class UserService {
      * 아이디로 사용자 조회 (로그인시 패스워드 비교용)
      * @param loginId 아이디
      */
-    async findEntityByLoginIdAndRoles(loginId: string, roles: UserRole[]): Promise<User> {
-        const encryptedLoginId = this.encryptionUtil.encryptDeterministic(loginId);
-        return await this.userRepository.findByLoginIdAndRoles(encryptedLoginId, roles);
+    async findByLoginIdAndRoles(loginId: string, roles: UserRole[]): Promise<User> {
+        const encLoginId = this.encryptionUtil.encryptDeterministic(loginId);
+        return await this.userRepository.findByLoginIdAndRoles(encLoginId, roles);
     }
 
-    // ========== Device 관련 메서드 위임 ==========
-    async createUserDevice(userDeviceCreateDto: UserDeviceCreateDto): Promise<void> {
-        return this.userDeviceService.createUserDevice(userDeviceCreateDto);
-    }
-
-    async findUserDeviceByJwtUuid(jwtUuid: string): Promise<UserDevice> {
-        return this.userDeviceService.findUserDeviceByJwtUuid(jwtUuid);
-    }
-
-    async existsDeviceByJwtUuid(jwtUuid: string): Promise<boolean> {
-        return this.userDeviceService.existsDeviceByJwtUuid(jwtUuid);
-    }
-
-    async deleteUserDeviceByJwtUuid(jwtUuid: string): Promise<boolean> {
-        return this.userDeviceService.deleteUserDeviceByJwtUuid(jwtUuid);
-    }
-
-    async deleteAllUserDeviceByUserId(userId: string): Promise<boolean> {
-        return this.userDeviceService.deleteAllUserDeviceByUserId(userId);
-    }
-
-    // ========== Oauth 관련 메서드 위임 ==========
-    async createUserOauth(userOauthCreateDto: UserOauthCreateDto): Promise<UserOauthDto> {
-        return this.userOauthService.createUserOauth(userOauthCreateDto);
-    }
-
-    async existsBySnsUserIdAndTypeWithDeleted(snsUserId: string, type: UserOauthType): Promise<boolean> {
-        return this.userOauthService.existsBySnsUserIdAndTypeWithDeleted(snsUserId, type);
-    }
-
-    async findUserOauthAllByUserId(userId: string): Promise<UserOauthDto[]> {
-        return this.userOauthService.findUserOauthAllByUserId(userId);
-    }
-
-    async findUserOauthBySnsUserIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauthDto> {
-        return this.userOauthService.findUserOauthBySnsUserIdAndType(snsUserId, type);
-    }
-
-    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
-        return this.userOauthService.findUserOauthEntityByUserIdAndType(userId, type);
-    }
-
-    async deleteUserOauthById(id: number): Promise<boolean> {
-        return this.userOauthService.deleteUserOauthById(id);
-    }
-
-    // ========== Address 관련 메서드 위임 ==========
-    async registerAddress(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
-        return this.userAddressService.registerAddress(userAddressCreateDto, userDto);
-    }
-
-    async updateAddress(addressId: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
-        return this.userAddressService.updateAddress(addressId, userAddressUpdateDto, userDto);
-    }
-
-    async findUserAddressAllByUserId(userId: string): Promise<UserAddressDto[]> {
-        return this.userAddressService.findUserAddressAllByUserId(userId);
-    }
 }
 
 

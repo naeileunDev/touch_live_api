@@ -21,10 +21,10 @@ export class StoreFilesDto {
     bannerImage?: {id: number, url: string};
 
     constructor(data: Map<UsageType, {id: number, url: string}>) {
-        this.businessRegistrationImage = data.get(UsageType.BusinessRegistrationImage) ?? null;
-        this.eCommerceLicenseImage = data.get(UsageType.eCommerceLicenseImage) ?? null;
-        this.accountImage = data.get(UsageType.AccountImage) ?? null;
-        this.profileImage = data.get(UsageType.Profile) ?? null;
-        this.bannerImage = data.get(UsageType.Banner) ?? null;
+        this.businessRegistrationImage = data.get(UsageType.BusinessRegistrationImage)!;
+        this.eCommerceLicenseImage = data.get(UsageType.eCommerceLicenseImage)!;
+        this.accountImage = data.get(UsageType.AccountImage)!
+        this.profileImage = data.get(UsageType.Profile) ?? undefined;
+        this.bannerImage = data.get(UsageType.Banner) ?? undefined;
     }
 }
