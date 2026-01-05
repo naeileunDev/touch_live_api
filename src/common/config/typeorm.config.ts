@@ -33,7 +33,7 @@ export const getTypeOrmConfig = (
       synchronize: configService.get<boolean>('DB_SYNCHRO'),
       ssl: configService.get<string>('NODE_ENV') === 'prod' ? { rejectUnauthorized: false } : false,
       // 빌드 후 dist 폴더 기준으로 경로 수정
-      entities: [join(__dirname, '../../**/*.entity.{js,ts}')],
+      entities: [join(__dirname, '../../**/*.entities.{js,ts}')],
       extra: { timezone: 'local' },
   });
 

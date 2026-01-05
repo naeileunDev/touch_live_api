@@ -12,23 +12,25 @@ import { UserAddressService } from './service/user-address.service';
 import { UserOauthService } from './service/user-oauth.service';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { UserOperationRepository } from './repository/user-operation-repository';
+import { UserOperationService } from './service/user-operation.service';
 
 @Module({
     controllers: [UserController],
     providers: [
         UserService,
+        UserAddressService,
+        UserOperationService,
+        UserOauthService,
+        UserDeviceService,
         UserRepository,
         UserOauthRepository,
         UserDeviceRepository,
         UserSignupSourceDataRepository,
         UserTermsAgreementRepository,
         UserAddressRepository,
-        UserDeviceService,
-        UserAddressService,
-        UserOauthService,
         EncryptionUtil,
         UserOperationRepository,
     ],
-    exports: [UserService],
+    exports: [UserService, UserOperationService, UserOauthService, UserDeviceService],
 })
 export class UserModule { }

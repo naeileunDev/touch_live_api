@@ -1,8 +1,10 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
+import { StoreRegisterLog } from "../entity/store-register-log.entity";
+import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 
 export class StoreDto {
     @ApiProperty({ description: '가게 식별자', example: 1, type: Number })
@@ -84,6 +86,20 @@ export class StoreDto {
     @IsNumber()
     userId: number;
 
+    @ApiProperty({ description: '가게 정보', example: '가게 정보' })
+    @IsRequiredString()
+    storeInfo: string;
+
+    @ApiPropertyOptional({ description: '가게 배너 이미지 id', example: 1, type: Number })
+    @IsOptional()
+    @IsNumber()
+    storeBannerImageId?: number | null;
+
+    @ApiPropertyOptional({ description: '가게 프로필 이미지 id', example: 1, type: Number })
+    @IsOptional()
+    @IsNumber()
+    storeProfileImageId?: number | null;
+
     @ApiProperty({ description: '가게 메인 태그', example: ['태그1', '태그2', '태그3'], isArray: true })
     @IsArray()
     @IsString({ each: true })
@@ -101,5 +117,33 @@ export class StoreDto {
     @ApiProperty({ description: '가게 노출 여부', example: true, type: Boolean })
     @IsBoolean()
     isVisible: boolean;
+
+    constructor(storeRegisterLog: StoreRegisterLog, fee: number) {
+        this.id = storeRegisterLog.id;
+        this.name = storeRegisterLog.name;
+        this.phone = storeRegisterLog.phone;
+        this.email = storeRegisterLog.email;
+        this.status = storeRegisterLog.status as unknown as StoreStatusType;
+        this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
+        this.businessRegistrationImageId = storeRegisterLog.businessRegistrationImageId;
+        this.ceoName = storeRegisterLog.ceoName;
+        this.businessType = storeRegisterLog.businessType;
+        this.businessCategory = storeRegisterLog.businessCategory;
+        this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
+        this.eCommerceLicenseImageId = storeRegisterLog.eCommerceLicenseImageId;
+        this.bankName = storeRegisterLog.bankName;
+        this.accountNumber = storeRegisterLog.accountNumber;
+        this.accountOwner = storeRegisterLog.accountOwner;
+        this.accountImageId = storeRegisterLog.accountImageId;
+        this.category = storeRegisterLog.category;  
+        this.storeEntryFee = fee;
+        this.mainTags = storeRegisterLog.mainTags;
+        this.subTags = storeRegisterLog .subTags;
+        this.isVisible = storeRegisterLog.status === StoreRegisterStatus.Approved;
+        this.userId = storeRegisterLog.user.id;
+        this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
+        this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
+        this.storeInfo = storeRegisterLog.storeInfo;
+    }
 
 }

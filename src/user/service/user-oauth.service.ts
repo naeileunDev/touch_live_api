@@ -13,7 +13,7 @@ export class UserOauthService {
      * OAuth 사용자 생성
      * @param userCreateDto 사용자 생성 DTO
      */
-     async createUserOauth(userOauthCreateDto: UserOauthCreateDto): Promise<UserOauthDto> {
+     async create(userOauthCreateDto: UserOauthCreateDto): Promise<UserOauthDto> {
         const userOauth = await this.userOauthRepository.createUserOauth(userOauthCreateDto);
         return new UserOauthDto(userOauth);
     }
@@ -23,15 +23,15 @@ export class UserOauthService {
      * @param snsUserId OAuth ID
      * @param type OAuth 타입
      */
-    async existsBySnsUserIdAndTypeWithDeleted(snsUserId: string, type: UserOauthType): Promise<boolean> {
-        return await this.userOauthRepository.existsBySnsUserIdAndTypeWithDeleted(snsUserId, type);
+    async existsByIdAndType(snsUserId: string, type: UserOauthType): Promise<boolean> {
+        return await this.userOauthRepository.existsOauthIdAndType(snsUserId, type);
     }
 
     /**
      * 사용자 식별자로 모든 oauth 정보 조회
      * @param userId 사용자 식별자
      */
-    async findUserOauthAllByUserId(userId: string): Promise<UserOauthDto[]> {
+    async findAllById(userId: string): Promise<UserOauthDto[]> {
         const userOauths = await this.userOauthRepository.findAllByUserId(userId);
         return userOauths.map(userOauth => new UserOauthDto(userOauth));
     }
@@ -41,8 +41,8 @@ export class UserOauthService {
      * @param snsUserId OAuth ID
      * @param type OAuth 타입
      */
-    async findUserOauthBySnsUserIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauthDto> {
-        const userOauth = await this.userOauthRepository.findBySnsUserIdAndType(snsUserId, type);
+    async findByIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauthDto> {
+        const userOauth = await this.userOauthRepository.findByIdAndType(snsUserId, type);
         return new UserOauthDto(userOauth);
     }
 
@@ -51,7 +51,7 @@ export class UserOauthService {
      * @param userId 사용자 식별자
      * @param type OAuth 타입
      */
-    async findUserOauthEntityByUserIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
+    async findEntityByIdAndType(userId: number, type: UserOauthType): Promise<UserOauth> {
         return await this.userOauthRepository.findByUserIdAndType(userId, type);
     }
 
@@ -59,7 +59,7 @@ export class UserOauthService {
      * OAuth 정보 삭제
      * @param id OAuth 식별자
      */
-    async deleteUserOauthById(id: number): Promise<boolean> {
+    async deleteById(id: number): Promise<boolean> {
         return await this.userOauthRepository.deleteById(id);
     }
 

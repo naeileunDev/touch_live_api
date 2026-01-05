@@ -7,6 +7,7 @@ import { UserAddressRepository } from "../repository/user-address-repository";
 import { UserRepository } from "../repository/user.repository";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Injectable } from "@nestjs/common";
+import { UserAddress } from "../entity/user-address.entity";
 
 @Injectable()
 export class UserAddressService {
@@ -15,31 +16,49 @@ export class UserAddressService {
         private readonly userRepository: UserRepository) {
     }
 
-    async registerAddress(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
+    async create(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
         const user = await this.userRepository.findByPublicId(userDto.id);
         const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, user);
         return new UserAddressDto(userAddress);
     }
 
-    async updateAddress(id: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
-        const isAuth = await this.checkAuthAddress(id, userDto);
-        if (!isAuth) {
+    async findById(id: number): Promise<UserAddressDto> {
+        const userAddress = await this.userAddressRepository.findById(id);
+        if (!userAddress) {
+            throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_NOT_FOUND);
+        }
+        return new UserAddressDto(userAddress);
+    }
+
+    async findEntityById(id: number): Promise<UserAddress> {
+        const userAddress = await this.userAddressRepository.findById(id);
+        if (!userAddress) {
+            throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_NOT_FOUND);
+        }
+        return userAddress;
+    }
+    
+    async deleteById(id: number): Promise<boolean> {
+        if (!await this.existsById(id)) {
+            throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_NOT_FOUND);
+        }
+        return await this.userAddressRepository.deleteById(id);
+    }
+
+    async save(id: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
+        const userAddress = await this.userAddressRepository.findById(id);
+        if (userAddress.user.publicId !== userDto.id) {
             throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED);
         }
-        const userAddress = await this.userAddressRepository.findByAddressId(id);
-        const updatedUserAddress = await this.userAddressRepository.updateUserAddress(userAddress, userAddressUpdateDto);
+        const updatedUserAddress = await this.userAddressRepository.updateById(id, userAddressUpdateDto);
         return new UserAddressDto(updatedUserAddress);
     }
 
-    async checkAuthAddress(id: number, userDto: UserDto): Promise<boolean> {
-        const user = await this.userRepository.findByPublicId(userDto.id);
-        const userAddress = await this.userAddressRepository.findByAddressId(id);
-        if (userAddress.user.publicId !== user.publicId) {
-            return false;
-        }
-        return true;
+    async existsById(id: number): Promise<boolean> {
+        return await this.userAddressRepository.existsById(id);
     }
-    async findUserAddressAllByUserId(userId: string): Promise<UserAddressDto[]> {
+
+    async findAllByUserId(userId: string): Promise<UserAddressDto[]> {
         const userAddresses = await this.userAddressRepository.findAllByUserId(userId);
         return userAddresses.map(userAddress => new UserAddressDto(userAddress));
     }

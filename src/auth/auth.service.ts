@@ -45,6 +45,9 @@ import { EncryptionUtil } from "src/common/util/encryption.util";
 import { User } from "src/user/entities/user.entity";
 import { UpdateQueryBuilder } from "typeorm";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
+import { UserOperationService } from "src/user/service/user-operation.service";
+import { UserOauthService } from "src/user/service/user-oauth.service";
+import { UserDeviceService } from "src/user/service/user-device.service";
 
 @Injectable()
 export class AuthService {
@@ -55,6 +58,9 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly jwksClient: jwksClient.JwksClient,
         private readonly encryptionUtil: EncryptionUtil,
+        private readonly userOauthService: UserOauthService,
+        private readonly userOperationService: UserOperationService,
+        private readonly userDeviceService: UserDeviceService,
     ) { }
 
     // Nice
@@ -134,11 +140,11 @@ export class AuthService {
     }
 
     async getOperatorRoleByUserId(user: User): Promise<UserRole | null> {
-        const existsOperationUser = await this.userService.existsOperationUserByUserId(user.publicId);
+        const existsOperationUser = await this.userOperationService.existsByUserId(user.publicId);
         let operatorRole: UserRole | null = null;
         if (existsOperationUser) {
-            const encryptedLoginId = this.encryptionUtil.encryptDeterministic(user.loginId);
-            const userOperation = await this.userService.findOperationUserEntityByEncryptedLoginId(encryptedLoginId);
+            const encLoginId = this.encryptionUtil.encryptDeterministic(user.loginId);
+            const userOperation = await this.userOperationService.findByLoginId(encLoginId);
             operatorRole = userOperation.role;
         }
         return operatorRole;
@@ -271,9 +277,8 @@ export class AuthService {
         // 캐시에서 SNS 정보 삭제
         await this.cacheManager.del(sessionKey);
 
-        const userOauth = await this.userService.findUserOauthBySnsUserIdAndType(snsProfile.snsUserId, snsProfile.type);
+        const userOauth = await this.userOauthService.findByIdAndType(snsProfile.snsUserId, snsProfile.type);
         const user = await this.userService.findEntityByPublicId(userOauth.userId, true);
-        const operatorRole = await this.getOperatorRoleByUserId(user);
         const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
@@ -286,7 +291,7 @@ export class AuthService {
      */
     async linkSns(userDto: UserDto, authSnsLinkDto: AuthSnsLinkDto): Promise<UserOauthDto> {
         const { sessionKey } = authSnsLinkDto;
-        const user = await this.userService.findEntityByPublicId(userDto.id);
+        await this.userService.findEntityByPublicId(userDto.id);
 
         // SNS 세션 토큰 유효기간 확인
         const isSessionKeyExpired: boolean = this.isJwtTokenExpired(sessionKey);
@@ -305,7 +310,7 @@ export class AuthService {
 
 
         // Oauth 중복 확인
-        const isExistOauth = await this.userService.existsBySnsUserIdAndTypeWithDeleted(snsProfile.snsUserId, snsProfile.type);
+        const isExistOauth = await this.userOauthService.existsByIdAndType(snsProfile.snsUserId, snsProfile.type);
         if (isExistOauth) {
             throw new ServiceException(MESSAGE_CODE.USER_OAUTH_ALREADY_LINKED);
         }
@@ -317,7 +322,7 @@ export class AuthService {
             type: snsProfile.type,
             user: userDto
         }
-        return await this.userService.createUserOauth(userOauthCreateDto);
+        return await this.userOauthService.create(userOauthCreateDto);
     }
 
     /**
@@ -326,8 +331,8 @@ export class AuthService {
      */
     async unlinkSns(userDto: UserDto, authSnsUnlinkDto: AuthSnsUnlinkDto): Promise<boolean> {
         const user = await this.userService.findEntityByPublicId(userDto.id);
-        const userOauth = await this.userService.findUserOauthEntityByUserIdAndType(user.id, authSnsUnlinkDto.type);
-        return await this.userService.deleteUserOauthById(userOauth.id);
+        const userOauth = await this.userOauthService.findEntityByIdAndType(user.id, authSnsUnlinkDto.type);
+        return await this.userOauthService.deleteById(userOauth.id);
     }
 
     /**
@@ -352,7 +357,7 @@ export class AuthService {
             this.configService.get<number>('OAUTH_SESSION_KEY_TTL_MINUTE') * 60 * 1000
         );
 
-        const isExistOauth = await this.userService.existsBySnsUserIdAndTypeWithDeleted(authSnsProfileDto.snsUserId, authSnsProfileDto.type);
+        const isExistOauth = await this.userOauthService.existsByIdAndType(authSnsProfileDto.snsUserId, authSnsProfileDto.type);
         return {
             sessionKey,
             isUser: isExistOauth
@@ -545,8 +550,10 @@ export class AuthService {
      * @param authPasswordConfirmDto 비밀번호 확인 DTO
      */
     async confirmPassword(userDto: UserDto, authPasswordConfirmDto: AuthPasswordConfirmDto): Promise<boolean> {
+        console.log("userDto", userDto.id);
+        console.log("authPasswordConfirmDto", authPasswordConfirmDto);
         const { password } = authPasswordConfirmDto;
-        const user = await this.userService.findEntityByPublicId(userDto.id);
+        const user = await this.userService.findEntityById(Number(userDto.id));
         return await compare(password, user.password);
     }
 
@@ -556,8 +563,8 @@ export class AuthService {
      * @param uuid JWT UUID
      */
     async logout(useDto: UserDto, uuid: string): Promise<boolean> {
-        const device = await this.userService.findUserDeviceByJwtUuid(uuid);
-        return await this.userService.deleteUserDeviceByJwtUuid(device.jwtUuid);
+        const device = await this.userDeviceService.findByJwtUuid(uuid);
+        return await this.userDeviceService.deleteByJwtUuid(device.jwtUuid);
     }
 
     /**
@@ -565,7 +572,7 @@ export class AuthService {
      * @param user 사용자 정보
      */
     async leave(userDto: UserDto): Promise<boolean> {
-        await this.userService.deleteAllUserDeviceByUserId(userDto.id);
+        await this.userDeviceService.deleteAllByUserId(userDto.id);
         return await this.userService.leave(userDto);
     }
 
@@ -585,10 +592,11 @@ export class AuthService {
             jwtUuid: uuid,
             user: userDto,
         }
-        await this.userService.createUserDevice(createUserDeviceDto);
+        await this.userDeviceService.create(createUserDeviceDto);
         return this.jwtService.sign(
             { 
-                id: user.id, 
+                id: user.id,
+                publicId: user.publicId, 
                 uuid, 
                 role: userDto.role, 
                 storeRegisterStatus: user.storeRegisterStatus as StoreRegisterStatus, 
@@ -609,7 +617,7 @@ export class AuthService {
      */
     private async generateRefreshToken(user: User, uuid: string): Promise<string> {
         return this.jwtService.sign(
-            { id: user.id, uuid },
+            { id: user.id, publicId: user.publicId, uuid },
             {
                 secret: this.configService.get('JWT_REFRESH_SECRET'),
                 expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
@@ -636,14 +644,13 @@ export class AuthService {
      */
     async reissueAccessToken(userDto: UserDto, refreshToken: string): Promise<AuthLoginResponseDto> {
         const user = await this.userService.findEntityByPublicId(userDto.id, true);
-        const operatorRole = await this.getOperatorRoleByUserId(user);
         // 토큰 유효기간 확인
         const decoded = this.jwtService.decode(refreshToken);
         const exp = decoded.exp;
         const now = Math.floor(Date.now() / 1000);
         const remainingDays = Math.floor((exp - now) / (60 * 60 * 24));
 
-        const userDevice = await this.userService.findUserDeviceByJwtUuid(decoded.uuid);
+        const userDevice = await this.userDeviceService.findByJwtUuid(decoded.uuid);
         // 디바이스 정보가 존재하지 않는 경우 예외 처리
         if (!userDevice) {
             throw new UnauthorizedException();
