@@ -48,7 +48,7 @@ export class UserService {
         const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
         savedUser.userTermsAgreement = userTermsAgreement;
         await this.userRepository.save(savedUser);
-        return new UserDto(savedUser, this.encryptionUtil);
+        return new UserDto(savedUser, );
     }
 
     private checkAdult(birth: string): boolean {
@@ -75,7 +75,7 @@ export class UserService {
      */
     async findById(id: number, includeStore: boolean = false): Promise<UserDto> {
         const user = await this.userRepository.findById(id, includeStore);
-        return new UserDto(user, this.encryptionUtil);
+        return new UserDto(user);
     }
 
     /**
@@ -95,7 +95,7 @@ export class UserService {
      */
     async findByPublicId(publicId: string, includeStore: boolean = false): Promise<UserDto> {
         const user = await this.userRepository.findByPublicId(publicId, includeStore);
-        return new UserDto(user, this.encryptionUtil);
+        return new UserDto(user);
     }
 
     /**
@@ -113,7 +113,7 @@ export class UserService {
     async findByDi(di: string): Promise<UserDto> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
         const user = await this.userRepository.findByDi(encryptedDi);
-        return new UserDto(user, this.encryptionUtil);
+        return new UserDto(user);
     }
 
      /**

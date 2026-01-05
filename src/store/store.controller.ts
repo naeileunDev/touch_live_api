@@ -77,18 +77,16 @@ export class StoreController {
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 로그 조회 성공')
-  async findById(@GetUser() user: UserDto, @Query('id') id: number): Promise<StoreRegisterLogDto> {
+  async findById(@GetUser() user: UserDto, @Query('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
     return await this.storeRegisterLogService.findById(id, user);
   }
+
 
   @Get('register-log/user')
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공', true)
   async findByRegisterLogUserId(@GetUser() user: UserDto, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
-    console.log("test3");
-    console.log("user", user);
-    console.log("userId", userId);
     return await this.storeRegisterLogService.findByUserId(userId, user);
   }
 }

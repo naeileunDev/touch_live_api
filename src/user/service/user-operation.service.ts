@@ -20,7 +20,7 @@ export class UserOperationService {
         const encLoginId = this.encryptionUtil.encryptDeterministic(dto.loginId);
         const user = await this.userRepository.findByLoginId(encLoginId, true);
         const userOperation = await this.userOperationRepository.createOperationUser(user, dto.role);
-        const userDto = new UserDto(user, this.encryptionUtil);
+        const userDto = new UserDto(user);
         return new UserOperationDto(userDto, userOperation.role);
     }
 
@@ -29,13 +29,13 @@ export class UserOperationService {
         const userOperation = await this.userOperationRepository.findByLoginId(encLoginId);
         userOperation.role = dto.role;
         await this.userOperationRepository.save(userOperation);
-        const userDto = new UserDto(userOperation.user, this.encryptionUtil);
+        const userDto = new UserDto(userOperation.user);
         return new UserOperationDto(userDto, userOperation.role);
     }
 
     async findById(id: number): Promise<UserOperationDto> {
         const userOperation = await this.userOperationRepository.findById(id);
-        return new UserOperationDto(new UserDto(userOperation.user, this.encryptionUtil), userOperation.role);
+        return new UserOperationDto(new UserDto(userOperation.user), userOperation.role);
     }
 
     async findEntityById(id: number): Promise<UserOperation> {
@@ -45,7 +45,7 @@ export class UserOperationService {
     async findByLoginId(loginId: string): Promise<UserOperationDto> {
         const encLoginId = this.encryptionUtil.encryptDeterministic(loginId);
         const userOperation = await this.userOperationRepository.findByLoginId(encLoginId);
-        const userDto = new UserDto(userOperation.user, this.encryptionUtil);
+        const userDto = new UserDto(userOperation.user);
         return new UserOperationDto(userDto, userOperation.role);
     }
 

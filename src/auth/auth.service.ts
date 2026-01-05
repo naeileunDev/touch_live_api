@@ -136,7 +136,7 @@ export class AuthService {
         const user = await this.userService.findEntityByPublicId(userDto.id, true);
         const accessToken = await this.generateAccessToken(user, uuid, userInfo.fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
-        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+        return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);
     }
 
     async getOperatorRoleByUserId(user: User): Promise<UserRole | null> {
@@ -172,7 +172,7 @@ export class AuthService {
         const uuid = uuidv4();
         const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
-        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+        return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);
     }
 
     // /**
@@ -281,7 +281,7 @@ export class AuthService {
         const user = await this.userService.findEntityByPublicId(userOauth.userId, true);
         const accessToken = await this.generateAccessToken(user, uuid, fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
-        return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+        return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);
     }
 
 
@@ -581,7 +581,7 @@ export class AuthService {
      * @param userDto 사용자 정보
      */
     private async generateAccessToken(user: User, uuid: string, fcmToken: string): Promise<string> {
-        const userDto = new UserDto(user, this.encryptionUtil);
+        const userDto = new UserDto(user);
         let operatorRole = await this.getOperatorRoleByUserId(user);
         if (!operatorRole) {
             operatorRole = user.role === UserRole.Admin ? UserRole.Admin : null;
@@ -660,11 +660,11 @@ export class AuthService {
             // 유효기간이 7일 미만인 경우 재발급
             const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
             const refreshToken = await this.generateRefreshToken(user, userDevice.jwtUuid);
-            return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+            return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);
         } else {
             // 유효기간이 충분한 경우 기존 토큰 반환
             const accessToken = await this.generateAccessToken(user, userDevice.jwtUuid, userDevice.fcmToken);
-            return new AuthLoginResponseDto(new UserDto(user, this.encryptionUtil), accessToken, refreshToken);
+            return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);
         }
     }
 

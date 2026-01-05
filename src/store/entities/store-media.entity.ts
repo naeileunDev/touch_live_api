@@ -1,9 +1,9 @@
-import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { Store } from "./store.entity";
 import { File } from "src/file/entities/file.entity";
 import { MediaPurpose } from "../enum/media-purpose.enum";
 import { MediaType } from "src/file/enum/file-category.enum";
+import { BaseEntity } from "src/common/base-entity/base.entity";
 
 @Entity()
 export class StoreMedia extends BaseEntity {

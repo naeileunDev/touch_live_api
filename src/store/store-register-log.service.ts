@@ -19,6 +19,7 @@ import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
 import { StoreRegisterLog } from './entities/store-register-log.entity';
 import { UserDto } from 'src/user/dto';
+import { Store } from './entities/store.entity';
 
 @Injectable()
 export class StoreRegisterLogService {
@@ -93,6 +94,8 @@ export class StoreRegisterLogService {
   }
 
   async findById(id: number, user: UserDto): Promise<StoreRegisterLogDto> {
+    console.log("id", id);
+    console.log("user", user);
     const log = await this.storeRegisterLogRepository.findById(id);
     if (log.user.publicId !== user.id){
         const userEntity = await this.userService.findEntityByPublicId(user.id, true);
@@ -120,13 +123,6 @@ export class StoreRegisterLogService {
   }
 
   async findByUserId(userId: string, dto: UserDto): Promise<StoreRegisterLogDto[]> {
-    if (userId !== dto.id){
-        const user = await this.userService.findEntityByPublicId(dto.id, true);
-        console.log("user", user);
-        if (user.userOperation === null && user.role === UserRole.User) {
-            throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
-        }
-    }
     const logs = await this.storeRegisterLogRepository.findAllByUserId(userId);
     if (logs[1] === 0 || logs[0].length === 0) {
         return [];
