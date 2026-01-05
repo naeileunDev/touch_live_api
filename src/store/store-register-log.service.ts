@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/user/entity/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
 import { FileService } from 'src/file/file.service';
 import { ContentCategory, UsageType } from 'src/file/enum/file-category.enum';
@@ -17,7 +17,7 @@ import { AuthTokenDto } from 'src/auth/dto/auth-token.dto';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
-import { StoreRegisterLog } from './entity/store-register-log.entity';
+import { StoreRegisterLog } from './entities/store-register-log.entity';
 import { UserDto } from 'src/user/dto';
 
 @Injectable()

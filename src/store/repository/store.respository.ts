@@ -2,7 +2,7 @@ import { DataSource, DeleteResult, Repository } from "typeorm";
 import { Store } from "../entities/store.entity";
 import { Injectable } from "@nestjs/common";
 import { StoreRegisterLogDto } from "../dto/store-register-log.dto";
-import { User } from "src/user/entity/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";

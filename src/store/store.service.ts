@@ -6,7 +6,7 @@ import { ServiceException } from 'src/common/filter/exception/service.exception'
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { plainToInstance } from 'class-transformer';
 import { StoreDto } from './dto/store.dto';
-import { Store } from './entity/store.entity';
+import { Store } from './entities/store.entity';
 
 @Injectable()
 export class StoreService {
