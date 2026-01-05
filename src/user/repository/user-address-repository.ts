@@ -1,11 +1,11 @@
-import { DataSource, Repository } from "typeorm";
-import { UserAddress } from "../entities/user-address.entity";
+import { DataSource, DeleteResult, Repository } from "typeorm";
+import { UserAddress } from "../entity/user-address.entity";
 import { UserAddressCreateDto } from "../dto/user-address-create.dto";
-import { User } from "../entities/user.entity";
+import { User } from "../entity/user.entity";
 import { Injectable } from "@nestjs/common";
+import { UserAddressUpdateDto } from "../dto/user-address-update.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { UserAddressUpdateDto } from "../dto/user-address-update.dto";
 
 @Injectable()
 export class UserAddressRepository extends Repository<UserAddress> {
@@ -16,13 +16,14 @@ export class UserAddressRepository extends Repository<UserAddress> {
     async createUserAddress(userAddressCreateDto: UserAddressCreateDto, user: User): Promise<UserAddress> {
         const userAddress = this.create(userAddressCreateDto);
         userAddress.user = user;
-        return await this.save(userAddress);
+        await this.save(userAddress);
+        return userAddress;
     }
 
-    async findByAddressId(addressId: number): Promise<UserAddress> {
+    async findById(id: number): Promise<UserAddress> {
         const userAddress = await this.findOne({
             where: {
-                id: addressId,
+                id,
             },
             relations: ['user'],
         });
@@ -32,7 +33,26 @@ export class UserAddressRepository extends Repository<UserAddress> {
         return userAddress;
     }
 
-    async updateUserAddress(userAddress: UserAddress, userAddressUpdateDto: UserAddressUpdateDto): Promise<UserAddress> {
+    async existsById(id: number): Promise<boolean> {
+        const userAddress = await this.findById(id);
+        if (!userAddress) {
+            return false;
+        }
+        return true;
+    }
+    
+    async deleteById(id: number): Promise<boolean> {
+        const rtn: DeleteResult = await this.softDelete({
+            id,
+        });
+        return rtn.affected > 0;
+    }
+
+    async updateById(id: number, userAddressUpdateDto: UserAddressUpdateDto): Promise<UserAddress> {
+        const userAddress = await this.findById(id);
+        if (!userAddress) {
+            throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_NOT_FOUND);
+        }
         Object.keys(userAddressUpdateDto).forEach(key => {
             const value = userAddressUpdateDto[key];
             if (value !== undefined) {

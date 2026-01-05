@@ -1,7 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { Product } from "./product.entity";
-import { Tag } from "src/tag/entities/tag.entity";
+import { Tag } from "src/tag/entity/tag.entity";
 
 @Entity('product_tag')
 @Unique(['productId', 'tagId'])

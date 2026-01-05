@@ -27,12 +27,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, MoreThan } from 'typeorm';
-import { ShortForm } from './entities/short-form.entity';
-import { ShortFormTag } from './entities/short-form-tag.entity';
-import { VideoViewLog } from 'src/video/entities/video.entity';
-import { SearchHistory } from 'src/search/entities/search-history.entity';
-import { UserFollow } from 'src/follow/entities/user-follow.entity';
-import { User } from 'src/user/entities/user.entity';
+import { ShortForm } from './entity/short-form.entity';
+import { ShortFormTag } from './entity/short-form-tag.entity';
+import { VideoViewLog } from 'src/video/entity/video.entity';
+import { SearchHistory } from 'src/search/entity/search-history.entity';
+import { UserFollow } from 'src/follow/entity/user-follow.entity';
+import { User } from 'src/user/entity/user.entity';
 import { VideoTargetType, SearchType } from 'src/common/enums';
 
 // =====================================================

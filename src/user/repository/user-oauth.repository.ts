@@ -1,6 +1,6 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
-import { UserOauth } from "../entities/user-oauth.entity";
+import { UserOauth } from "../entity/user-oauth.entity";
 import { UserOauthCreateDto } from "../dto/user-oauth-create.dto";
 import { UserOauthType } from "../enum/user-oauth-type.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
@@ -23,7 +23,7 @@ export class UserOauthRepository extends Repository<UserOauth> {
         return userOauth;
     }
 
-    async existsBySnsUserIdAndTypeWithDeleted(snsUserId: string, type: UserOauthType): Promise<boolean> {
+    async existsOauthIdAndType(snsUserId: string, type: UserOauthType): Promise<boolean> {
         return await this.exists({
             where: {
                 snsUserId,
@@ -33,7 +33,7 @@ export class UserOauthRepository extends Repository<UserOauth> {
         });
     }
 
-    async findBySnsUserIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauth> {
+    async findByIdAndType(snsUserId: string, type: UserOauthType): Promise<UserOauth> {
         const userOauth = await this.findOne({
             where: {
                 snsUserId,

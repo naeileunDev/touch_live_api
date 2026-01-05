@@ -7,20 +7,20 @@ import { BannerPosition } from 'src/common/enums';
 
 @ApiTags('Banner')
 @Controller('banners')
+@ApiBearerAuth('access-token')
 export class BannerController {
     constructor(private readonly bannerService: BannerService) {}
 
     @Post()
     @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
     @ApiOperation({ summary: '배너 등록 (관리자)' })
-    async create(@Body() dto: CreateBannerDto) {
+    create(@Body() dto: CreateBannerDto) {
         return this.bannerService.create(dto);
     }
 
     @Get()
     @ApiOperation({ summary: '배너 목록 조회' })
-    async findAll(@Query('position') position?: BannerPosition) {
+    findAll(@Query('position') position?: BannerPosition) {
         return this.bannerService.findAll(position);
     }
 
@@ -32,9 +32,8 @@ export class BannerController {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
     @ApiOperation({ summary: '배너 수정 (관리자)' })
-    async update(
+    update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateBannerDto,
     ) {

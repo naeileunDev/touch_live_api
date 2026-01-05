@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { plainToInstance, Transform } from "class-transformer";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsString } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsOptional, IsString, MaxLength } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 
@@ -55,6 +55,16 @@ export class StoreRegisterLogCreateDto {
     @IsString({ each: true })
     @ArrayMinSize(1)
     @ArrayMaxSize(3)
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            if (value.includes(',')) {
+                return value.split(',').map(v => v.trim()).filter(v => v);
+            }
+            // 단일 문자열인 경우 배열로 변환
+            return [value.trim()].filter(v => v);
+        }
+        return value;
+    })
     mainTags: string[];
 
     @ApiProperty({ type: 'string', isArray: true, description: '서브태그 리스트', example: ['태그1', '태그2', '태그3']})
@@ -62,6 +72,18 @@ export class StoreRegisterLogCreateDto {
     @IsString({ each: true })
     @ArrayMinSize(1)
     @ArrayMaxSize(3)
+    @Transform(({ value }) => {
+        if (!value) return undefined;
+        if (Array.isArray(value)) return value;
+        if (typeof value === 'string') {
+            // 쉼표로 구분된 문자열인 경우
+            if (value.includes(',')) {
+                return value.split(',').map(v => v.trim()).filter(v => v);
+            }
+            return [value.trim()].filter(v => v);
+        }
+        return value;
+    })
     subTags: string[];
 
     @ApiProperty({ description: 'FCM 토큰', example: 'FCM_TOKEN' })
@@ -79,4 +101,10 @@ export class StoreRegisterLogCreateDto {
             : value
     )
     category: CategoryType[];
+
+    @ApiPropertyOptional({ description: '가게 정보', example: '가게 정보', nullable: true })
+    @IsOptional()
+    @IsString()
+    @MaxLength(255)
+    storeInfo: string;
 }

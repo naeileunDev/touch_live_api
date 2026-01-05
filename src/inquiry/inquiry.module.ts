@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InquiryController } from './inquiry.controller';
 import { InquiryService } from './inquiry.service';
-import { ProductInquiry } from './entities/product-inquiry.entity';
-import { ProductInquiryAnswer } from './entities/product-inquiry-answer.entity';
+import { ProductInquiry } from './entity/product-inquiry.entity';
+import { ProductInquiryAnswer } from './entity/product-inquiry-answer.entity';
 
 @Module({
     imports: [

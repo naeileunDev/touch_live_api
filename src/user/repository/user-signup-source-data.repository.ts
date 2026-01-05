@@ -1,8 +1,8 @@
 import { DataSource, Repository } from "typeorm";
-import { UserSignupSourceData } from "../entities/user-signup-surce-data.entity";
+import { UserSignupSourceData } from "../entity/user-signup-surce-data.entity";
 import { Injectable } from "@nestjs/common";
 import { UserSignupSourceDto } from "../dto/user-signup-source.dto";
-import { User } from "../entities/user.entity";
+import { User } from "../entity/user.entity";
 
 @Injectable()
 export class UserSignupSourceDataRepository extends Repository<UserSignupSourceData> {

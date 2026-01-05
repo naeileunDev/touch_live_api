@@ -4,7 +4,8 @@ import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
 import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
-import { User } from "../entities/user.entity";
+import { Transform } from "class-transformer";
+import { User } from "../entity/user.entity";
 import { EncryptionUtil } from "src/common/util/encryption.util";
 
 export class UserDto {
@@ -46,17 +47,18 @@ export class UserDto {
     isAdult: boolean;
 
 
-    constructor(user: User, encryptionUtil?: EncryptionUtil) {
+    constructor(user: User) {
         this.id = user.publicId;
-        this.loginId = encryptionUtil ? encryptionUtil.decryptDeterministic(user.loginId) : user.loginId;
+        // @Transform 데코레이터가 있지만, 생성자에서 직접 할당할 때는 작동하지 않으므로 여기서도 복호화
+        this.loginId = EncryptionUtil.decryptDeterministic(user.loginId)?? null;
         this.role = user.role as UserRole;
         this.status = user.status;
-        this.email = encryptionUtil ? encryptionUtil.decryptDeterministic(user.email) : user.email;
+        this.email = EncryptionUtil.decryptDeterministic(user.email)?? null;
         this.nickname = user.nickname;
-        this.name = encryptionUtil ? encryptionUtil.decryptDeterministic(user.name) : user.name;
-        this.phone = encryptionUtil ? encryptionUtil.decryptDeterministic(user.phone) : user.phone;
-        this.gender = encryptionUtil ? encryptionUtil.decryptDeterministic(user.gender) as UserGender : user.gender as UserGender;
-        this.birth = encryptionUtil ? encryptionUtil.decryptDeterministic(user.birth) : user.birth.toString();
+        this.name = EncryptionUtil.decryptDeterministic(user.name)?? null;
+        this.phone = EncryptionUtil.decryptDeterministic(user.phone)?? null;
+        this.gender = EncryptionUtil.decryptDeterministic(user.gender) as UserGender?? null;
+        this.birth = EncryptionUtil.decryptDeterministic(user.birth)?? null;
         this.isAdult = user.isAdult;
     }
 }

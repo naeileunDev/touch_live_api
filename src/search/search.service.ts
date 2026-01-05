@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SearchHistory } from './entities/search-history.entity';
+import { SearchHistory } from './entity/search-history.entity';
 import { CreateSearchHistoryDto } from './dto/search.dto';
 import { SearchType } from 'src/common/enums';
 

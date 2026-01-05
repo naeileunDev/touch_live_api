@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
-import { User } from "src/user/entities/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { VideoTargetType } from "src/common/enums";
 
 // 영상 시청 기록

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BannerController } from './banner.controller';
 import { BannerService } from './banner.service';
-import { Banner } from './entities/banner.entity';
+import { Banner } from './entity/banner.entity';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Banner])],

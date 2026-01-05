@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { UserDeviceCreateDto } from "../dto/user-device-create.dto";
-import { UserDevice } from "../entities/user-device.entity";
+import { UserDevice } from "../entity/user-device.entity";
 import { UserDeviceRepository } from "../repository/user-device.repository";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class UserDeviceService {
      * 사용자 디바이스 생성
      * @param userDeviceCreateDto 사용자 디바이스 생성 DTO
      */
-    async createUserDevice(userDeviceCreateDto: UserDeviceCreateDto): Promise<void> {
+    async create(userDeviceCreateDto: UserDeviceCreateDto): Promise<void> {
         const { user, jwtUuid, fcmToken } = userDeviceCreateDto;
         const maxLoginDeviceCount = parseInt(process.env.MAX_LOGIN_DEVICE_COUNT);
         const devices = await this.userDeviceRepository.findAllByUserId(user.id);
@@ -38,7 +38,7 @@ export class UserDeviceService {
      * JWT UUID로 사용자 디바이스 조회
      * @param jwtUuid 디바이스 UUID
      */
-    async findUserDeviceByJwtUuid(jwtUuid: string): Promise<UserDevice> {
+    async findByJwtUuid(jwtUuid: string): Promise<UserDevice> {
         return await this.userDeviceRepository.findByJwtUuid(jwtUuid);
     }
 
@@ -46,7 +46,7 @@ export class UserDeviceService {
      * JWT UUID로 사용자 디바이스 존재 여부 확인
      * @param jwtUuid 디바이스 JWT UUID
      */
-    async existsDeviceByJwtUuid(jwtUuid: string): Promise<boolean> {
+    async existsByJwtUuid(jwtUuid: string): Promise<boolean> {
         return await this.userDeviceRepository.existsByJwtUuid(jwtUuid);
     }
 
@@ -54,7 +54,7 @@ export class UserDeviceService {
      * 사용자 디바이스 삭제
      * @param jwtUuid 디바이스 JWT UUID
      */
-    async deleteUserDeviceByJwtUuid(jwtUuid: string): Promise<boolean> {
+    async deleteByJwtUuid(jwtUuid: string): Promise<boolean> {
         return await this.userDeviceRepository.deleteByJwtUuid(jwtUuid);
     }
 
@@ -62,7 +62,7 @@ export class UserDeviceService {
      * 사용자 식별자로 모든 디바이스 삭제
      * @param userId 사용자 식별자
      */
-    async deleteAllUserDeviceByUserId(userId: string): Promise<boolean> {
+    async deleteAllByUserId(userId: string): Promise<boolean> {
         return await this.userDeviceRepository.deleteAllByUserId(userId);
     }
 }

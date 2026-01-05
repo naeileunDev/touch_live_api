@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductInquiry } from './entities/product-inquiry.entity';
-import { ProductInquiryAnswer } from './entities/product-inquiry-answer.entity';
+import { ProductInquiry } from './entity/product-inquiry.entity';
+import { ProductInquiryAnswer } from './entity/product-inquiry-answer.entity';
 import { CreateProductInquiryDto, UpdateProductInquiryDto, CreateInquiryAnswerDto } from './dto/inquiry.dto';
 
 @Injectable()

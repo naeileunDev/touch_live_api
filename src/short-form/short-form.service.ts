@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ShortForm } from './entities/short-form.entity';
-import { ShortFormProductTag } from './entities/short-form-product-tag.entity';
-import { ShortFormTag } from './entities/short-form-tag.entity';
+import { ShortForm } from './entity/short-form.entity';
+import { ShortFormProductTag } from './entity/short-form-product-tag.entity';
+import { ShortFormTag } from './entity/short-form-tag.entity';
 import { CreateShortFormDto, UpdateShortFormDto, ShortFormListQueryDto } from './dto/short-form.dto';
 
 @Injectable()

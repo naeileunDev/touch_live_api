@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "src/user/entities/user.entity";
+import { User } from "src/user/entity/user.entity";
 import axios from "axios";
 import { ConfigService } from "@nestjs/config";
 import { PaymentScope } from "./enum/payment-scope.enum";

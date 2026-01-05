@@ -3,15 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ShortFormController } from './short-form.controller';
 import { ShortFormService } from './short-form.service';
 import { ShortFormRecommendationService } from './short-form-recommendation.service';
-import { ShortForm } from './entities/short-form.entity';
-import { ShortFormProductTag } from './entities/short-form-product-tag.entity';
-import { ShortFormTag } from './entities/short-form-tag.entity';
+import { ShortForm } from './entity/short-form.entity';
+import { ShortFormTag } from './entity/short-form-tag.entity';
 
 // 추천 알고리즘에 필요한 외부 엔티티
-import { VideoViewLog } from 'src/video/entities/video.entity';
-import { SearchHistory } from 'src/search/entities/search-history.entity';
-import { UserFollow } from 'src/follow/entities/user-follow.entity';
-import { User } from 'src/user/entities/user.entity';
+import { VideoViewLog } from 'src/video/entity/video.entity';
+import { UserFollow } from 'src/follow/entity/user-follow.entity';
+import { User } from 'src/user/entity/user.entity';
+import { SearchHistory } from 'src/search/entity/search-history.entity';
+import { ShortFormProductTag } from './entity/short-form-product-tag.entity';
 
 @Module({
     imports: [

@@ -1,7 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { Store } from "src/store/entities/store.entity";
-import { File } from "src/file/entities/file.entity";
+import { Store } from "src/store/entity/store.entity";
+import { File } from "src/file/entity/file.entity";
 import { ShortFormProductTag } from "./short-form-product-tag.entity";
 
 @Entity('short_form')

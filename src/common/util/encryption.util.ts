@@ -24,12 +24,36 @@ export class EncryptionUtil {
     }
 
     /**
-     * 개인정보 복호화
+     * 개인정보 복호화 (인스턴스 메서드)
      * @param encrypted 암호화된 문자열
      * @returns 복호화된 문자열
      */
     decryptDeterministic(encrypted: string): string {
-        const decipher = crypto.createDecipheriv('aes-256-cbc',Buffer.from(this.ENCRYPTION_KEY), Buffer.from(this.FIXED_IV));
+        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.ENCRYPTION_KEY), Buffer.from(this.FIXED_IV));
+        let decrypted = decipher.update(encrypted, 'base64', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    }
+
+    /**
+     * 정적 메서드: 개인정보 복호화 (Transform 데코레이터에서 사용)
+     * @param encrypted 암호화된 문자열
+     * @returns 복호화된 문자열
+     */
+    static decryptDeterministic(encrypted: string | null | undefined): string {
+        // undefined나 null이면 그대로 반환
+        if (!encrypted) {
+            return encrypted as string;
+        }
+        
+        const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+        const FIXED_IV = process.env.FIXED_IV;
+        
+        if (!ENCRYPTION_KEY || !FIXED_IV) {
+            throw new Error('ENCRYPTION_KEY or FIXED_IV is not set');
+        }
+        
+        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), Buffer.from(FIXED_IV));
         let decrypted = decipher.update(encrypted, 'base64', 'utf8');
         decrypted += decipher.final('utf8');
         return decrypted;

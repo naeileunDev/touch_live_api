@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { User } from "src/user/entities/user.entity";
+import { User } from "src/user/entity/user.entity";
 import { SearchType } from "src/common/enums";
 
 @Entity('search_history')

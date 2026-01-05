@@ -37,14 +37,20 @@ export class StoreOwnerGuard implements CanActivate {
             storeRegisterStatus?: StoreRegisterStatus | null;
         };
 
+        console.log(user);
+
         if (requireStore) {
             if (!user.storeId) {
                 throw new ServiceException(MESSAGE_CODE.STORE_OWNER_ONLY);
             }        
         }
         else if (requireNoStore) {
+            console.log(user.storeRegisterStatus);
             if (user.storeId) {
                 throw new ServiceException(MESSAGE_CODE.STORE_NON_OWNER_ONLY);
+            }
+            else if (user.storeRegisterStatus && user.storeRegisterStatus === StoreRegisterStatus.Rejected) {
+                return true;
             }
             else if (user.storeRegisterStatus && user.storeRegisterStatus === StoreRegisterStatus.Pending) {
                 throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_STATUS_PENDING);

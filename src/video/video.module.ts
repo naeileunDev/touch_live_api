@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VideoController } from './video.controller';
 import { VideoService } from './video.service';
-import { VideoViewLog, VideoLike, VideoComment, VideoCommentLike } from './entities/video.entity';
+import { VideoViewLog, VideoLike, VideoComment, VideoCommentLike } from './entity/video.entity';
 
 @Module({
     imports: [

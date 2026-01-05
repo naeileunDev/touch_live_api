@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
-import { Store } from "src/store/entities/store.entity";
+import { Store } from "src/store/entity/store.entity";
 import { ProductInquiry } from "./product-inquiry.entity";
 
 @Entity('product_inquiry_answer')
