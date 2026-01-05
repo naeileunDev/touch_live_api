@@ -6,10 +6,10 @@ import { UserCreateDto } from "../dto/user-create.dto";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";
 import { UserTermsAgreement } from "./user-terms-agreement.entity";
 import { UserAddress } from "./user-address.entity";
-import { Store } from "src/store/entity/store.entity";
+import { Store } from "src/store/entities/store.entity";
 import { UserRole } from "../enum/user-role.enum";
 import { UserOperation } from "./user-operation.entity";
-import { StoreRegisterLog } from "src/store/entity/store-register-log.entity";
+import { StoreRegisterLog } from "src/store/entities/store-register-log.entity";
 
 @Entity()
 export class User extends BaseEntity {

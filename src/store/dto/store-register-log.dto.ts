@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { StoreRegisterLog } from "../entity/store-register-log.entity";
+import { StoreRegisterLog } from "../entities/store-register-log.entity";
 import { IsArray, IsEnum, IsNumber, IsString, MaxLength, MinLength } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";

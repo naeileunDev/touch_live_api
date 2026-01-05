@@ -1,10 +1,10 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { StoreStatusType } from "../enum/store-status-type.enum";
-import { User } from "src/user/entity/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { Tag } from "src/tag/entity/tag.entity";
-import { File } from "src/file/entitiy/file.entity";
+import { Tag } from "src/tag/entities/tag.entity";
+import { File } from "src/file/entities/file.entity";
 import { UsageType } from "src/file/enum/file-category.enum";
 
 @Entity()

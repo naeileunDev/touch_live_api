@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
-import { StoreRegisterLog } from "../entity/store-register-log.entity";
+import { StoreRegisterLog } from "../entities/store-register-log.entity";
 import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
-import { User } from "src/user/entity/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { StoreFilesDto } from "../dto/store-files.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";

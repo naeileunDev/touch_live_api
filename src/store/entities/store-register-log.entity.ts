@@ -1,6 +1,6 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
-import { User } from "src/user/entity/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 

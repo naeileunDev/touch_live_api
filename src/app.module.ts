@@ -2,23 +2,34 @@ import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+
+// === Common & Config Imports ===
 import { ServiceExceptionFilter } from './common/filter/service-exception.filter';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { validationSchema } from './common/config/validation.schema';
 import { dataSourceFactory, getTypeOrmConfig } from './common/config/typeorm.config';
+import { EncryptionUtil } from './common/util/encryption.util';
+
+// === Existing Feature Modules ===
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 import { StoreModule } from './store/store.module';
 import { ProductModule } from './product/product.module';
-import { EncryptionUtil } from './common/util/encryption.util';
+import { PaymentModule } from './payment/payment.module';
 import { FileModule } from './file/file.module';
 import { TagModule } from './tag/tag.module';
-import { PaymentModule } from './payment/payment.module';
+import { ShortFormModule } from './short-form/short-form.module';
+import { VideoModule } from './video/video.module';
+import { BannerModule } from './banner/banner.module';
+import { FollowModule } from './follow/follow.module';
+import { SearchModule } from './search/search.module';
+import { InquiryModule } from './inquiry/inquiry.module';
 
 @Module({
     imports: [
+        // 1. Global Config Modules
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: `.${process.env.NODE_ENV}.env`,
@@ -32,6 +43,8 @@ import { PaymentModule } from './payment/payment.module';
             useFactory: getTypeOrmConfig,
             dataSourceFactory: dataSourceFactory,
         }),
+
+        // 2. Feature Modules
         UserModule,
         AuthModule,
         StoreModule,
@@ -39,6 +52,12 @@ import { PaymentModule } from './payment/payment.module';
         PaymentModule,
         FileModule,
         TagModule,
+        ShortFormModule,
+        VideoModule,
+        BannerModule,
+        FollowModule,
+        SearchModule,
+        InquiryModule,
     ],
     controllers: [],
     providers: [

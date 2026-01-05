@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
-import { UserTermsAgreement } from "../entity/user-terms-agreement.entity";
+import { UserTermsAgreement } from "../entities/user-terms-agreement.entity";
 import { UserTermsAgreementDto } from "../dto/user-terms-agreement.dto";
-import { User } from "../entity/user.entity";
+import { User } from "../entities/user.entity";
 import { UserSignupSourceDto } from "../dto/user-signup-source.dto";
 
 @Injectable()

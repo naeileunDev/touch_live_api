@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Tag } from "../entity/tag.entity";
+import { Tag } from "../entities/tag.entity";
 import { CATEGORY_FIELD_MAP, CategoryType } from "../enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "../enum/usage-type.enum";
 import { IsArray, IsDate, IsEnum } from "class-validator";

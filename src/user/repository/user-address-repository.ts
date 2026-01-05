@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
-import { UserAddress } from "../entity/user-address.entity";
+import { UserAddress } from "../entities/user-address.entity";
 import { UserAddressCreateDto } from "../dto/user-address-create.dto";
-import { User } from "../entity/user.entity";
+import { User } from "../entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";

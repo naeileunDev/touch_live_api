@@ -5,7 +5,7 @@ import { Role } from "src/common/decorator/role.decorator";
 import { USER_PERMISSION } from "src/common/permission/permission";
 import { ApiOkSuccessResponse } from "src/common/decorator/swagger/api-response.decorator";
 import { GetUser } from "src/common/decorator/get-user.decorator";
-import { User } from "src/user/entity/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { PaymentScope } from "./enum/payment-scope.enum";
 import { PaymentTermDto } from "./dto/payment-term.dto";
 import { PaymentCheckTermsDto } from "./dto/payment-check-terms.dto";

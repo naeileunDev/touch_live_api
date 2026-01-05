@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, DeleteResult, In, Repository } from "typeorm";
-import { User } from "../entity/user.entity";
+import { User } from "../entities/user.entity";
 import { UserCreateDto } from "../dto/user-create.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";

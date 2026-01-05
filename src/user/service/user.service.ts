@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository/user.repository';
 import { UserOauthRepository } from '../repository/user-oauth.repository';
-import { User } from '../entity/user.entity';
+import { User } from '../entities/user.entity';
 import { UserRole } from '../enum/user-role.enum';
 import { UserOauthType } from '../enum/user-oauth-type.enum';
-import { UserOauth } from '../entity/user-oauth.entity';
-import { UserDevice } from '../entity/user-device.entity';
+import { UserOauth } from '../entities/user-oauth.entity';
+import { UserDevice } from '../entities/user-device.entity';
 import { UserStatus } from '../enum/user-status.enum';
 import { UserSignupSourceDataRepository } from '../repository/user-signup-source-data.repository';
 import { Transactional } from 'typeorm-transactional';
@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserOperationRepository } from '../repository/user-operation-repository';
 import { UserOperationDto } from '../dto/user-operaion.dto';
 import { UserOperationRequestDto } from '../dto/user-operation-request.dto';
-import { UserOperation } from '../entity/user-operation.entity';
+import { UserOperation } from '../entities/user-operation.entity';
 
 @Injectable()
 export class UserService {

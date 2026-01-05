@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { UserAddress } from "../entity/user-address.entity";
+import { UserAddress } from "../entities/user-address.entity";
 
 export class UserAddressDto {
     @ApiProperty({ description: '주소 식별자', example: 1 })

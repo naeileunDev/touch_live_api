@@ -1,6 +1,6 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
-import { UserOauth } from "../entity/user-oauth.entity";
+import { UserOauth } from "../entities/user-oauth.entity";
 import { UserOauthCreateDto } from "../dto/user-oauth-create.dto";
 import { UserOauthType } from "../enum/user-oauth-type.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";

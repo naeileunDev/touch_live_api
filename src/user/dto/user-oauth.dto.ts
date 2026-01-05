@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { UserOauth } from "../entity/user-oauth.entity";
+import { UserOauth } from "../entities/user-oauth.entity";
 import { UserOauthType } from "../enum/user-oauth-type.enum";
 
 export class UserOauthDto {

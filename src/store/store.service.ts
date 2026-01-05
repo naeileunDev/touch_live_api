@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/user/entity/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { StoreRepository } from './repository/store.respository';
 import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
 import { FileService } from 'src/file/file.service';

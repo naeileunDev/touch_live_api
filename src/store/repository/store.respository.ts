@@ -1,5 +1,5 @@
 import { DataSource, DeleteResult, Repository } from "typeorm";
-import { Store } from "../entity/store.entity";
+import { Store } from "../entities/store.entity";
 import { Injectable } from "@nestjs/common";
 import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
 

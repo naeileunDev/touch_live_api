@@ -4,7 +4,7 @@ import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
 import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
-import { User } from "../entity/user.entity";
+import { User } from "../entities/user.entity";
 import { EncryptionUtil } from "src/common/util/encryption.util";
 
 export class UserDto {
