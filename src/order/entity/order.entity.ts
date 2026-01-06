@@ -1,6 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { User } from "src/user/entity/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { OrderProduct } from "./order-product.entity";
 
 @Entity()
 export class Order extends BaseEntity {
@@ -15,5 +16,9 @@ export class Order extends BaseEntity {
     @Column({ type: 'boolean', comment: '사용자 숨김 여부', default: false })
     isUserHidden: boolean;
 
+    @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
+    orderProducts: OrderProduct[];
 
+    @Column({ type: 'boolean', comment: '체험단 여부' })
+    isTrial: boolean;
 }
