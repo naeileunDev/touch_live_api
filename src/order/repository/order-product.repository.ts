@@ -2,7 +2,7 @@ import { DataSource, Repository } from "typeorm";
 import { OrderProduct } from "../entity/order-product.entity";
 import { Injectable } from "@nestjs/common";
 import { Order } from "../entity/order.entity";
-import { Product } from "src/product/entity/product.entity";
+import { OrderProductCreateDto } from "../dto/order-product-create.dto";
 
 @Injectable()
 export class OrderProductRepository extends Repository<OrderProduct> {
@@ -10,7 +10,7 @@ export class OrderProductRepository extends Repository<OrderProduct> {
         super(OrderProduct, dataSource.createEntityManager());
     }
 
-    async createOrderProduct(dto: any, order: Order): Promise<OrderProduct> {
+    async createOrderProduct(dto: OrderProductCreateDto, order: Order): Promise<OrderProduct> {
         const entity = this.create({
             ...dto,
             order,
