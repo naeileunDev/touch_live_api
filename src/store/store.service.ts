@@ -16,12 +16,12 @@ export class StoreService {
   }
 
   
-  async createStore(createDto: StoreRegisterLogDto, user: User): Promise<StoreDto> {
+  async create(createDto: StoreRegisterLogDto, user: User): Promise<StoreDto> {
     const store = await this.storeRepository.createStore(createDto, user, 11);
     return plainToInstance(StoreDto, store);
   }
   
-  async findByStoreId(id: number): Promise<StoreDto> {
+  async findById(id: number): Promise<StoreDto> {
     const store = await this.storeRepository.findById(id);
     if (!store) {
       throw new ServiceException(MESSAGE_CODE.STORE_NOT_FOUND);
@@ -29,7 +29,7 @@ export class StoreService {
     return plainToInstance(StoreDto, store);
   }
 
-  async findEntityByStoreId(id: number): Promise<Store> {
+  async findEntityById(id: number): Promise<Store> {
     const store = await this.storeRepository.findById(id);
     if (!store) {
       throw new ServiceException(MESSAGE_CODE.STORE_NOT_FOUND);
@@ -38,11 +38,11 @@ export class StoreService {
   }
   
 
-  async saveStore(store: Store): Promise<Store> {
+  async save(store: Store): Promise<Store> {
     return await this.storeRepository.save(store);
   }
 
-  async deleteByStoreId(id: number): Promise<boolean> {
+  async deleteById(id: number): Promise<boolean> {
     return await this.storeRepository.deleteById(id);
   }
 

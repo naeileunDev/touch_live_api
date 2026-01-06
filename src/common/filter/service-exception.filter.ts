@@ -18,6 +18,9 @@ export class ServiceExceptionFilter implements ExceptionFilter {
         // ServiceException 처리
         if (exception instanceof ServiceException) {
             code = exception.statusCode;
+            console.log(typeof code);
+            console.log(code);
+            console.log(exception.message);
             statusCode = code < 1000 ? code : 409; // 1000 이상은 내부 코드이므로 409로 매핑
             message = exception.message || 'Service Error';
         }
