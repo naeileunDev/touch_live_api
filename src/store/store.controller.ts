@@ -60,7 +60,7 @@ export class StoreController {
   @Role(USER_PERMISSION)
   @ApiOperation({ summary: '[유저 role] 가게 등록, 아직 가게를 등록하지 않았고, 로그상태가 null 또는 rejected인 경우 가게 등록 가능' })
   @ApiCreatedSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 성공')
-  async createRegisterLog (
+  createRegisterLog (
     @Body() createDto: StoreRegisterLogCreateDto,
     @GetUser() user: User, 
     @UploadedFiles(MediaValidationPipeArray) files: {
@@ -70,24 +70,23 @@ export class StoreController {
         profileImage: Express.Multer.File[],
         bannerImage: Express.Multer.File[],
     }): Promise<StoreRegisterLogCreateResponseDto> {
-        return await this.storeRegisterLogService.create(createDto, user, files);
+        return this.storeRegisterLogService.create(createDto, user, files);
     }
 
-  @Get('register-log/search')
+  @Get('register-log/:id')
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-  @ApiOkSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 로그 조회 성공')
-  async findById(@GetUser() user: UserDto, @Query('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
-    return await this.storeRegisterLogService.findById(id, user);
+  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
+  findById(@GetUser() user: UserDto, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
+    return this.storeRegisterLogService.findById(id, user);
   }
 
-
-  @Get('register-log/user')
+  @Get('register-log')
   @Role(ALL_PERMISSION)
-  @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공', true)
-  async findByRegisterLogUserId(@GetUser() user: UserDto, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
-    return await this.storeRegisterLogService.findByUserId(userId, user);
+  @ApiOperation({ summary: '[모든 role] 사용자별 가게 등록 로그 목록 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 목록 조회 성공', true)
+  findByRegisterLogUserId(@GetUser() user: UserDto, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
+    return this.storeRegisterLogService.findByUserId(userId, user);
   }
 }
 

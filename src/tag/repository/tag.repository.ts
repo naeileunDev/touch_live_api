@@ -39,7 +39,7 @@ export class TagRepository extends Repository<Tag> {
         });
     }
 
-    async findTagList(categories: CategoryType[], usages: UsageType[]): Promise<Tag[]> {
+    async findByUsageAndCategory(categories: CategoryType[], usages: UsageType[]): Promise<Tag[]> {
         const queryBuilder = this.createQueryBuilder('tag');
         // 용도 조건 (OR) - 먼저 필터링
         if (usages?.length) {

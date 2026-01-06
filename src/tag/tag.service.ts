@@ -46,14 +46,9 @@ export class TagService {
         return await this.tagRepository.existsByTagName(name);
     }
 
-    async findTagList(requestDto: TagFindRequestDto): Promise<TagDto[]> {
+    async findByUsageAndCategory(requestDto: TagFindRequestDto): Promise<string[]> {
         const { category, usage } = requestDto;
-        const tags = await this.tagRepository.findTagList(category, usage);
-        return tags.map(tag => new TagDto(tag));
-    }
-    async findTagListGroupedByUsage(requestDto: TagFindRequestDto): Promise<string[]> {
-        const { category, usage } = requestDto;
-        const tags = await this.tagRepository.findTagList(category, usage);
+        const tags = await this.tagRepository.findByUsageAndCategory(category, usage);
         
         // 필터링할 usage와 category 결정
         const targetUsages = usage?.length ? usage : Object.values(UsageType);

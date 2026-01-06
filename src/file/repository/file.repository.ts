@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, DeleteResult, Repository } from "typeorm";
 import { File } from "../entity/file.entity";
 import { FileDto } from "../dto/file.dto";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
@@ -11,7 +11,7 @@ export class FileRepository extends Repository<File> {
         super(File, dataSource.createEntityManager());
     }
 
-    async saveFile(file: FileDto): Promise<File> {
+    async createFile(file: FileDto): Promise<File> {
         const fileEntity = this.create({
             contentCategory: file.contentCategory,
             mediaType: file.mediaType,
@@ -25,11 +25,16 @@ export class FileRepository extends Repository<File> {
         return await this.save(fileEntity);
     }
 
-    async findOneById(id: number): Promise<File> {
+    async findById(id: number): Promise<File> {
         const file = await this.findOneBy({id});
         if (!file) {
             throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
         }
         return file;
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+        const rtn: DeleteResult = await this.softDelete({ id });
+        return rtn.affected > 0;
     }
 }

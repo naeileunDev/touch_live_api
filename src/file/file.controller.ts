@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes, ParseIntPipe } from '@nestjs/common';
 import { FileService } from './file.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -52,8 +52,8 @@ export class FileController {
     },
     })
     @ApiOperation({ summary: '파일 저장' })
-    async saveLocal(@UploadedFile(MediaValidationPipe) file: Express.Multer.File, @Body() fileCreateDto: FileCreateDto) {
-    return await this.fileService.saveLocalToUploads(file, fileCreateDto) ;
+    createLocal(@UploadedFile(MediaValidationPipe) file: Express.Multer.File, @Body() fileCreateDto: FileCreateDto) {
+    return this.fileService.createLocal(file, fileCreateDto) ;
     }
 
     //   @Get()
@@ -64,11 +64,11 @@ export class FileController {
     @Get(':id')
     @ApiOperation({ summary: '파일 조회' })
     @ApiOkSuccessResponse(FileDto, '파일 조회 성공', true)
-    async findOne(@Param('id') id: number) {
-    return await this.fileService.findOne(id);
+    findById(@Param('id', ParseIntPipe) id: number) {
+    return this.fileService.findById(id);
     }
     
-    @Get('serve/:id')
+    @Get('test/:id')
     @ApiOperation({ summary: '파일 조회 및 표시 (브라우저에서 열기)' })
     @ApiResponse({ 
         status: 200, 
@@ -78,8 +78,8 @@ export class FileController {
             'video/*': { schema: { type: 'string', format: 'binary' } },
         }
     })
-    async serveFile(@Param('id') id: number): Promise<StreamableFile> {
-        return await this.fileService.serveFile(id);
+    findByIdAndServe(@Param('id') id: number): Promise<StreamableFile> {
+        return this.fileService.findByIdAndServe(id);
     }
 //   @Patch(':id')
 //   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
