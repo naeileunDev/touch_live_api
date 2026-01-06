@@ -26,6 +26,8 @@ import { BannerModule } from './banner/banner.module';
 import { FollowModule } from './follow/follow.module';
 import { SearchModule } from './search/search.module';
 import { InquiryModule } from './inquiry/inquiry.module';
+import { OrderModule } from './order/order.module';
+import { CouponModule } from './coupon/coupon.module';
 
 @Module({
     imports: [
@@ -58,6 +60,8 @@ import { InquiryModule } from './inquiry/inquiry.module';
         FollowModule,
         SearchModule,
         InquiryModule,
+        OrderModule,
+        CouponModule,
     ],
     controllers: [],
     providers: [

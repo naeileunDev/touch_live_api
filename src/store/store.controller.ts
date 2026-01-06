@@ -77,7 +77,7 @@ export class StoreController {
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
-  findById(@GetUser() user: UserDto, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
+  findRegisterLogById(@GetUser() user: UserDto, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
     return this.storeRegisterLogService.findById(id, user);
   }
 

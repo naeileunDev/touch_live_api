@@ -58,4 +58,11 @@ export const MESSAGE_TEXT = {
 
     // Order
     [MESSAGE_CODE.ORDER_NOT_FOUND]: '주문을 찾을 수 없습니다.',
+
+    // Coupon
+    [MESSAGE_CODE.COUPON_NOT_FOUND]: '쿠폰을 찾을 수 없습니다.',
+    [MESSAGE_CODE.COUPON_EXPIRED_TIME_INVALID]: '쿠폰 만료 일시가 올바르지 않습니다.',
+    [MESSAGE_CODE.COUPON_AMOUNT_INVALID]: '쿠폰 할인 금액이 올바르지 않습니다.',
+    [MESSAGE_CODE.COUPON_PERCENTAGE_INVALID]: '쿠폰 할인 퍼센트가 올바르지 않습니다.',
+    [MESSAGE_CODE.COUPON_STOCK_INVALID]: '쿠폰 재고가 올바르지 않습니다.',
 };
