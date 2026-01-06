@@ -38,6 +38,7 @@ export class CouponService {
         return await this.couponRepository.deleteById(id);
     }
     
+    // 업데이트 시 재고와 discountType 변경 불가
     async save(id: number, dto: CouponUpdateDto): Promise<CouponDto> {
         const coupon = await this.couponRepository.findById(id);
         this.validateExpireAt(dto.expireAt, coupon.createdAt);
