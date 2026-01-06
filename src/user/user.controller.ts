@@ -49,7 +49,7 @@ export class UserController {
         return this.userService.existsByEmailWithDeleted(email).then(result => ({ exists: result }));
     }
 
-    @Post('register/address')
+    @Post('address')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 등록' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 등록 성공')
@@ -57,7 +57,7 @@ export class UserController {
         return this.userAddressService.create(userAddressCreateDto, userDto);
     }
 
-    @Put('update/address/:id')
+    @Put('address/:id')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 수정' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 수정 성공')
@@ -81,10 +81,10 @@ export class UserController {
         return this.userOperationService.create(userOperationRequestDto);
     }
 
-    @Put('operation/role/update')
+    @Put('operation/role')
     @Role(ADMIN_PERMISSION)
-    @ApiOperation({ summary: '해당 사용자의 운영자(매니저, 어드민) 권한 업데이트' })
-    @ApiOkSuccessResponse(UserOperationDto, '운영자(매니저, 어드민) 권한 업데이트 성공')
+    @ApiOperation({ summary: '해당 사용자의 운영자(매니저, 어드민) 권한 변경' })
+    @ApiOkSuccessResponse(UserOperationDto, '운영자(매니저, 어드민) 권한 변경 성공')
     modifyOperationRole(@Body() userOperationRequestDto: UserOperationRequestDto): Promise<UserOperationDto> {
         return this.userOperationService.save(userOperationRequestDto);
     }

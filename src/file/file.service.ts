@@ -32,7 +32,7 @@ export class FileService {
         });
     }
       
-    async saveLocalToUploads(file: Express.Multer.File, dto: FileCreateDto): Promise<FileDto> {
+    async createLocal(file: Express.Multer.File, dto: FileCreateDto): Promise<FileDto> {
         const fullPath = this.generatePath(dto, file.mimetype);
         const dir = path.dirname(fullPath); 
         await fs.mkdir(dir, { recursive: true });
@@ -57,7 +57,7 @@ export class FileService {
             }
         );
 
-        const savedFile = await this.fileRepository.saveFile(fileDto);
+        const savedFile = await this.fileRepository.createFile(fileDto);
         fileDto.id = savedFile.id;
         return fileDto;
     }
@@ -108,13 +108,13 @@ export class FileService {
         }
     }
 
-    async findOne(id: number): Promise<FileDto> {
-        const file = await this.fileRepository.findOneById(id);
+    async findById(id: number): Promise<FileDto> {
+        const file = await this.fileRepository.findById(id);
         return new FileDto(file);
     }
     
-    async serveFile(id: number): Promise<StreamableFile> {
-        const file = await this.findOne(id);
+    async findByIdAndServe(id: number): Promise<StreamableFile> {
+        const file = await this.findById(id);
         try {
             await fs.access(file.fileUrl);
         } catch {

@@ -60,7 +60,7 @@ export class StoreRegisterLogService {
             .filter(m => files[m.field])  // 파일이 있는 것만 처리
             .map(async (m) => {
                 const fileArray = files[m.field] as Express.Multer.File[];
-                const file = await this.FileService.saveLocalToUploads(
+                const file = await this.FileService.createLocal(
                     fileArray[0],
                     {   
                         contentCategory: ContentCategory.User,

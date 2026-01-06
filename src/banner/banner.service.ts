@@ -14,7 +14,7 @@ export class BannerService {
 
     async create(dto: CreateBannerDto): Promise<Banner> {
         const banner = this.bannerRepository.create(dto);
-        return this.bannerRepository.save(banner);
+        return await this.bannerRepository.save(banner);
     }
 
     async findAll(position?: BannerPosition) {
@@ -32,7 +32,7 @@ export class BannerService {
             qb.andWhere('b.position = :position', { position });
         }
 
-        return qb.orderBy('b.displayOrder', 'ASC').getMany();
+        return await qb.orderBy('b.displayOrder', 'ASC').getMany();
     }
 
     async findOne(id: number): Promise<Banner> {
@@ -51,7 +51,7 @@ export class BannerService {
     async update(id: number, dto: UpdateBannerDto): Promise<Banner> {
         const banner = await this.findOne(id);
         Object.assign(banner, dto);
-        return this.bannerRepository.save(banner);
+        return await this.bannerRepository.save(banner);
     }
 
     async remove(id: number): Promise<void> {
