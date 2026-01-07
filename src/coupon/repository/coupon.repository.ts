@@ -28,7 +28,7 @@ export class CouponRepository extends Repository<Coupon> {
         return await this.find(
             {
                 where: {
-                    expireAt: MoreThan(new Date()),
+                    issuableUntil: MoreThan(new Date()),
                 },
                 order: {
                     createdAt: 'DESC',

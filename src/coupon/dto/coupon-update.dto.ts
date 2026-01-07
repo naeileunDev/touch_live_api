@@ -9,10 +9,10 @@ export class CouponUpdateDto {
     @IsEnum(CategoryType)
     category?: CategoryType;
 
-    @ApiPropertyOptional({ description: '쿠폰 사용 가능 최대 금액' })
+    @ApiPropertyOptional({ description: '쿠폰 할인 최대 금액(퍼센트 쿠폰용)' })
     @IsOptional()
     @IsInt()
-    maxOrderAmount?: number;
+    maxDiscountAmount?: number;
 
     @ApiPropertyOptional({ description: '쿠폰 사용 가능 최소 금액' })
     @IsOptional()
@@ -22,7 +22,7 @@ export class CouponUpdateDto {
     @ApiPropertyOptional({ description: '쿠폰 만료 일시' })
     @IsOptional()
     @IsDate()
-    expireAt?: Date;
+    issuableUntil?: Date;
 
     @ApiPropertyOptional({ description: '할인 금액 또는 퍼센트 ' })
     @IsOptional()
