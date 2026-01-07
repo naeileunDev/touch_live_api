@@ -1,11 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { CouponCreateDto } from "./dto/coupon-create.dto";
-import { CouponDto } from "./dto/coupon.dto";
-import { CouponRepository } from "./repository/coupon.repository";
-import { CouponUpdateDto } from "./dto/coupon-update.dto";
+import { CouponCreateDto } from "../dto/coupon-create.dto";
+import { CouponDto } from "../dto/coupon.dto";
+import { CouponRepository } from "../repository/coupon.repository";
+import { CouponUpdateDto } from "../dto/coupon-update.dto";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { DiscountType } from "./enum/coupon.enum";
+import { DiscountType } from "../enum/coupon.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
+import { Coupon } from "../entity/coupon.entity";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class CouponService {
@@ -25,6 +27,11 @@ export class CouponService {
     async findById(id: number): Promise<CouponDto> {
         const coupon = await this.couponRepository.findById(id);
         return new CouponDto(coupon);
+    }
+
+    async findEntityById(id: number): Promise<Coupon> {
+        const coupon = await this.couponRepository.findById(id);
+        return coupon;
     }
 
     async findAllNotExpired(): Promise<CouponDto[]> {
@@ -49,6 +56,18 @@ export class CouponService {
         
         return new CouponDto(await this.couponRepository.save(coupon));
     }
+    /**
+     * 재고를 원자적으로 감소시킴 (동시성 문제 방지)
+     * @param couponId 쿠폰 ID
+     * @throws {ServiceException} 재고가 부족한 경우 예외 발생
+     */
+    async decreaseStock(couponId: number): Promise<void> {
+        const success = await this.couponRepository.decreaseStockAtomically(couponId);
+        if (!success) {
+            throw new ServiceException(MESSAGE_CODE.COUPON_OUT_OF_STOCK);
+        }
+    }
+    
     // 만료일시 유효검사 
     private validateIssuableUntil(issuableUntil: Date | undefined, createdAt?: Date): void {
         if (!issuableUntil) return;

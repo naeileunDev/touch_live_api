@@ -28,6 +28,7 @@ import { SearchModule } from './search/search.module';
 import { InquiryModule } from './inquiry/inquiry.module';
 import { OrderModule } from './order/order.module';
 import { CouponModule } from './coupon/coupon.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
     imports: [
@@ -45,7 +46,7 @@ import { CouponModule } from './coupon/coupon.module';
             useFactory: getTypeOrmConfig,
             dataSourceFactory: dataSourceFactory,
         }),
-
+        ScheduleModule.forRoot(),
         // 2. Feature Modules
         UserModule,
         AuthModule,
