@@ -44,4 +44,20 @@ export class CouponRepository extends Repository<Coupon> {
         });
         return rtn.affected > 0;
     }
+
+    /**
+     * 재고를 원자적으로 감소시킴 (동시성 문제 방지)
+     * @param id 쿠폰 ID
+     * @returns 재고 감소 성공 여부 (재고가 부족하면 false)
+     */
+    async decreaseStockAtomically(id: number): Promise<boolean> {
+        const result = await this.createQueryBuilder()
+            .update(Coupon)
+            .set({ stock: () => 'stock - 1' })
+            .where('id = :id', { id })
+            .andWhere('stock > 0')
+            .execute();
+        
+        return result.affected > 0;
+    }
 }     

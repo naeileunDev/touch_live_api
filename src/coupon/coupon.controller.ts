@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { CouponService } from "./coupon.service";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
+import { CouponService } from "./service/coupon.service";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ApiOkSuccessResponse } from "src/common/decorator/swagger/api-response.decorator";
 import { CouponDto } from "./dto/coupon.dto";
 import { CouponCreateDto } from "./dto/coupon-create.dto";
 import { Role } from "src/common/decorator/role.decorator";
-import { ALL_PERMISSION, ANY_PERMISSION, OPERATOR_PERMISSION } from "src/common/permission/permission";
+import { ALL_PERMISSION, ANY_PERMISSION, OPERATOR_PERMISSION, USER_PERMISSION } from "src/common/permission/permission";
 import { CouponUpdateDto } from "./dto/coupon-update.dto";
+import { UserCouponService } from "./service/user-coupon.service";
+import { GetUser } from "src/common/decorator/get-user.decorator";
+import { UserDto } from "src/user/dto";
+import { UserCouponDto } from "./dto/user-coupon.dto";
 
 @ApiTags('Coupon')
 @Controller('coupon')
@@ -14,11 +18,12 @@ import { CouponUpdateDto } from "./dto/coupon-update.dto";
 export class CouponController {
     constructor(
         private readonly couponService: CouponService,
+        private readonly userCouponService: UserCouponService,
     ) {
     }
 
     @Post()
-    @Role(OPERATOR_PERMISSION)
+    @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '[operator role] 쿠폰 생성' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 생성 성공')
     create(@Body() couponCreateDto: CouponCreateDto): Promise<CouponDto> {
@@ -57,4 +62,26 @@ export class CouponController {
     updateById(@Param('id', ParseIntPipe) id: number, @Body() couponUpdateDto: CouponUpdateDto): Promise<CouponDto> {
         return this.couponService.save(id, couponUpdateDto);
     }
+
+    @Post('issue/:couponId')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '[유저 role] 쿠폰 발급' })
+    @ApiOkSuccessResponse(CouponDto, '쿠폰 발급 성공')
+    issueCoupon(@Param('couponId', ParseIntPipe) couponId: number,@GetUser() user: UserDto): Promise<any> {
+        return this.userCouponService.create(couponId, user.id);
+    }
+
+    @Get('users/:userId')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '[유저 role] 내 쿠폰 목록 조회 (사용 여부 필터링 가능)' })
+    @ApiQuery({ name: 'isUsed', required: false, type: Boolean, description: '사용 여부 필터 (true: 사용한 쿠폰, false: 사용하지 않은 쿠폰, 미지정: 전체)' })
+    @ApiOkSuccessResponse(UserCouponDto, '내 쿠폰 목록 조회 성공', true)
+    findMyCoupons(
+        @Param('userId') userId: string,
+        @Query('isUsed', ParseBoolPipe) isUsed?: boolean
+    ): Promise<UserCouponDto[]> {
+        return this.userCouponService.findByUserId(userId, isUsed);
+    }
+
+
 }
