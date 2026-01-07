@@ -64,5 +64,5 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.COUPON_EXPIRED_TIME_INVALID]: '쿠폰 만료 일시가 올바르지 않습니다.',
     [MESSAGE_CODE.COUPON_AMOUNT_INVALID]: '쿠폰 할인 금액이 올바르지 않습니다.',
     [MESSAGE_CODE.COUPON_PERCENTAGE_INVALID]: '쿠폰 할인 퍼센트가 올바르지 않습니다.',
-    [MESSAGE_CODE.COUPON_STOCK_INVALID]: '쿠폰 재고가 올바르지 않습니다.',
+    [MESSAGE_CODE.COUPON_MAX_DISCOUNT_AMOUNT_NOT_ALLOWED]: '쿠폰 할인 최대 금액은 퍼센트 할인 쿠폰타입에만 적용할 수 있습니다.',
 };

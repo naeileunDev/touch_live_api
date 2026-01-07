@@ -24,19 +24,23 @@ export class CouponDto {
     @IsOptional()
     minOrderAmount?: number;
 
-    @ApiPropertyOptional({ description: '쿠폰 사용 가능 최대 금액', example: 20000, nullable: true })
+    @ApiPropertyOptional({ description: '쿠폰 할인 최대 금액(퍼센트 쿠폰용)', example: 20000, nullable: true })
     @IsOptional()
-    maxOrderAmount?: number;
+    maxDiscountAmount?: number;
 
     @ApiPropertyOptional({ description: '쿠폰 만료 일시', example: '2025-01-01 12:00:00', nullable: true })
     @IsOptional()
-    expireAt?: Date;
+    issuableUntil?: Date;
 
     @ApiProperty({ description: '쿠폰 생성 일시', example: '2025-01-01 12:00:00' })
     createdAt: Date;
 
     @ApiProperty({ description: '쿠폰 수정 일시', example: '2025-01-01 12:00:00' })
     updatedAt: Date;
+
+    @ApiPropertyOptional({ description: '쿠폰 유효 일수(일 단위)', example: 30, nullable: true })
+    @IsOptional()
+    validDays?: number;
 
     constructor(coupon: Coupon) {
         this.id = coupon.id;
@@ -45,10 +49,11 @@ export class CouponDto {
         this.category = coupon.category;
         this.amount = coupon.amount;
         this.minOrderAmount = coupon.minOrderAmount;
-        this.maxOrderAmount = coupon.maxOrderAmount;
-        this.expireAt = coupon.expireAt;
+        this.maxDiscountAmount = coupon.maxDiscountAmount;
+        this.issuableUntil = coupon.issuableUntil;
         this.createdAt = coupon.createdAt;
         this.updatedAt = coupon.updatedAt;
+        this.validDays = coupon.validDays;
     }
 
 }

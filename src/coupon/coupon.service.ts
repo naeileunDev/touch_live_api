@@ -15,11 +15,9 @@ export class CouponService {
     }
 
     async create(couponCreateDto: CouponCreateDto): Promise<CouponDto> {
-        if (couponCreateDto.stock < 1) {
-            throw new ServiceException(MESSAGE_CODE.COUPON_STOCK_INVALID);
-        }
-        this.validateExpireAt(couponCreateDto.expireAt);
+        this.validateIssuableUntil(couponCreateDto.issuableUntil);
         this.validateAmount(couponCreateDto.discountType, couponCreateDto.amount);
+        this.validateMaxDiscountAmount(couponCreateDto.maxDiscountAmount, couponCreateDto.discountType);
         const coupon = await this.couponRepository.createCoupon(couponCreateDto);
         return new CouponDto(coupon);
     }
@@ -41,7 +39,7 @@ export class CouponService {
     // 업데이트 시 재고와 discountType 변경 불가
     async save(id: number, dto: CouponUpdateDto): Promise<CouponDto> {
         const coupon = await this.couponRepository.findById(id);
-        this.validateExpireAt(dto.expireAt, coupon.createdAt);
+        this.validateIssuableUntil(dto.issuableUntil, coupon.createdAt);
         this.validateAmount(coupon.discountType, dto.amount);       
         Object.keys(dto).forEach(key => {
             if (dto[key] !== undefined) {
@@ -52,13 +50,13 @@ export class CouponService {
         return new CouponDto(await this.couponRepository.save(coupon));
     }
     // 만료일시 유효검사 
-    private validateExpireAt(expireAt: Date | undefined, createdAt?: Date): void {
-        if (!expireAt) return;
+    private validateIssuableUntil(issuableUntil: Date | undefined, createdAt?: Date): void {
+        if (!issuableUntil) return;
         
-        if (expireAt < new Date()) {
+        if (issuableUntil < new Date()) {
             throw new ServiceException(MESSAGE_CODE.COUPON_EXPIRED_TIME_INVALID);
         }
-        if (createdAt && expireAt < createdAt) {
+        if (createdAt && issuableUntil < createdAt) {
             throw new ServiceException(MESSAGE_CODE.COUPON_EXPIRED_TIME_INVALID);
         }
     }
@@ -72,6 +70,15 @@ export class CouponService {
         }
         if (discountType === DiscountType.Percentage && (amount > 100 || amount === 0)) {
             throw new ServiceException(MESSAGE_CODE.COUPON_PERCENTAGE_INVALID);
+        }
+    }
+
+    private validateMaxDiscountAmount(maxDiscountAmount: number | undefined, discountType: DiscountType): void {
+        if (maxDiscountAmount === undefined) return;
+        if (discountType === DiscountType.Percentage) return;
+        //amount 가 따로있으므로 할인 금액 최대 금액 검사 필요 없음
+        if (discountType === DiscountType.Amount && maxDiscountAmount) {
+            throw new ServiceException(MESSAGE_CODE.COUPON_MAX_DISCOUNT_AMOUNT_NOT_ALLOWED);
         }
     }
 }
