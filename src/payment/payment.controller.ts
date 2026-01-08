@@ -4,6 +4,7 @@ import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from "@nestj
 import { PaymentTossApprovalRequestDto } from "./dto/payment-toss-approval-request.dto";
 import { PaymentTossDepositCallbackDto } from "./dto/payment-toss-deposit-callback.dto";
 import { PaymentTossAccessTokenRequestDto } from "./dto/payment-toss-access-token-request.dto";
+import { PaymentTossApprovalRequestFailDto } from "./dto/payment-toss-approval-request-fail.dto";
 
 @Controller('payment')
 @ApiTags('Payment')
@@ -21,6 +22,12 @@ export class PaymentController {
     @ApiOperation({ summary: 'Toss Brandpay 결제 승인 리다이렉트' })
     tossBrandpayConfirmRedirect(@Query() paymentTossApprovalRequestDto: PaymentTossApprovalRequestDto) {
         return this.paymentService.confirmTossPayment(paymentTossApprovalRequestDto);
+    }
+
+    @Get('toss/confirm/fail/redirect')
+    @ApiOperation({ summary: 'Toss 결제 실패 리다이렉트' })
+    tossFailRedirect(@Query() paymentTossApprovalRequestFailDto: PaymentTossApprovalRequestFailDto) {
+        return this.paymentService.failTossPayment(paymentTossApprovalRequestFailDto);
     }
 
     @Get('toss/brandpay/access-token')

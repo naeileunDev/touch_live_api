@@ -11,6 +11,7 @@ import { PaymentTossBrandpayCardDto } from "./dto/payment-toss-brandpay-card.dto
 import { PaymentTossBrandpayBankAccountDto } from "./dto/payment-toss-brandpay-bank-account.dto";
 import { PaymentTossBrandpayMethodDto } from "./dto/payment-toss-brandpay-method.dto";
 import { PaymentTossCancelResultDto } from "./dto/payment-toss-cancel-result.dto";
+import { PaymentTossApprovalRequestFailDto } from "./dto/payment-toss-approval-request-fail.dto";
 
 
 @Injectable()
@@ -82,6 +83,14 @@ export class PaymentService {
         
         // TODO: 결제 승인 이후 주문 상태 업데이트
         return approvalResult;
+    }
+
+    /**
+     * Toss 결제 요청 실패
+     * @param paymentTossApprovalRequestFailDto - 결제 실패 요청
+     */
+    async failTossPayment(paymentTossApprovalRequestFailDto: PaymentTossApprovalRequestFailDto): Promise<void> {
+        // TODO: 결제 요청 실패 이후 주문 상태 업데이트 또는 삭제
     }
 
     /**
@@ -166,7 +175,7 @@ export class PaymentService {
         // 주문번호로 토스페이먼츠 결제 조회
         const tossPayment = await this.getTossPaymentByOrderId(orderId);
 
-        // TODO: 웹훅 시크릿 키로 결제 승인 응답으로 돌아온 secret 과 같은지 웹훅 검증
+        // 웹훅 시크릿 키로 결제 승인 응답으로 돌아온 secret 과 같은지 웹훅 검증
         if (secret !== tossPayment.secret) {
             throw new ConflictException("정상적인 웹훅 요청이 아닙니다.");
         }
