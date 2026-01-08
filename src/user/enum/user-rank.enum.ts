@@ -1,4 +1,4 @@
-export enum UserRate {
+export enum UserRank {
     //이전 6개월 간 5,000,000원 미만 구매한 유저
     Red = 'RED',
     //이전 6개월 간 1,000,000원 이상 구매한 유저

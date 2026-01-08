@@ -1,11 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { UserFollow } from '../entity/user-follow.entity';
 import { UserFollowRepository } from '../repository/user-follow.repository';
 import { ServiceException } from 'src/common/filter/exception/service.exception';
 import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 import { UserService } from 'src/user/service/user.service';
+import { UserFollowsDto } from '../dto/user-follows.dto';
+import { FollowingUserDto } from '../dto/following-user.dto';
 
 @Injectable()
 export class UserFollowService {
@@ -15,7 +15,7 @@ export class UserFollowService {
     ) {}
 
     // 이미 팔로우 되있으면 언팔, 없으면 팔로우 
-    async followAndUnfollow(followerId: string, followingId: string): Promise<UserFollow | boolean> {
+    async followAndUnfollow(followerId: string, followingId: string): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(followerId);
         const following = await this.userService.findEntityByPublicId(followingId);
         if (!follower || !following) {
@@ -32,25 +32,8 @@ export class UserFollowService {
         if (deleted) {
             return await this.userFollowRepository.restoreByUsersIdFast(follower.id, following.id);
         }
-        return await this.userFollowRepository.createUserFollow(follower.id, following.id);
-    }
-
-    async findFollowers(followingId: string, lastId: number | null, limit: number) {
-        const following = await this.userService.findEntityByPublicId(followingId);
-        const [items, total] = await this.userFollowRepository.findFollowers(following.id, lastId, limit);
-        return { 
-            items: items.map(f => f.follower), 
-            total
-        };
-    }
-
-    async findFollowings(followerId: string, lastId: number | null, limit: number) {
-        const follower = await this.userService.findEntityByPublicId(followerId);
-        const [items, total] = await this.userFollowRepository.findFollowings(follower.id, lastId, limit);
-        return { 
-            items: items.map(f => f.following), 
-            total
-        };
+        await this.userFollowRepository.createUserFollow(follower.id, following.id);
+        return true;
     }
 
     async findCountFollowOrFollower(publicId: string, isFollowers: boolean): Promise<number> {
@@ -65,5 +48,35 @@ export class UserFollowService {
         }
         // 해당 유저를 팔로잉하는 사람 수를 조회  
         return await this.userFollowRepository.count({ where: { followerId: userId } });
+    }
+
+    /**
+     * 특정 유저가 팔로잉하는 유저들의 팔로워 수를 반환
+     * @param followerPublicId 팔로우하는 유저의 publicId
+     * @returns [{ followingId: number, count: number }] 형태의 배열
+     * Ui 상 무한 스크롤로 7개씩 조회가능하기때문에 limit 기본값을 7로 설정
+     * 예시: User A가 User B, User C를 팔로우하는 경우
+     * - User B의 팔로워 수와 User C의 팔로워 수를 반환
+     */
+    async findFollowingUsersFollowerCounts(followerPublicId: string, lastId: number | null, limit: number = 7): Promise<UserFollowsDto> {
+        const follower = await this.userService.findEntityByPublicId(followerPublicId);
+
+        const followings = await this.userFollowRepository.findFollowings(follower.id, lastId, limit);
+
+        const followingIds = followings[0].map(f => f.followingId);
+        
+        if (followingIds.length === 0) {
+            return new UserFollowsDto([], 0);
+        }
+        const followingUsers: FollowingUserDto[] = [];
+        for (const following of followings[0]) {
+            const followersCount = await this.userFollowRepository.count({ where: { followingId: following.followingId } });
+            followingUsers.push(new FollowingUserDto(following, followersCount));
+        }
+       
+        return {
+            livers: followingUsers,
+            followersCount: followings[1]
+        };
     }
 }

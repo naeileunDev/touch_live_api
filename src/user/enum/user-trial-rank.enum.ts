@@ -1,4 +1,4 @@
-export enum UserTrialRate {
+export enum UserTrialRank {
     Purple = 'PURPLE',
     Blue = 'BLUE',
     Normal = 'NORMAL',

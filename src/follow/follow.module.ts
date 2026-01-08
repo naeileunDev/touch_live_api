@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { FollowController } from './follow.controller';
 import { UserFollowService } from './service/user-follow.service';
 import { UserFollowRepository } from './repository/user-follow.repository';
