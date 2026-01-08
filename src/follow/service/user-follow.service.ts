@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UserFollow } from '../entity/user-follow.entity';
 import { UserFollowRepository } from '../repository/user-follow.repository';
 import { ServiceException } from 'src/common/filter/exception/service.exception';
 import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
@@ -78,5 +77,10 @@ export class UserFollowService {
             livers: followingUsers,
             followersCount: followings[1]
         };
+    }
+
+    async unfollowLivers(publicId: string, followingIds: number[]): Promise<boolean> {
+        const follower = await this.userService.findEntityByPublicId(publicId);
+        return await this.userFollowRepository.deleteByUsersIds(follower.id, followingIds);
     }
 }

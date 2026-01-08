@@ -4,6 +4,8 @@ import { UserFollow } from "../entity/user-follow.entity";
 import { UserRank } from "src/user/enum/user-rank.enum";
 
 export class FollowingUserDto {
+    @ApiProperty({ description: '유저 ID' })
+    id: number;
     @ApiProperty({ description: '유저 닉네임' })
     nickname: string;
     @ApiProperty({ description: '유저 칭호', example: '월세수익 건물주! 외교관형 레드' })
@@ -17,6 +19,7 @@ export class FollowingUserDto {
 
 
     constructor(userFollow: UserFollow, followersCount: number) {
+        this.id = userFollow.follower.id;
         this.nickname = userFollow.follower.nickname;
         this.title = FollowingUserDto.mappingTitle(userFollow.follower.rank);
         this.profileImage = userFollow.follower.profileImage;

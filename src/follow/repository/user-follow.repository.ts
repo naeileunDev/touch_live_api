@@ -118,4 +118,13 @@ export class UserFollowRepository extends Repository<UserFollow> {
         });
         return followings.map(f => f.followingId);
     }
+
+    async deleteByUsersIds(followerId: number, followingIds: number[]): Promise<boolean> {
+        const result = await this.createQueryBuilder()
+            .delete()
+            .where('followerId = :followerId', { followerId })
+            .andWhere('followingId IN (:...followingIds)', { followingIds })
+            .execute();
+        return result.affected > 0;
+    }
 }
