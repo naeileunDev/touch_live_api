@@ -72,8 +72,6 @@ export const validationSchema = Joi.object({
     // Term 
     TERM_HTML_FILE_BASE_PATH: Joi.string().required(),
     // Toss payments
-    TOSS_MID: Joi.string().required(),
-    TOSS_TEST_SECRET_KEY: Joi.string().required(),
-    TOSS_TEST_PROTECT_KEY: Joi.string().required(),
+    TOSS_SECRET_KEY: Joi.string().required(),
 });
 
