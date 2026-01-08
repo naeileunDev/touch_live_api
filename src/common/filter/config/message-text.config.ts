@@ -18,6 +18,8 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED]: '배송지 주소 수정 권한이 없습니다.',
     [MESSAGE_CODE.USER_OPERATION_ALREADY_EXISTS]: '사용자 권한이 이미 설정되어 있습니다.',
     [MESSAGE_CODE.USER_OPERATION_NOT_FOUND]: '사용자의 운영 권한이 존재하지 않습니다.',
+    [MESSAGE_CODE.USER_DI_NOT_FOUND]: '사용자 DI를 찾을 수 없습니다.',
+    [MESSAGE_CODE.USER_CI_NOT_FOUND]: '사용자 CI를 찾을 수 없습니다.',
     
     // Auth
     [MESSAGE_CODE.NICE_SESSION_KEY_EXPIRED]: 'Nice session key expired',
@@ -76,4 +78,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.PRODUCT_OPTION_NOT_FOUND]: '상품 옵션을 찾을 수 없습니다.',
     [MESSAGE_CODE.PRODUCT_CATEGORY_NOT_FOUND]: '상품 카테고리를 찾을 수 없습니다.',
     [MESSAGE_CODE.PRODUCT_OPTION_DETAIL_NOT_FOUND]: '상품 옵션 상세를 찾을 수 없습니다.',
+
+    // Follow
+    [MESSAGE_CODE.FOLLOW_NOT_ALLOWED_SELF]: '자기 자신을 팔로우할 수 없습니다.',
 };

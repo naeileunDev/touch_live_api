@@ -102,32 +102,5 @@ export class UserRepository extends Repository<User> {
             withDeleted: true,
         });
     }
-    async existsByDi(di: string): Promise<boolean> {
-        return await this.exists({
-            where: {
-                di,
-            },
-        });
-    }
 
-    async existsByDiWithDeleted(di: string): Promise<boolean> {
-        return await this.exists({
-            where: {
-                di,
-            },
-            withDeleted: true,
-        });
-    }
-
-    async findByDi(di: string): Promise<User> {
-        const user = await this.findOne({
-            where: {
-                di,
-            },
-        });
-        if (!user) {
-            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
-        };
-        return user;
-    }
 }

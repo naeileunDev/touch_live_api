@@ -1,64 +1,64 @@
-import { Controller, Get, Post, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, ParseIntPipe, ParseBoolPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { FollowService } from './follow.service';
-import { JwtAuthGuard } from 'src/common/guard/jwt.guard';
+import { UserFollowService } from './service/user-follow.service';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
+import { Role } from 'src/common/decorator/role.decorator';
+import { UserDto } from 'src/user/dto';
 
 @ApiTags('Follow')
 @Controller('follow')
+@ApiBearerAuth('access-token')
 export class FollowController {
-    constructor(private readonly followService: FollowService) {}
+    constructor(private readonly userFollowService: UserFollowService) {}
 
     @Post(':userId')
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: '팔로우/언팔로우 토글' })
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '팔로우/언팔로우 토글 (해당 유저 팔로우/언팔로우)' })
     async toggle(
-        @GetUser('id') followerId: number,
-        @Param('userId', ParseIntPipe) followingId: number,
+        @GetUser() user: UserDto,
+        @Param('userId') userId: string,
     ) {
-        return this.followService.follow(followerId, followingId);
-    }
-
-    @Get('check/:userId')
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: '팔로우 여부 확인' })
-    async checkFollowing(
-        @GetUser('id') followerId: number,
-        @Param('userId', ParseIntPipe) followingId: number,
-    ) {
-        const isFollowing = await this.followService.isFollowing(followerId, followingId);
-        return { isFollowing };
+        return this.userFollowService.followAndUnfollow(user.id, userId);
     }
 
     @Get('followers/:userId')
-    @ApiOperation({ summary: '팔로워 목록' })
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '해당 유저 팔로워 목록' })
     async getFollowers(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Query('page') page?: number,
-        @Query('limit') limit?: number,
+        @Param('userId', ParseIntPipe) userId: string,
+        @Query('lastId') lastId?: number,
+        @Query('limit') limit: number = 7,
     ) {
-        return this.followService.getFollowers(userId, page, limit);
+        return this.userFollowService.findFollowers(userId, lastId, limit);
     }
 
-    @Get('following/:userId')
-    @ApiOperation({ summary: '팔로잉 목록' })
+    @Get('followings/:userId')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '헤당 유저 팔로잉 목록' })
     async getFollowing(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Query('page') page?: number,
+        @Param('userId', ParseIntPipe) userId: string,
+        @Query('lastId') lastId?: number,
         @Query('limit') limit?: number,
     ) {
-        return this.followService.getFollowing(userId, page, limit);
+        return this.userFollowService.findFollowings(userId, lastId, limit);
     }
 
-    @Get('count/:userId')
-    @ApiOperation({ summary: '팔로워/팔로잉 수' })
-    async getCounts(@Param('userId', ParseIntPipe) userId: number) {
-        const [followers, following] = await Promise.all([
-            this.followService.getFollowerCount(userId),
-            this.followService.getFollowingCount(userId),
-        ]);
-        return { followers, following };
+    @Get('count/followings/:userId')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '해당 유저 팔로잉 수' })
+    async getCountsFollowers(
+        @Param('userId', ParseIntPipe) userId: string, 
+    ) {
+        return await this.userFollowService.findCountFollowOrFollower(userId, true);
+    }
+
+    @Get('count/followers/:userId')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '해당 유저 팔로워 수 (팔로워의 경우 9999 넘어가면 +9999로 표시해주세요 => 팔로잉 목록에서 팔로잉 유저의 팔로워 수 표기 용)' })
+    async getCountsFollowings(
+        @Param('userId', ParseIntPipe) userId: string, 
+    ) {
+        return await this.userFollowService.findCountFollowOrFollower(userId, false);
     }
 }

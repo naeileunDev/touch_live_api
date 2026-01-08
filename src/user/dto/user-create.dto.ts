@@ -54,5 +54,8 @@ export class UserCreateDto {
     @ApiProperty({ description: 'DI', example: 'DI' })
     @IsRequiredString()
     di: string;
-    
+
+    @ApiProperty({ description: 'CI', example: 'CI' })
+    @IsRequiredString()
+    ci: string;
 }

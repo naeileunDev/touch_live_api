@@ -1,5 +1,6 @@
 export enum OrderProductStatus {
     Pending = 'PENDING',  //장바구니 상태 
+    PaymentPending = 'PAYMENT_PENDING',
     PaymentFailed = 'PAYMENT_FAILED',
     Paid = 'PAID',
     Preparing = 'PREPARING',

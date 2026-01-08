@@ -95,8 +95,9 @@ export class AuthService {
         console.log("isExpired:", isExpired);
         // CI, DI 캐시 조회
         //const niceSessionData: AuthNiceSessionDataDto = await this.cacheManager.get(userInfo.sessionKey);
+        // 진짜로 조회하는 대신 임의의 값 넣기(추후 윗 줄 주석 해제 시 삭제)
         const niceSessionData: AuthNiceSessionDataDto = {
-            ci: 'CI',
+            ci: userInfo.ci,
             name: userInfo.name,
             phone: userInfo.phone,
             gender: userInfo.gender,

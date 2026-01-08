@@ -13,6 +13,8 @@ import { UserOauthService } from './service/user-oauth.service';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { UserOperationRepository } from './repository/user-operation-repository';
 import { UserOperationService } from './service/user-operation.service';
+import { UserCiRepository } from './repository/user-ci.repository';
+import { UserDiRepository } from './repository/user-di.repository';
 
 @Module({
     controllers: [UserController],
@@ -30,6 +32,8 @@ import { UserOperationService } from './service/user-operation.service';
         UserAddressRepository,
         EncryptionUtil,
         UserOperationRepository,
+        UserCiRepository,
+        UserDiRepository,
     ],
     exports: [UserService, UserOperationService, UserOauthService, UserDeviceService],
 })
