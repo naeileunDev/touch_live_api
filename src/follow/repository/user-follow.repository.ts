@@ -53,7 +53,7 @@ export class UserFollowRepository extends Repository<UserFollow> {
     }
 
     // 팔로워 목록 return
-    async findFollowers(followingId: number, lastId: number | null, limit: number): Promise<[UserFollow[], number]> {
+    async findFollowers(followingId: number, lastId: number | null, limit: number = 7): Promise<[UserFollow[], number]> {
         if (lastId != null) {
             return await this.findAndCount({
                 where: { followingId, id: LessThan(lastId) },
@@ -86,5 +86,36 @@ export class UserFollowRepository extends Repository<UserFollow> {
             order: { createdAt: 'DESC' },
             take: limit,
         });
+    }
+
+    /**
+     * 특정 유저 ID들의 팔로워 수를 집계
+     * @param followingIds 팔로잉 ID 배열
+     * @returns [{ followingId: number, count: string }] 형태의 배열
+     */
+    async findFollowersCountByIds(followingIds: number[]): Promise<Array<{ followingId: number, count: string }>> {
+        if (followingIds.length === 0) {
+            return [];
+        }
+        return await this.createQueryBuilder('user_follow')
+            .select('user_follow', 'userFollow')
+            .addSelect('COUNT(userFollow.followerId)', 'count')
+            .where('userFollow.followerId IN (:...followingIds)', { followingIds })
+            .andWhere('userFollow.deletedAt IS NULL')
+            .groupBy('userFollow.followingId')
+            .getRawMany();
+    }
+
+    /**
+     * 특정 유저가 팔로잉하는 유저 ID 목록 조회
+     * @param followerId 팔로워 ID (팔로우하는 유저)
+     * @returns 팔로잉하는 유저 ID 배열
+     */
+    async findFollowingIdsByFollowerId(followerId: number): Promise<number[]> {
+        const followings = await this.find({
+            where: { followerId },
+            select: ['followingId'],
+        });
+        return followings.map(f => f.followingId);
     }
 }
