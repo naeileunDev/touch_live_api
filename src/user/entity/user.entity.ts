@@ -10,6 +10,8 @@ import { Store } from "src/store/entity/store.entity";
 import { UserRole } from "../enum/user-role.enum";
 import { UserOperation } from "./user-operation.entity";
 import { StoreRegisterLog } from "src/store/entity/store-register-log.entity";
+import { UserRate } from "../enum/user-rate.enum";
+import { UserTrialRate } from "../enum/user-trial-rate.enum";
 
 @Entity()
 export class User extends BaseEntity {
@@ -50,9 +52,6 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', length: 255, comment: '사용자 생년월일' })
     birth: string;
 
-    @Column({ type: 'varchar', length: 255, comment: '사용자 DI' })
-    di: string;
-
     @Column({ type: 'boolean', comment: '사용자 성인여부' })
     isAdult: boolean;
 
@@ -84,4 +83,10 @@ export class User extends BaseEntity {
 
     @OneToMany(() => StoreRegisterLog, storeRegisterLog => storeRegisterLog.user)
     storeRegisterLog: StoreRegisterLog[];
+
+    @Column({ type: 'enum', enum: UserRate, comment: '사용자 등급', default: UserRate.Silver })
+    rate: UserRate;
+
+    @Column({ type: 'enum', enum: UserTrialRate, comment: '사용자 트라이 등급', default: UserTrialRate.Normal })
+    trialRate: UserTrialRate;
 }

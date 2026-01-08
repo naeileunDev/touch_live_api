@@ -52,24 +52,6 @@ export class UserFollowRepository extends Repository<UserFollow> {
         return result.affected > 0;
     }
 
-    async findAndCountByUsersId(followingId: number, followerId: number, lastId: number | null, limit: number): Promise<[UserFollow[], number]> {
-        if (lastId != null) {
-            return await this.findAndCount({
-                where: { followingId, followerId, id: LessThan(lastId) },
-                relations: ['following'],
-                order: { createdAt: 'DESC' },
-                take: limit,
-            });
-        }
-        
-        return await this.findAndCount({
-            where: { followingId, followerId },
-            relations: ['following'],
-            order: { createdAt: 'DESC' },
-            take: limit,
-        });
-    }
-
     // 팔로워 목록 return
     async findFollowers(followingId: number, lastId: number | null, limit: number): Promise<[UserFollow[], number]> {
         if (lastId != null) {

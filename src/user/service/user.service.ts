@@ -11,6 +11,8 @@ import { UserTermsAgreementRepository } from '../repository/user-terms-agreement
 import {UserDto} from '../dto/index';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { v4 as uuidv4 } from 'uuid'; 
+import { UserCiRepository } from '../repository/user-ci.repository';
+import { UserDiRepository } from '../repository/user-di.repository';
 
 @Injectable()
 export class UserService {
@@ -20,9 +22,14 @@ export class UserService {
         private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
         private readonly userTermsAgreementRepository: UserTermsAgreementRepository,
         private readonly encryptionUtil: EncryptionUtil,
+        private readonly userCiRepository: UserCiRepository,
+        private readonly userDiRepository: UserDiRepository,
     ) {}
-    private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'di', 'name', 'email'];
-
+    // ** 
+    // *private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'name', 'email', 'ci', 'di'];
+    // 개발 테스트를 위해 ci, di 필드 제외 => 실 서비스에서는 ci, di 필드 포함
+    // */
+    private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'name', 'email'];
     /**
      * 사용자 생성
      * @param userCreateDto 사용자 생성 정보
@@ -43,12 +50,20 @@ export class UserService {
         });
         user.publicId = uuidv4();
         user.status = UserStatus.Active;
+        await this.userCiRepository.createUserCi({
+            ci: dto.userInfo.ci,
+            publicId: user.publicId,
+        });
+        await this.userDiRepository.createUserDi({
+            di: dto.userInfo.di,
+            publicId: user.publicId,
+        });
         const savedUser = await this.userRepository.save(user);
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
         const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
         savedUser.userTermsAgreement = userTermsAgreement;
         await this.userRepository.save(savedUser);
-        return new UserDto(savedUser, );
+        return new UserDto(savedUser);
     }
 
     private checkAdult(birth: string): boolean {
@@ -112,17 +127,21 @@ export class UserService {
      */
     async findByDi(di: string): Promise<UserDto> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        const user = await this.userRepository.findByDi(encryptedDi);
+        const userDi = await this.userDiRepository.findByDi(encryptedDi);
+        const user = await this.userRepository.findByPublicId(userDi.publicId);
         return new UserDto(user);
     }
 
-     /**
-     * DI로 사용자 조회
+    /**
+     * 
      * @param di DI
+     * @param includeStore 스토어 포함 여부
+     * @returns 사용자 엔티티
      */
-    async findEntityByDi(di: string): Promise<User> {
+    async findEntityByDi(di: string, includeStore: boolean = false): Promise<User> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        return await this.userRepository.findByDi(encryptedDi);
+        const userDi = await this.userDiRepository.findByDi(encryptedDi);
+        return await this.userRepository.findByPublicId(userDi.publicId);
     }
     
     /**
@@ -164,13 +183,22 @@ export class UserService {
         return true;
     }
 
+
+    /**
+     * CI로 사용자가 존재하는지 확인
+     * @param ci CI
+     */
+    async existsByCi(ci: string): Promise<boolean> {
+        return await this.userCiRepository.existsByCiWithDeleted(ci);
+    }
+
     /**
      * DI로 사용자가 존재하는지 확인
      * @param di DI
      */
     async existsByDi(di: string): Promise<boolean> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        return await this.userRepository.existsByDi(encryptedDi);
+        return await this.userDiRepository.existsByDi(encryptedDi);
     }
 
     /**
@@ -179,7 +207,7 @@ export class UserService {
      */
     async existsByDiWithDeleted(di: string): Promise<boolean> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
-        return await this.userRepository.existsByDiWithDeleted(encryptedDi);
+        return await this.userDiRepository.existsByDiWithDeleted(encryptedDi);
     }
 
     /**
