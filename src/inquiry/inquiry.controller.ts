@@ -86,6 +86,7 @@ export class InquiryController {
         @GetUser('storeId') storeId: number,
         @Body() dto: CreateInquiryAnswerDto,
     ) {
-        return this.inquiryService.createAnswer(id, storeId, dto);
+        // return this.inquiryService.createAnswer(id, storeId, dto);
+        return "product, store 작업 후 리팩토링 예정"
     }
 }

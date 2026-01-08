@@ -1,65 +1,51 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { ProductService } from './product.service';
-import { CreateProductDto, UpdateProductDto, ProductListQueryDto } from './dto/product.dto';
-import { JwtAuthGuard } from 'src/common/guard/jwt.guard';
-import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ProductService } from "./product.service";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { ProductCreateDto } from "./dto/product-create.dto";
+import { Role } from "src/common/decorator/role.decorator";
+import { ANY_PERMISSION } from "src/common/permission/permission";
+import { ProductUpdateDto } from "./dto/product-update.dto";
+import { ProductReadDto } from "./dto/product-read.dto";
+import { StoreOwner } from "src/common/decorator/store-owner.decorator";
 
 @ApiTags('Product')
-@Controller('products')
+@Controller('product')
+@ApiBearerAuth('access-token')
 export class ProductController {
-    constructor(private readonly productService: ProductService) {}
+    constructor(private readonly productService: ProductService) { }
 
     @Post()
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: '상품 등록' })
-    async create(
-        @GetUser('storeId') storeId: number,
-        @Body() dto: CreateProductDto,
-    ) {
-        return this.productService.create(storeId, dto);
+    @StoreOwner()
+    @ApiOperation({ summary: '[스토어] 상품 생성' })
+    create(@Body() productCreateDto: ProductCreateDto) {
+        return this.productService.create(productCreateDto);
     }
 
     @Get()
+    @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '상품 목록 조회' })
-    async findAll(@Query() query: ProductListQueryDto) {
-        return this.productService.findAll(query);
-    }
-
-    @Get('store/:storeId')
-    @ApiOperation({ summary: '스토어별 상품 목록' })
-    async getByStore(
-        @Param('storeId', ParseIntPipe) storeId: number,
-        @Query('page') page?: number,
-        @Query('limit') limit?: number,
-    ) {
-        return this.productService.getByStore(storeId, page, limit);
+    findAll(@Query() productReadDto: ProductReadDto) {
+        return this.productService.findAll(productReadDto);
     }
 
     @Get(':id')
+    @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '상품 상세 조회' })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        await this.productService.incrementViewCount(id);
-        return this.productService.findOne(id);
+    findById(@Param('id') id: number) {
+        return this.productService.findById(id);
     }
 
     @Put(':id')
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: '상품 수정' })
-    async update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() dto: UpdateProductDto,
-    ) {
-        return this.productService.update(id, dto);
+    @StoreOwner()
+    @ApiOperation({ summary: '[스토어] 상품 수정' })
+    updateById(@Param('id') id: number, @Body() productUpdateDto: ProductUpdateDto) {
+        return this.productService.updateById(id, productUpdateDto);
     }
 
     @Delete(':id')
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: '상품 삭제' })
-    async remove(@Param('id', ParseIntPipe) id: number) {
-        return this.productService.remove(id);
+    @StoreOwner()
+    @ApiOperation({ summary: '[스토어] 상품 삭제' })
+    deleteById(@Param('id') id: number) {
+        return this.productService.deleteById(id);
     }
 }

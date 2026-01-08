@@ -1,218 +1,128 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProductRequiredInfo } from './entity/product-required-info.entity';
-import { CreateProductDto, UpdateProductDto, ProductListQueryDto } from './dto/product.dto';
-import { ProductOptionType, ProductStatus } from 'src/common/enums';
-import { Product } from './entity/product.entity';
-import { ProductImage } from './entity/product-image.entity';
-import { ProductOption } from './entity/product-option.entity';
-import { ProductTag } from './entity/product-tag.entity';
+import { Injectable } from "@nestjs/common";
+import { ProductRepository } from "./repository/product.respository";
+import { ProductCategoryRepository } from "./repository/product-category.repository";
+import { ProductMediaRepository } from "./repository/product-media.respository";
+import { ProductOptionRepository } from "./repository/product-option.respository";
+import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository";
+import { ProductStockRepository } from "./repository/product-stock.respository";
+import { ProductCreateDto } from "./dto/product-create.dto";
+import { ProductUpdateDto } from "./dto/product-update.dto";
+import { ProductDto } from "./dto/product.dto";
+import { ProductOptionDetailDto } from "./dto/product-option-detail.dto";
+import { ProductOptionDto } from "./dto/product-option.dto";
+import { ProductReadDto } from "./dto/product-read.dto";
+import { Pagination, PaginationResponse } from "src/common/pagination/pagination.interface";
+import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class ProductService {
     constructor(
-        @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>,
-        @InjectRepository(ProductImage)
-        private readonly imageRepository: Repository<ProductImage>,
-        @InjectRepository(ProductOption)
-        private readonly optionRepository: Repository<ProductOption>,
-        @InjectRepository(ProductRequiredInfo)
-        private readonly requiredInfoRepository: Repository<ProductRequiredInfo>,
-        @InjectRepository(ProductTag)
-        private readonly tagRepository: Repository<ProductTag>,
-    ) {}
+        private readonly productRepository: ProductRepository,
+        private readonly productStockRepository: ProductStockRepository,
+        private readonly productCategoryRepository: ProductCategoryRepository,
+        private readonly productMediaRepository: ProductMediaRepository,
+        private readonly productOptionRepository: ProductOptionRepository,
+        private readonly productOptionDetailRepository: ProductOptionDetailRepository,
+        private readonly productOptionDetailStockRepository: ProductOptionDetailStockRepository,
+    ) { }
 
-    async create(storeId: number, dto: CreateProductDto): Promise<Product> {
-        // 유효성 검사
-        if (dto.tagIds.length < 1 || dto.tagIds.length > 3) {
-            throw new BadRequestException('해시태그는 1~3개 선택해야 합니다.');
-        }
+    /**
+     * 상품 생성
+     * @param store 스토어
+     * @param productCreateDto 상품 생성 DTO
+     * @returns 상품
+     */
+    @Transactional()
+    async create(productCreateDto: ProductCreateDto) {
+        const { options } = productCreateDto;
+        const now = new Date();
 
-        if (dto.optionType === ProductOptionType.Single && dto.stock === undefined) {
-            throw new BadRequestException('단일 옵션일 때 재고는 필수입니다.');
-        }
+        // 카테고리 조회
+        const category = await this.productCategoryRepository.findById(productCreateDto.categoryId);
 
-        if (dto.optionType === ProductOptionType.Option && (!dto.options || dto.options.length === 0)) {
-            throw new BadRequestException('옵션 타입일 때 옵션 목록은 필수입니다.');
-        }
+        // TODO: 수수료 계산
 
-        // 최종 판매가 계산
-        const salePrice = dto.discountRate 
-            ? Math.floor(dto.price * (100 - dto.discountRate) / 100)
-            : dto.price;
+        // 상품 생성
+        const product = await this.productRepository.createProduct({
+            ...productCreateDto,
+            productCategory: category,
+            version: now,
+        });
+        const productDto = new ProductDto(product);
 
-        // 제품 생성
-        const product = this.productRepository.create({
-            storeId,
-            thumbnailFileId: dto.thumbnailFileId,
-            name: dto.name,
-            category: dto.category,
-            price: dto.price,
-            discountRate: dto.discountRate || 0,
-            salePrice,
-            optionType: dto.optionType,
-            stock: dto.optionType === ProductOptionType.Single ? dto.stock : null,
-            gender: dto.gender,
-            age: dto.age,
-            deliveryFee: dto.deliveryFee || 0,
-            jejuDeliveryFee: dto.jejuDeliveryFee || 0,
-            islandDeliveryFee: dto.islandDeliveryFee || 0,
-            deliveryCompany: dto.deliveryCompany,
-            deliveryPeriod: dto.deliveryPeriod,
-            uploadType: dto.uploadType,
+        // 상품 수량 생성
+        await this.productStockRepository.createProductStock({
+            stock: productCreateDto.stock,
+            product,
         });
 
-        const savedProduct = await this.productRepository.save(product);
+        // 옵션 생성
+        await Promise.all(options.map(async (option) => {
+            const productOption = await this.productOptionRepository.createProductOption({
+                ...option,
+                product,
+            });
+            const productOptionDto = new ProductOptionDto(productOption);
+            productDto.options.push(productOptionDto);
 
-        // 상세 이미지 저장
-        if (dto.detailImageFileIds?.length) {
-            const images = dto.detailImageFileIds.map((fileId, index) => 
-                this.imageRepository.create({
-                    productId: savedProduct.id,
-                    fileId,
-                    imageType: 'DETAIL',
-                    displayOrder: index,
-                })
-            );
-            await this.imageRepository.save(images);
-        }
+            // 옵션 상세 생성
+            await Promise.all(option.optionDetails.map(async (optionDetail) => {
+                const productOptionDetail = await this.productOptionDetailRepository.createProductOptionDetail({
+                    ...optionDetail,
+                    productOption,
+                });
+                const productOptionDetailDto = new ProductOptionDetailDto(productOptionDetail);
+                productOptionDto.optionDetails.push(productOptionDetailDto);
 
-        // 상세 정보 이미지 저장
-        if (dto.infoImageFileIds?.length) {
-            const infoImages = dto.infoImageFileIds.map((fileId, index) => 
-                this.imageRepository.create({
-                    productId: savedProduct.id,
-                    fileId,
-                    imageType: 'INFO',
-                    displayOrder: index,
-                })
-            );
-            await this.imageRepository.save(infoImages);
-        }
+                // 옵션 상세 수량 생성
+                await this.productOptionDetailStockRepository.createProductOptionDetailStock({
+                    stock: optionDetail.stock,
+                    productOptionDetail,
+                });
+            }));
+        }));
 
-        // 옵션 저장
-        if (dto.optionType === ProductOptionType.Option && dto.options) {
-            const options = dto.options.map((opt, index) => 
-                this.optionRepository.create({
-                    productId: savedProduct.id,
-                    imageFileId: opt.imageFileId,
-                    name: opt.name,
-                    stock: opt.stock,
-                    additionalPrice: opt.additionalPrice || 0,
-                    displayOrder: index,
-                })
-            );
-            await this.optionRepository.save(options);
-        }
-
-        // 필수 표기 정보 저장
-        if (dto.requiredInfos?.length) {
-            const infos = dto.requiredInfos.map((info, index) => 
-                this.requiredInfoRepository.create({
-                    productId: savedProduct.id,
-                    itemType: info.itemType,
-                    infoName: info.infoName,
-                    infoValue: info.infoValue,
-                    displayOrder: index,
-                })
-            );
-            await this.requiredInfoRepository.save(infos);
-        }
-
-        // 태그 저장
-        const tags = dto.tagIds.map((tagId, index) => 
-            this.tagRepository.create({
-                productId: savedProduct.id,
-                tagId,
-                displayOrder: index,
-            })
-        );
-        await this.tagRepository.save(tags);
-
-        return this.findOne(savedProduct.id);
+        return productDto;
     }
 
-    async findAll(query: ProductListQueryDto) {
-        const { category, gender, age, storeId, keyword, page = 1, limit = 20 } = query;
-
-        const qb = this.productRepository
-            .createQueryBuilder('p')
-            .leftJoinAndSelect('p.thumbnailFile', 'thumbnail')
-            .leftJoinAndSelect('p.store', 'store')
-            .where('p.deletedAt IS NULL')
-            .andWhere('p.status = :status', { status: ProductStatus.OnSale });
-
-        if (category) {
-            qb.andWhere('p.category = :category', { category });
-        }
-        if (gender) {
-            qb.andWhere('p.gender = :gender', { gender });
-        }
-        if (age) {
-            qb.andWhere('p.age = :age', { age });
-        }
-        if (storeId) {
-            qb.andWhere('p.storeId = :storeId', { storeId });
-        }
-        if (keyword) {
-            qb.andWhere('p.name ILIKE :keyword', { keyword: `%${keyword}%` });
-        }
-
-        const [items, total] = await qb
-            .orderBy('p.createdAt', 'DESC')
-            .skip((page - 1) * limit)
-            .take(limit)
-            .getManyAndCount();
-
-        return {
-            items,
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
-        };
+    /**
+     * 상품 목록 조회
+     * @returns 상품 목록
+     */
+    async findAll(productReadDto: ProductReadDto): Promise<PaginationResponse> {
+        const { page, limit } = productReadDto;
+        const [data, total] = await this.productRepository.findAll(productReadDto);
+        const products = data.map(product => new ProductDto(product));
+        return Pagination.create(products, total, page, limit);
     }
 
-    async findOne(id: number): Promise<Product> {
-        const product = await this.productRepository.findOne({
-            where: { id, deletedAt: null },
-            relations: ['thumbnailFile', 'store', 'images', 'images.file', 'options', 'requiredInfos'],
-        });
-
-        if (!product) {
-            throw new NotFoundException('상품을 찾을 수 없습니다.');
-        }
-
-        return product;
+    /**
+     * 상품 상세 조회
+     * @param id 상품 ID
+     * @returns 상품
+     */
+    async findById(id: number) {
+        const product = await this.productRepository.findById(id);
+        return new ProductDto(product);
     }
 
-    async update(id: number, dto: UpdateProductDto): Promise<Product> {
-        const product = await this.findOne(id);
-
-        // 가격 변경시 최종 판매가 재계산
-        if (dto.price !== undefined || dto.discountRate !== undefined) {
-            const price = dto.price ?? product.price;
-            const discountRate = dto.discountRate ?? product.discountRate;
-            dto['salePrice'] = Math.floor(price * (100 - discountRate) / 100);
-        }
-
-        Object.assign(product, dto);
-        return this.productRepository.save(product);
+    /**
+    * 상품 수정
+    * @param id 상품 ID
+    * @param productUpdateDto 상품 수정 DTO
+    * @returns 상품
+    */
+    async updateById(id: number, productUpdateDto: ProductUpdateDto) {
     }
 
-    async remove(id: number): Promise<void> {
-        const product = await this.findOne(id);
-        product.deletedAt = new Date();
-        await this.productRepository.save(product);
-    }
-
-    async incrementViewCount(id: number): Promise<void> {
-        await this.productRepository.increment({ id }, 'viewCount', 1);
-    }
-
-    async getByStore(storeId: number, page = 1, limit = 20) {
-        return this.findAll({ storeId, page, limit });
+    /**
+     * 상품 삭제
+     * @param id 상품 ID
+     * @returns 상품
+     */
+    async deleteById(id: number): Promise<boolean> {
+        const product = await this.productRepository.findById(id);
+        return this.productRepository.deleteById(product.id);
     }
 }

@@ -70,4 +70,10 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.USER_COUPON_ALREADY_ISSUED]: '이미 발급받은 쿠폰입니다.',
     [MESSAGE_CODE.USER_COUPON_EXPIRED]: '쿠폰 만료되었습니다.',
     [MESSAGE_CODE.USER_COUPON_ALREADY_USED]: '이미 사용된 쿠폰입니다.',
+
+    // Product
+    [MESSAGE_CODE.PRODUCT_NOT_FOUND]: '상품을 찾을 수 없습니다.',
+    [MESSAGE_CODE.PRODUCT_OPTION_NOT_FOUND]: '상품 옵션을 찾을 수 없습니다.',
+    [MESSAGE_CODE.PRODUCT_CATEGORY_NOT_FOUND]: '상품 카테고리를 찾을 수 없습니다.',
+    [MESSAGE_CODE.PRODUCT_OPTION_DETAIL_NOT_FOUND]: '상품 옵션 상세를 찾을 수 없습니다.',
 };

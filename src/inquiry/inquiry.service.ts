@@ -95,36 +95,36 @@ export class InquiryService {
     }
 
     // === 답변 ===
-    async createAnswer(inquiryId: number, storeId: number, dto: CreateInquiryAnswerDto): Promise<ProductInquiryAnswer> {
-        const inquiry = await this.inquiryRepository.findOne({
-            where: { id: inquiryId, deletedAt: null },
-            relations: ['product'],
-        });
+    // async createAnswer(inquiryId: number, storeId: number, dto: CreateInquiryAnswerDto): Promise<ProductInquiryAnswer> {
+    //     const inquiry = await this.inquiryRepository.findOne({
+    //         where: { id: inquiryId, deletedAt: null },
+    //         relations: ['product'],
+    //     });
 
-        if (!inquiry) {
-            throw new NotFoundException('문의를 찾을 수 없습니다.');
-        }
+    //     if (!inquiry) {
+    //         throw new NotFoundException('문의를 찾을 수 없습니다.');
+    //     }
 
-        if (inquiry.product.storeId !== storeId) {
-            throw new ForbiddenException('해당 상품의 판매자만 답변할 수 있습니다.');
-        }
+    //     if (inquiry.product.storeId !== storeId) {
+    //         throw new ForbiddenException('해당 상품의 판매자만 답변할 수 있습니다.');
+    //     }
 
-        if (inquiry.isAnswered) {
-            throw new ForbiddenException('이미 답변이 등록된 문의입니다.');
-        }
+    //     if (inquiry.isAnswered) {
+    //         throw new ForbiddenException('이미 답변이 등록된 문의입니다.');
+    //     }
 
-        const answer = this.answerRepository.create({
-            inquiryId,
-            storeId,
-            content: dto.content,
-        });
+    //     const answer = this.answerRepository.create({
+    //         inquiryId,
+    //         storeId,
+    //         content: dto.content,
+    //     });
 
-        await this.answerRepository.save(answer);
+    //     await this.answerRepository.save(answer);
 
-        // 문의 상태 업데이트
-        inquiry.isAnswered = true;
-        await this.inquiryRepository.save(inquiry);
+    //     // 문의 상태 업데이트
+    //     inquiry.isAnswered = true;
+    //     await this.inquiryRepository.save(inquiry);
 
-        return answer;
-    }
+    //     return answer;
+    // }
 }
