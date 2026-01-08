@@ -76,4 +76,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.PRODUCT_OPTION_NOT_FOUND]: '상품 옵션을 찾을 수 없습니다.',
     [MESSAGE_CODE.PRODUCT_CATEGORY_NOT_FOUND]: '상품 카테고리를 찾을 수 없습니다.',
     [MESSAGE_CODE.PRODUCT_OPTION_DETAIL_NOT_FOUND]: '상품 옵션 상세를 찾을 수 없습니다.',
+
+    // Follow
+    [MESSAGE_CODE.FOLLOW_NOT_ALLOWED_SELF]: '자기 자신을 팔로우할 수 없습니다.',
 };
