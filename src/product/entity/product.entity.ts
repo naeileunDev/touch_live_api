@@ -17,8 +17,8 @@ export class Product extends BaseEntity {
     @Column({ type: 'enum', enum: ProductTargetAge, comment: '구매 대상 나이' })
     targetAge: ProductTargetAge;
 
-    @Column({ type: 'int', comment: '할인 가격' })
-    discountValue: number;
+    @Column({ type: 'int', comment: '할인 가격', nullable: true })
+    discountValue?: number;
 
     @Column({ type: 'int', comment: '배송비' })
     deliveryFee: number;
@@ -29,7 +29,7 @@ export class Product extends BaseEntity {
     @Column({ type: 'int', comment: '배송 기간' })
     deliveryPeriod: number;
 
-    @Column({ type: 'int', comment: '최대 결제 횟수' })
+    @Column({ type: 'int', comment: '최대 결제 횟수', nullable: true })
     maxPurchaseLimit: number;
 
     @Column({ type: 'boolean', default: true, comment: '활성 여부' })
@@ -43,4 +43,14 @@ export class Product extends BaseEntity {
 
     @Column({ type: 'timestamptz', comment: '버전' })
     version: Date;
+
+    @Column({ type: 'int', comment: '제주도 배송비', default: 0 })
+    jejuDeliveryFee: number;
+
+    @Column({ type: 'int', comment: '도서산간 배송비', default: 0 })
+    islandDeliveryFee: number;
+
+
+
+    
 }
