@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Param, Query, ParseIntPipe, ParseBoolPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, Query, ParseIntPipe, Body, ParseArrayPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiExtraModels, ApiBody } from '@nestjs/swagger';
 import { UserFollowService } from './service/user-follow.service';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
-import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
+import { ALL_PERMISSION, ANY_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { Role } from 'src/common/decorator/role.decorator';
 import { UserDto } from 'src/user/dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { UserFollowsDto } from './dto/user-follows.dto';
+import { FollowingUserDto } from './dto/following-user.dto';
 
 @ApiTags('Follow')
 @Controller('follow')
@@ -47,9 +48,32 @@ export class FollowController {
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '해당 유저 팔로워 수 (팔로워의 경우 9999 넘어가면 +9999로 표시해주세요 => 팔로잉 유저의 팔로워 수 표기 용)' })
     @ApiOkSuccessResponse(Number, '해당 유저 팔로워 수 조회 성공')
+    @ApiExtraModels(FollowingUserDto)
     getCountFollowers(
         @Param('userId', ParseIntPipe) userId: string, 
     ): Promise<number> {
         return this.userFollowService.findCountFollowOrFollower(userId, false);
     }
+
+    @Post('user/unfollow/livers')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '팔로잉 목록에서 팔로잉 유저 언팔로우(팔로잉 유저 ID 배열)' })
+    @ApiBody({
+        schema: {
+            type: 'array',
+            items: {
+                type: 'number'
+            },
+            example: [1, 2, 3]
+        }
+    })
+    @ApiOkSuccessResponse(Boolean, '팔로잉 목록에서 팔로잉 유저 언팔로우 성공')
+    unfollowLivers(
+        @GetUser() user: UserDto, 
+        @Body(new ParseArrayPipe({ items: Number })) livers: number[]
+    ): Promise<boolean> {
+        return this.userFollowService.unfollowLivers(user.id, livers);
+    }
+
+
 }
