@@ -12,7 +12,7 @@ export class FollowingUserDto {
     title: string;
     @ApiProperty({ description: '유저 프로필 이미지', example: 'https://example.com/profile.jpg' })
     profileImage: string;
-    @ApiProperty({ description: '팔로워 총 수, 9999 넘어가면 +9999로 표시해주세요' })
+    @ApiProperty({ description: '팔로워 총 수, 9999 넘어가면 +9999로 표시해주세요', example: 99 })
     followersCount: number;
     @ApiProperty({ description: '트라이 등급', example: UserTrialRank.Normal })
     trialRank: UserTrialRank;

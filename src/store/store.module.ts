@@ -19,5 +19,6 @@ import { StoreRegisterLogService } from './store-register-log.service';
     StoreRegisterLogService,
   ],
   imports: [FileModule, UserModule, AuthModule],
+  exports: [StoreService],
 })
 export class StoreModule {}

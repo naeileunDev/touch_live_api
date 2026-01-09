@@ -37,9 +37,6 @@ export class UserFollowService {
 
     async findCountFollowOrFollower(publicId: string, isFollowers: boolean): Promise<number> {
         const user = await this.userService.findEntityByPublicId(publicId);
-        if (!user) {
-            throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
-        }
         const userId = user.id;
         // 해당 유저가 팔로워라면 내가 팔로잉하는 사람 수를 조회  
         if (!isFollowers) {
@@ -75,11 +72,11 @@ export class UserFollowService {
        
         return {
             livers: followingUsers,
-            followersCount: followings[1]
+            total: followings[1]
         };
     }
 
-    async unfollowLivers(publicId: string, followingIds: number[]): Promise<boolean> {
+    async unfollow(publicId: string, followingIds: number[]): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(publicId);
         return await this.userFollowRepository.deleteByUsersIds(follower.id, followingIds);
     }
