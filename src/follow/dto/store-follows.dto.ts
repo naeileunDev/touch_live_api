@@ -4,16 +4,16 @@ import { IsInt, ValidateNested } from "class-validator";
 import { FollowingStoreDto } from "./following-store.dto";
 
 export class StoreFollowsDto {
-    @ApiProperty({ description: '팔로워 정보', type: () => StoreFollowsDto, required: true })
+    @ApiProperty({ description: '팔로워 정보', type: () => FollowingStoreDto, required: true })
     @ValidateNested()
-    @Type(() => StoreFollowsDto)
-    stores?: StoreFollowsDto[] = [];
+    @Type(() => FollowingStoreDto)
+    stores?: FollowingStoreDto[] = [];
     @ApiProperty({ description: '팔로워 수', example: 9999, required: true })
     @IsInt()
-    followersCount: number;
+    total: number;
 
-    constructor(stores: FollowingStoreDto[] = [], followersCount: number) {
+    constructor(stores: FollowingStoreDto[] = [], total: number) {
         this.stores = stores;
-        this.followersCount = followersCount;
+        this.total = total;
     }
 }

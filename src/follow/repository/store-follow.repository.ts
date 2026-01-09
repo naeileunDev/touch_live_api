@@ -1,7 +1,9 @@
-import { DataSource, DeleteResult, LessThan, Repository } from "typeorm";
+import { DataSource, DeleteResult, In, LessThan, Repository } from "typeorm";
 import { StoreFollow } from "../entity/store-follow.entity";
 import { Injectable } from "@nestjs/common";
 import { ServiceException } from "src/common/filter/exception/service.exception";
+import { StoreFollowsDto } from "../dto/store-follows.dto";
+import { Store } from "src/store/entity/store.entity";
 
 @Injectable()
 export class StoreFollowRepository extends Repository<StoreFollow> {
@@ -43,10 +45,25 @@ export class StoreFollowRepository extends Repository<StoreFollow> {
         return result.affected > 0;
     }
 
-    async findFollowingStoresFollowerCounts(storeId: number, lastId: number | null, limit: number = 7): Promise<[StoreFollow[], number]> {
+    async findFollowingStoresFollowerCounts(userId: number, lastId: number | null, limit: number = 7): Promise<[Store[], number]> {
         if (lastId != null) {
-            return await this.findAndCount({ where: { storeId, id: LessThan(lastId) }, relations: ['follower', 'store'], order: { createdAt: 'DESC' }, take: limit });
+            const [stores, count] = await this.findAndCount({ where: { followerId: userId, id: LessThan(lastId) }, relations: ['follower', 'store'], order: { createdAt: 'DESC' }, take: limit });
+            return [stores.map(s => s.store), count];
         }
-        return await this.findAndCount({ where: { storeId }, relations: ['follower', 'store'], order: { createdAt: 'DESC' }, take: limit });
+        const [stores, count] = await this.findAndCount({ where: { followerId: userId }, relations: ['follower', 'store'], order: { createdAt: 'DESC' }, take: limit });
+        return [stores.map(s => s.store), count];
+    }
+
+    async deleteByStoreIds(userId: number, storeIds: number[]): Promise<boolean> {
+        const result = await this.createQueryBuilder()
+        .delete()
+        .where('followerId = :followerId', { followerId: userId })
+        .andWhere('storeId IN (:...storeIds)', { storeIds })
+        .execute();
+    return result.affected > 0;
+    }
+
+    async countFollowersByStoreId(storeId: number): Promise<number> {
+        return await this.count({ where: { storeId: storeId } });
     }
 }

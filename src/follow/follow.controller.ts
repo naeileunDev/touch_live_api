@@ -8,12 +8,18 @@ import { UserDto } from 'src/user/dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { UserFollowsDto } from './dto/user-follows.dto';
 import { FollowingUserDto } from './dto/following-user.dto';
+import { StoreFollowService } from './service/store-follow.service';
+import { StoreFollowsDto } from './dto/store-follows.dto';
+import { FollowingStoreDto } from './dto/following-store.dto';
 
 @ApiTags('Follow')
 @Controller('follow')
 @ApiBearerAuth('access-token')
 export class FollowController {
-    constructor(private readonly userFollowService: UserFollowService) {}
+    constructor(
+        private readonly userFollowService: UserFollowService,
+        private readonly storeFollowService: StoreFollowService,
+    ) {}
 
     @Post('user/:userId')
     @Role(USER_PERMISSION)
@@ -55,7 +61,7 @@ export class FollowController {
         return this.userFollowService.findCountFollowOrFollower(userId, false);
     }
 
-    @Post('user/unfollow/livers')
+    @Post('user/unfollow/users')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '팔로잉 목록에서 팔로잉 유저 언팔로우(팔로잉 유저 ID 배열)' })
     @ApiBody({
@@ -79,40 +85,30 @@ export class FollowController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '팔로우/언팔로우 토글 (해당 스토어 팔로우/언팔로우)' })
     @ApiOkSuccessResponse(Boolean, '팔로우/언팔로우 토글 성공')
-    toggleStoreFollow(@GetUser() user: UserDto, @Param('storeId') storeId: string): Promise<boolean> {
-        return this.userFollowService.followAndUnfollow(user.id, storeId);
+    toggleStoreFollow(@GetUser() user: UserDto, @Param('storeId') storeId: number): Promise<boolean> {
+        return this.storeFollowService.followAndUnfollow(user.id, storeId);
     }
 
-    @Get('store/followings/:storeId')
+    @Get('store/followings/:publicId')
     @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '해당 스토어 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, store의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
-    @ApiOkSuccessResponse(UserFollowsDto, '헤당 스토어 팔로잉 목록 조회 성공')
+    @ApiExtraModels(FollowingStoreDto)
+    @ApiOperation({ summary: '해당 유저의 스토어 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, store의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
+    @ApiOkSuccessResponse(StoreFollowsDto, '헤당 스토어 팔로잉 목록 조회 성공')
     getStoreFollowings(
-        @Param('userId', ParseIntPipe) userId: string,
+        @Param('publicId') publicId: string,
         @Query('lastId') lastId?: number,
-    ): Promise<UserFollowsDto> {
-        return this.userFollowService.findFollowingUsersFollowerCounts(userId, lastId, 7);
-    }
-
-    @Get('store/count/followings/:storeId')
-    @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '해당 스토어 팔로잉 수' })
-    @ApiOkSuccessResponse(Number, '해당 스토어 팔로잉 수 조회 성공')
-    getCountStoreFollowings(
-        @Param('userId', ParseIntPipe) userId: string, 
-    ): Promise<number> {
-        return this.userFollowService.findCountFollowOrFollower(userId, true);
+    ): Promise<StoreFollowsDto> {
+        return this.storeFollowService.findFollowingStoresFollowerCounts(publicId, lastId, 7);
     }
 
     @Get('store/count/followers/:storeId')
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '해당 스토어 팔로워 수 (팔로워의 경우 9999 넘어가면 +9999로 표시해주세요 => 팔로잉 스토어의 팔로워 수 표기 용)' })
     @ApiOkSuccessResponse(Number, '해당 스토어 팔로워 수 조회 성공')
-    @ApiExtraModels(FollowingUserDto)
     getCountStoreFollowers(
-        @Param('userId', ParseIntPipe) userId: string, 
+        @Param('storeId') storeId: number, 
     ): Promise<number> {
-        return this.userFollowService.findCountFollowOrFollower(userId, false);
+        return this.storeFollowService.findCountFollowers(storeId);
     }
 
     @Post('store/unfollow/stores')
@@ -127,12 +123,12 @@ export class FollowController {
             example: [1, 2, 3]
         }
     })
-    @ApiOkSuccessResponse(Boolean, '팔로잉 목록에서 팔로잉 유저 언팔로우 성공')
+    @ApiOkSuccessResponse(Boolean, '팔로잉 목록에서 팔로잉 스토어 언팔로우 성공')
     unfollowStores(
         @GetUser() user: UserDto, 
         @Body(new ParseArrayPipe({ items: Number })) stores: number[]
     ): Promise<boolean> {
-        return this.userFollowService.unfollow(user.id, stores);
+        return this.storeFollowService.unfollow(user.id, stores);
     }
 
 

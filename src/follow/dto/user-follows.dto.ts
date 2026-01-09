@@ -9,13 +9,13 @@ export class UserFollowsDto {
     @ValidateNested()
     @Type(() => FollowingUserDto)
     livers?: FollowingUserDto[] = [];
-    @ApiProperty({ description: '팔로워 수', example: 9999, required: true })
+    @ApiProperty({ description: '팔로워 수', example: 30, required: true })
     @IsInt()
     @IsPositive()
-    followersCount: number;
+    total: number;
 
-    constructor(livers: FollowingUserDto[] = [], followersCount: number) {
+    constructor(livers: FollowingUserDto[] = [], total: number) {
         this.livers = livers;
-        this.followersCount = followersCount;
+        this.total = total;
     }
 }
