@@ -39,8 +39,8 @@ export class TagService {
     async deleteById(id: number): Promise<boolean> {
         return await this.tagRepository.deleteById(id);
     }
-    async findByTagName(name: string): Promise<Tag> {
-        return await this.tagRepository.findByTagName(name);
+    async findByTagName(name: string): Promise<TagDto> {
+        return new TagDto(await this.tagRepository.findByTagName(name));
     }
     async existsByTagName(name: string): Promise<boolean> {
         return await this.tagRepository.existsByTagName(name);
