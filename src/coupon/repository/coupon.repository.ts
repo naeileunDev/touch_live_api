@@ -60,4 +60,8 @@ export class CouponRepository extends Repository<Coupon> {
         
         return result.affected > 0;
     }
+
+    async findByCouponNo(couponNo: string): Promise<Coupon> {
+        return await this.findOne({ where: { couponNo } });
+    }
 }     

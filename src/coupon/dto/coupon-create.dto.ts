@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsEnum, IsInt, IsOptional, Min } from "class-validator";
 import { DiscountType } from "../enum/coupon.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
+import { IsRequiredString } from "src/common/validator/is-required-string";
 
 export class CouponCreateDto {
     @ApiProperty({ description: '쿠폰 재고' })
@@ -41,4 +42,8 @@ export class CouponCreateDto {
     @IsOptional()
     @IsInt()
     validDays?: number;
+
+    @ApiProperty({ description: '쿠폰 번호', example: 'COUPON-uuid' })
+    @IsRequiredString()
+    couponNo: string;
 }

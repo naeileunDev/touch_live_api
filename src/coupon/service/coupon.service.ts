@@ -7,7 +7,7 @@ import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { DiscountType } from "../enum/coupon.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Coupon } from "../entity/coupon.entity";
-import { Transactional } from "typeorm-transactional";
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CouponService {
@@ -20,6 +20,8 @@ export class CouponService {
         this.validateIssuableUntil(couponCreateDto.issuableUntil);
         this.validateAmount(couponCreateDto.discountType, couponCreateDto.amount);
         this.validateMaxDiscountAmount(couponCreateDto.maxDiscountAmount, couponCreateDto.discountType);
+        const couponNo = `COUPON-${uuidv4()}`;
+        couponCreateDto.couponNo = couponNo;
         const coupon = await this.couponRepository.createCoupon(couponCreateDto);
         return new CouponDto(coupon);
     }
@@ -99,5 +101,21 @@ export class CouponService {
         if (discountType === DiscountType.Amount && maxDiscountAmount) {
             throw new ServiceException(MESSAGE_CODE.COUPON_MAX_DISCOUNT_AMOUNT_NOT_ALLOWED);
         }
+    }
+
+    async findByCouponNo(couponNo: string): Promise<CouponDto> {
+        const coupon = await this.couponRepository.findByCouponNo(couponNo);
+        if (!coupon) {
+            throw new ServiceException(MESSAGE_CODE.COUPON_NOT_FOUND);
+        }
+        return new CouponDto(coupon);
+    }
+    
+    async findEntityByCouponNo(couponNo: string): Promise<Coupon> {
+        const coupon = await this.couponRepository.findByCouponNo(couponNo);
+        if (!coupon) {
+            throw new ServiceException(MESSAGE_CODE.COUPON_NOT_FOUND);
+        }
+        return coupon;
     }
 }

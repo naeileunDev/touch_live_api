@@ -28,4 +28,7 @@ export class Coupon extends BaseEntity {
 
     @Column({ type: 'int', comment: '쿠폰 유효 일수', nullable: true })
     validDays: number;
+
+    @Column({ type: 'varchar',  comment: '쿠폰 번호' })
+    couponNo: string
 }

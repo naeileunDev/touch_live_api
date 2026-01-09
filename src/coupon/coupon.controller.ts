@@ -67,8 +67,8 @@ export class CouponController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '[유저 role] 쿠폰 발급' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 발급 성공')
-    issueCoupon(@Param('couponId', ParseIntPipe) couponId: number,@GetUser() user: UserDto): Promise<any> {
-        return this.userCouponService.create(couponId, user.id);
+    issueCoupon(@Param('couponNo') couponNo: string, @GetUser() user: UserDto): Promise<any> {
+        return this.userCouponService.create(couponNo, user.id);
     }
 
     @Get('users/:userId')
@@ -82,6 +82,11 @@ export class CouponController {
     ): Promise<UserCouponDto[]> {
         return this.userCouponService.findByUserId(userId, isUsed);
     }
-
-
+    @Get(':couponNo')
+    @Role(ANY_PERMISSION)
+    @ApiOperation({ summary: '쿠폰 번호로 조회, 비회원이 외부에서 유입될 경우의 쿠폰 조회를 위해 모든 타입의 role 접근 가능' })
+    @ApiOkSuccessResponse(CouponDto, '쿠폰 번호로 조회 성공')
+    getCouponByCouponNo(@Param('couponNo') couponNo: string): Promise<CouponDto> {
+        return this.couponService.findByCouponNo(couponNo);
+    }
 }
