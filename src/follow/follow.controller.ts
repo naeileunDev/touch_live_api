@@ -83,8 +83,8 @@ export class FollowController {
 
     @Post('store/:storeId')
     @Role(USER_PERMISSION)
-    @ApiOperation({ summary: '팔로우/언팔로우 토글 (해당 스토어 팔로우/언팔로우)' })
-    @ApiOkSuccessResponse(Boolean, '팔로우/언팔로우 토글 성공')
+    @ApiOperation({ summary: '유저가 해당 스토어를 팔로우/언팔로우 토글' })
+    @ApiOkSuccessResponse(Boolean, '유저가 해당 스토어를 팔로우/언팔로우 토글 성공')
     toggleStoreFollow(@GetUser() user: UserDto, @Param('storeId') storeId: number): Promise<boolean> {
         return this.storeFollowService.followAndUnfollow(user.id, storeId);
     }
@@ -113,7 +113,7 @@ export class FollowController {
 
     @Post('store/unfollow/stores')
     @Role(USER_PERMISSION)
-    @ApiOperation({ summary: '팔로잉 목록에서 팔로잉 스토어 언팔로우(팔로잉 스토어 ID 배열)' })
+    @ApiOperation({ summary: '유저가 팔로잉 목록에서 팔로잉 스토어 언팔로우(팔로잉 스토어 ID 배열)' })
     @ApiBody({
         schema: {
             type: 'array',
@@ -123,7 +123,7 @@ export class FollowController {
             example: [1, 2, 3]
         }
     })
-    @ApiOkSuccessResponse(Boolean, '팔로잉 목록에서 팔로잉 스토어 언팔로우 성공')
+    @ApiOkSuccessResponse(Boolean, '유저가 팔로잉 목록에서 팔로잉 스토어 언팔로우 성공')
     unfollowStores(
         @GetUser() user: UserDto, 
         @Body(new ParseArrayPipe({ items: Number })) stores: number[]

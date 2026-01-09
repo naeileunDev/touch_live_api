@@ -3,7 +3,6 @@ import { StoreStatusType } from "../enum/store-status-type.enum";
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { User } from "src/user/entity/user.entity";
-import { StoreMedia } from "./store-media.entity";
 
 @Entity()
 export class Store extends BaseEntity{
@@ -16,8 +15,9 @@ export class Store extends BaseEntity{
     @Column({ type: 'varchar', length: 255, comment: '가게 이메일' })
     email: string;
 
-    @Column({ type: 'boolean', comment: '가게 노출 여부', default: false })
-    isVisible: boolean;
+    // 가게 노출 여부 ( 가게 상태가 Active 인 경우에만 노출)
+    @Column({ type: 'boolean', comment: '가게 노출 여부', default: true })
+    isVisible: boolean = true;
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;
@@ -61,6 +61,7 @@ export class Store extends BaseEntity{
     @Column({ type: 'varchar', array: true, length: 5, comment: '최대 서브태그(5개까지)' })
     subTags: string[];
 
+    // 가게 상태 타입 ( 유저의 행위나 제재에 영향)
     @Column({ type: 'enum', enum: StoreStatusType, comment: '가게 상태', default: StoreStatusType.Active })
     status: StoreStatusType;
 
@@ -83,6 +84,18 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
     storeProfileImageId?: number | null;
 
-    @OneToMany(() => StoreMedia, storeMedia => storeMedia.store)
-    medias: StoreMedia[];
+    @Column({ type: 'varchar', length: 255, comment: '교환/환불 불가 사유' })
+    nonReturnableReason: string; 
+
+    @Column({ type: 'varchar', length: 255, comment: '교환/환불 처리 방법' })
+    returnableProcess: string;
+
+    @Column({ type: 'varchar', length: 255, comment: '택배 지불 주체' })
+    shippingPayer: string;
+
+    @Column({ type: 'varchar', length: 255, comment: 'As 제공자' })
+    asProvider: string;
+
+    @Column({ type: 'varchar', length: 255, comment: '고객센터 전화번호' })
+    csPhoneNumber: string;
 }

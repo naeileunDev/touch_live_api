@@ -3,6 +3,7 @@ import { MESSAGE_CODE } from './message-code.config';
 export const MESSAGE_TEXT = {
     // Common
     [MESSAGE_CODE.NOT_ALLOWED_SELF]: '스스로 수정할 수 없습니다.',
+    [MESSAGE_CODE.NOT_ALLOWED_OTHER]: '다른 사용자의 데이터는 접근할 수 없습니다.',
 
     // User
     [MESSAGE_CODE.USER_NOT_FOUND]: '사용자를 찾을 수 없습니다.',

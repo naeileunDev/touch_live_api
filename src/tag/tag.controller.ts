@@ -8,6 +8,7 @@ import { Role } from "src/common/decorator/role.decorator";
 import { ALL_PERMISSION, ANY_PERMISSION, OPERATOR_PERMISSION } from "src/common/permission/permission";
 import { TagFindRequestDto } from "./dto/tag-find-request.dto";
 import { TagFindDto } from "./dto/tag-find.dto";
+import { TagCheckDto } from "./dto/tag-check.dto";
 
 @ApiTags('Tag')
 @Controller('tag')
@@ -46,5 +47,13 @@ export class TagController {
     @ApiOkSuccessResponse(TagFindDto, '태그 목록 조회 성공', true)
     findByUsageAndCategory(@Query() requestDto: TagFindRequestDto): Promise<string[]> {
         return this.tagService.findByUsageAndCategory(requestDto);
+    }
+
+    @Get('check/tags')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '[모든 role] 메인태그와 서브태그 중복 여부 조회' })
+    @ApiOkSuccessResponse(Boolean, '메인태그와 서브태그 중복 여부 조회 성공')
+    checkTags(@Query() tagCheckDto: TagCheckDto): Promise<boolean> {
+        return this.tagService.checkTags(tagCheckDto);
     }
 }
