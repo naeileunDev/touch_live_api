@@ -36,8 +36,8 @@ export class TagController {
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 태그 조회' })
     @ApiOkSuccessResponse(TagDto, '태그 조회 성공')
-    findById(@Param('id', ParseIntPipe) id: number): Promise<TagDto> {
-        return this.tagService.findById(id);
+    findById(@Param('name') name: string): Promise<TagDto> {
+        return this.tagService.findByTagName(name);
     }
 
     @Get()
