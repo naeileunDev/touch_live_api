@@ -13,6 +13,9 @@ export class UserCoupon extends BaseEntity {
     @Column({ type: 'int', comment: '쿠폰 ID' })
     couponId: number;
 
+    @Column({ type: 'varchar', comment: '쿠폰 번호' })
+    couponNo: string;
+    
     @Column({ type: 'boolean', comment: '사용 여부', default: false })
     isUsed: boolean;
 

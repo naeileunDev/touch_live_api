@@ -42,6 +42,10 @@ export class CouponDto {
     @IsOptional()
     validDays?: number;
 
+
+    @ApiProperty({ description: '쿠폰 번호', example: 'COUPON-uuid' })
+    couponNo: string;
+    
     constructor(coupon: Coupon) {
         this.id = coupon.id;
         this.stock = coupon.stock;

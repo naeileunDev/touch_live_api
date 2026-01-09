@@ -20,8 +20,8 @@ export class UserCouponService {
     }
     
     @Transactional()
-    async create(couponId: number, userPublicId: string): Promise<UserCouponDto> {
-        const coupon = await this.couponService.findEntityById(couponId);
+    async create(couponNo: string, userPublicId: string): Promise<UserCouponDto> {
+        const coupon = await this.couponService.findEntityByCouponNo(couponNo);
         const user = await this.userService.findEntityByPublicId(userPublicId);
         
         // 중복 발급 확인
@@ -32,7 +32,7 @@ export class UserCouponService {
         }
         
         // 원자적 재고 감소 (재고 부족 시 예외 발생)
-        await this.couponService.decreaseStock(couponId);
+        await this.couponService.decreaseStock(coupon.id);
         
         // UserCoupon 생성
         const userCoupon = new UserCouponCreateDto(coupon, user);

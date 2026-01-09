@@ -4,12 +4,17 @@ import { CategoryType } from "src/tag/enum/category-type.enum";
 import { DiscountType } from "../enum/coupon.enum";
 import { Coupon } from "../entity/coupon.entity";
 import { User } from "src/user/entity/user.entity";
+import { IsRequiredString } from "src/common/validator/is-required-string";
 
 export class UserCouponCreateDto {
     @ApiProperty({ description: '쿠폰 ID' })
     @IsInt()
     couponId: number;
 
+    @ApiProperty({ description: '쿠폰 번호', example: 'COUPON-uuid' })
+    @IsRequiredString()
+    couponNo: string;
+    
     @ApiProperty({ description: '사용자' })
     user: User;
 
@@ -58,6 +63,7 @@ export class UserCouponCreateDto {
 
     constructor(coupon: Coupon, user: User) {
         this.couponId = coupon.id;
+        this.couponNo = coupon.couponNo;
         this.user = user;
         this.isUsed = false;
         this.category = coupon.category;

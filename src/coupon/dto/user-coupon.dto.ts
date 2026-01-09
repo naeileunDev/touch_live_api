@@ -11,6 +11,9 @@ export class UserCouponDto {
     @ApiProperty({ description: '쿠폰 ID', example: 1 })
     couponId: number;
 
+    @ApiProperty({ description: '쿠폰 번호', example: 'COUPON-uuid' })
+    couponNo: string;
+
     @ApiPropertyOptional({ description: '할인 타입', example: DiscountType.Amount, nullable: true })
     @IsOptional()
     discountType?: DiscountType;
@@ -51,6 +54,7 @@ export class UserCouponDto {
     constructor(userCoupon: UserCoupon) {
         this.id = userCoupon.id;
         this.couponId = userCoupon.couponId;
+        this.couponNo = userCoupon.couponNo;
         this.discountType = userCoupon.discountType;
         this.category = userCoupon.category;
         this.amount = userCoupon.amount;
