@@ -79,7 +79,7 @@ export class UserFollowService {
         };
     }
 
-    async unfollowLivers(publicId: string, followingIds: number[]): Promise<boolean> {
+    async unfollow(publicId: string, followingIds: number[]): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(publicId);
         return await this.userFollowRepository.deleteByUsersIds(follower.id, followingIds);
     }

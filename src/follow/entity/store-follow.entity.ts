@@ -19,4 +19,5 @@ export class StoreFollow extends BaseEntity {
     @ManyToOne(() => Store)
     @JoinColumn({ name: 'storeId' })
     store: Store;
+    followersCount: number;
 }
