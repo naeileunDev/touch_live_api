@@ -23,7 +23,7 @@ export class FollowController {
 
     @Get('user/check/:userId')
     @Role(USER_PERMISSION)
-    @ApiOperation({ summary: '해당 유저 팔로우 여부 확인' })
+    @ApiOperation({ summary: '[user role] 해당 유저 팔로우 여부 확인' })
     @ApiOkSuccessResponse(Boolean, '팔로우 여부 확인 성공')
     checkUserFollowing(
         @GetUser() userDto: UserDto,
@@ -34,43 +34,43 @@ export class FollowController {
 
     @Post('user/:userId')
     @Role(USER_PERMISSION)
-    @ApiOperation({ summary: '팔로우/언팔로우 토글 (해당 유저 팔로우/언팔로우)' })
+    @ApiOperation({ summary: '[user role] 팔로우/언팔로우 토글 (해당 유저 팔로우/언팔로우)' })
     @ApiOkSuccessResponse(Boolean, '팔로우/언팔로우 토글 성공')
     toggleFollow(@GetUser() userDto: UserDto, @Param('userId') userId: string): Promise<boolean> {
         return this.userFollowService.followAndUnfollow(userDto.id, userId);
     }
 
-    @Get('user/followings/:userId')
-    @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '해당 유저 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, liver의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
+    @Get('user/followings')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '[user role] 해당 유저 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, liver의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
     @ApiExtraModels(FollowingUserDto)
     @ApiOkSuccessResponse(UserFollowsDto, '해당 유저 팔로잉 목록 조회 성공')
     getFollowings(
-        @Param('userId', ParseIntPipe) userId: string,
+        @GetUser() userDto: UserDto,
         @Query('lastId') lastId?: number,
     ): Promise<UserFollowsDto> {
-        return this.userFollowService.findFollowingUsersFollowerCounts(userId, lastId, 7);
+        return this.userFollowService.findFollowingUsersFollowerCounts(userDto.id, lastId, 7);
     }
 
-    @Get('user/count/followings/:userId')
+    @Get('user/count/:userId')
     @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '해당 유저 팔로잉 수' })
+    @ApiOperation({ summary: '[all role] 해당 유저 팔로잉 수' })
     @ApiOkSuccessResponse(Number, '해당 유저 팔로잉 수 조회 성공')
     getCountFollowings(
-        @Param('userId', ParseIntPipe) userId: string, 
+        @Param('userId') publicId: string, 
     ): Promise<number> {
-        return this.userFollowService.findCountFollowOrFollower(userId, true);
+        return this.userFollowService.findCountFollowOrFollower(publicId, true);
     }
 
-    @Get('user/count/followers/:userId')
+    @Get('user/count/followers')
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '해당 유저 팔로워 수 (팔로워의 경우 9999 넘어가면 +9999로 표시해주세요 => 팔로잉 유저의 팔로워 수 표기 용)' })
     @ApiOkSuccessResponse(Number, '해당 유저 팔로워 수 조회 성공')
     @ApiExtraModels(FollowingUserDto)
     getCountFollowers(
-        @Param('userId', ParseIntPipe) userId: string, 
+        @Param('userId') publicId: string, 
     ): Promise<number> {
-        return this.userFollowService.findCountFollowOrFollower(userId, false);
+        return this.userFollowService.findCountFollowOrFollower(publicId, false);
     }
 
     @Post('user/unfollow/users')
@@ -112,13 +112,13 @@ export class FollowController {
         return this.storeFollowService.followAndUnfollow(userDto.id, storeId);
     }
 
-    @Get('store/followings/:publicId')
+    @Get('store/followings/:userId')
     @Role(ALL_PERMISSION)
     @ApiExtraModels(FollowingStoreDto)
     @ApiOperation({ summary: '해당 유저의 스토어 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, store의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
     @ApiOkSuccessResponse(StoreFollowsDto, '해당 유저의 스토어 팔로잉 목록 조회 성공', true)
     getStoreFollowings(
-        @Param('publicId') publicId: string,
+        @Param('userId') publicId: string,
         @Query('lastId') lastId?: number,
     ): Promise<StoreFollowsDto> {
         return this.storeFollowService.findFollowingStoresFollowerCounts(publicId, lastId, 7);
@@ -154,6 +154,15 @@ export class FollowController {
         return this.storeFollowService.unfollow(userDto.id, stores);
     }
 
+    @Get('total/count')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '해당 유저의 전체 팔로잉 수(유저 팔로잉 수 + 스토어 팔로잉 수, +9999 로 표기x)' })
+    @ApiOkSuccessResponse(Number, '전체 팔로워 수 조회 성공')
+    getTotalFollowers(
+        @GetUser() userDto: UserDto,
+    ): Promise<number> {
+        return this.userFollowService.findTotalFollowers(userDto.id);
+    }
 
 
 }

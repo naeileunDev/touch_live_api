@@ -65,6 +65,10 @@ export class StoreFollowService {
         return await this.storeFollowRepository.countFollowersByStoreId(storeId);
     }
 
+    async findCountByUserId(userId: number): Promise<number> {
+        return await this.storeFollowRepository.count({ where: { followerId: userId } });
+    }
+
     async unfollow(publicId: string, storeIds: number[]): Promise<boolean> {
         const user = await this.userService.findEntityByPublicId(publicId);
         return await this.storeFollowRepository.deleteByStoreIds(user.id, storeIds);

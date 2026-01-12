@@ -9,14 +9,14 @@ export class StoreFollow extends BaseEntity {
     @Column({ type: 'int', comment: '팔로워 ID' })
     followerId: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'followerId' })
     follower: User;
 
     @Column({ type: 'int', comment: '스토어 ID' })
     storeId: number;
 
-    @ManyToOne(() => Store)
+    @ManyToOne(() => Store, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'storeId' })
     store: Store;
     followersCount: number;

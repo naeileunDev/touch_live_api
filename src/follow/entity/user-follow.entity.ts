@@ -9,14 +9,14 @@ export class UserFollow extends BaseEntity {
     @Column({ type: 'int', comment: '팔로워 ID' })
     followerId: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'followerId' })
     follower: User;
 
     @Column({ type: 'int', comment: '팔로잉 ID' })
     followingId: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'followingId' })
     following: User;
 }
