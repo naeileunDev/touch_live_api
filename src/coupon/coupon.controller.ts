@@ -39,12 +39,12 @@ export class CouponController {
         return this.couponService.findAllNotExpired();
     }
 
-    @Get(':id')
+    @Get(':couponNo')
     @Role(ANY_PERMISSION)
-    @ApiOperation({ summary: '[모든 role] 쿠폰 상세 조회' })
+    @ApiOperation({ summary: '[모든 role] 쿠폰 번호로 조회, 비회원이 외부에서 유입될 경우의 쿠폰 조회를 위해 모든 타입의 role 접근 가능' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 상세 조회 성공')
-    findById(@Param('id', ParseIntPipe) id: number): Promise<CouponDto> {
-        return this.couponService.findById(id);
+    findById(@Param('couponNo') couponNo: string): Promise<CouponDto> {
+        return this.couponService.findByCouponNo(couponNo);
     }
 
     @Delete(':id')
@@ -63,7 +63,7 @@ export class CouponController {
         return this.couponService.save(id, couponUpdateDto);
     }
 
-    @Post('issue/:couponId')
+    @Post('issue/:couponNo')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '[유저 role] 쿠폰 발급' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 발급 성공')

@@ -14,6 +14,7 @@ import { ProductReadDto } from "./dto/product-read.dto";
 import { Pagination, PaginationResponse } from "src/common/pagination/pagination.interface";
 import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
 import { Transactional } from "typeorm-transactional";
+import { Product } from "./entity/product.entity";
 
 @Injectable()
 export class ProductService {
@@ -102,9 +103,18 @@ export class ProductService {
      * @param id 상품 ID
      * @returns 상품
      */
-    async findById(id: number) {
+    async findById(id: number): Promise<ProductDto> {
         const product = await this.productRepository.findById(id);
         return new ProductDto(product);
+    }
+
+    /**
+     * 상품 엔티티 조회
+     * @param id 상품 ID
+     * @returns 상품 엔티티
+     */
+    async findEntityById(id: number): Promise<Product> {
+        return await this.productRepository.findById(id);
     }
 
     /**

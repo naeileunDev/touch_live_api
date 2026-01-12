@@ -58,6 +58,7 @@ export class CouponDto {
         this.createdAt = coupon.createdAt;
         this.updatedAt = coupon.updatedAt;
         this.validDays = coupon.validDays;
+        this.couponNo = coupon.couponNo;
     }
 
 }

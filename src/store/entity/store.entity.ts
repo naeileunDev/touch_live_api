@@ -98,4 +98,5 @@ export class Store extends BaseEntity{
 
     @Column({ type: 'varchar', length: 255, comment: '고객센터 전화번호' })
     csPhoneNumber: string;
+    
 }

@@ -5,12 +5,14 @@ import { MESSAGE_CODE } from 'src/common/filter/config/message-code.config';
 import { UserService } from 'src/user/service/user.service';
 import { UserFollowsDto } from '../dto/user-follows.dto';
 import { FollowingUserDto } from '../dto/following-user.dto';
+import { StoreFollowService } from './store-follow.service';
 
 @Injectable()
 export class UserFollowService {
     constructor(
         private readonly userFollowRepository: UserFollowRepository,
         private readonly userService: UserService,
+        private readonly storeFollowService: StoreFollowService,
     ) {}
 
     async isFollowing(followerId: string, followingId: string): Promise<boolean> {
@@ -88,5 +90,13 @@ export class UserFollowService {
     async unfollow(publicId: string, followingIds: number[]): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(publicId);
         return await this.userFollowRepository.deleteByUsersIds(follower.id, followingIds);
+    }
+    
+    // 해당 유저의 유저 팔로잉 수와 스토어 팔로잉 수를 합쳐서 반환
+    async findTotalFollowers(userId: string): Promise<number> {
+        const user = await this.userService.findEntityByPublicId(userId);
+        const userFollowers = await this.userFollowRepository.count({ where: { followerId: user.id } });
+        const storeFollowers = await this.storeFollowService.findCountFollowers(user.id);
+        return userFollowers + storeFollowers;
     }
 }
