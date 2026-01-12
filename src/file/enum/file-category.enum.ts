@@ -3,9 +3,10 @@ export enum ContentCategory {
     Store = 'STORE',
     Operator = 'OPERATOR',
     Term = 'TERM',
-    Temp = 'TEMP',
     Product = 'PRODUCT',
     Review = 'REVIEW',
+    StoreRegisterLog = 'STORE_REGISTER_LOG',
+    ProductRegisterLog = 'PRODUCT_REGISTER_LOG',
 }
 
 export enum MediaType {

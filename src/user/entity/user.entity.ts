@@ -1,5 +1,5 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";

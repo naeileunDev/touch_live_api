@@ -46,7 +46,7 @@ export class Store extends BaseEntity{
     @Column({ type: 'varchar', length: 255, comment: '사업자 은행명' })
     bankName: string;
 
-    @Column({ type: 'varchar', length: 255, comment: '사업자 계좌번호' })
+    @Column({ type: 'varchar', length: 255, comment: '사업자 계좌번호(암호화해서 저장)' })
     accountNumber: string;
     
     @Column({ type: 'varchar', length: 255, comment: '사업자 예금주' })

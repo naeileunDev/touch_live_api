@@ -13,6 +13,18 @@ export class UserFollowService {
         private readonly userService: UserService,
     ) {}
 
+    async isFollowing(followerId: string, followingId: string): Promise<boolean> {
+        if (followerId === followingId) {
+            throw new ServiceException(MESSAGE_CODE.FOLLOW_NOT_ALLOWED_SELF);
+        }
+        const follower = await this.userService.findEntityByPublicId(followerId);
+        const following = await this.userService.findEntityByPublicId(followingId);
+        if (!follower || !following) {
+           throw new ServiceException(MESSAGE_CODE.USER_NOT_FOUND);
+        }
+        return await this.userFollowRepository.existsByUsersId(follower.id, following.id);
+    }
+
     // 이미 팔로우 되있으면 언팔, 없으면 팔로우 
     async followAndUnfollow(followerId: string, followingId: string): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(followerId);
@@ -70,10 +82,7 @@ export class UserFollowService {
             followingUsers.push(new FollowingUserDto(following, followersCount));
         }
        
-        return {
-            livers: followingUsers,
-            total: followings[1]
-        };
+        return new UserFollowsDto(followingUsers, followings[1]);
     }
 
     async unfollow(publicId: string, followingIds: number[]): Promise<boolean> {

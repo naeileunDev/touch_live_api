@@ -21,6 +21,14 @@ import { StoreRegisterLog } from './entity/store-register-log.entity';
 import { UserDto } from 'src/user/dto';
 import { Store } from './entity/store.entity';
 
+
+/* 
+ * Todo 심사 요청 추가 로직 구현
+ * 수정 사항: 파일 업로드 먼저 저장하고 값을 return 해서 로그 저장하는 방식으로 변경 
+ * 심사 요청 추가 로직 구현
+ * 어드민 심사로그 승인 로직 구현
+ */
+
 @Injectable()
 export class StoreRegisterLogService {
   constructor(

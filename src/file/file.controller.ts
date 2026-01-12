@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes, ParseIntPipe } from '@nestjs/common';
 import { FileService } from './file.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { MediaValidationPipe } from './pipe/media-validation.pipe';
 import { FileCreateDto } from './dto/file-create.dto';
 import { ContentCategory, UsageType } from './enum/file-category.enum';
@@ -9,6 +9,10 @@ import { FileDto } from './dto/file.dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ApiResponse } from '@nestjs/swagger';
 import { StreamableFile } from '@nestjs/common';
+import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { User } from 'src/user/entity/user.entity';
+import { UserDto } from 'src/user/dto';
 
 @ApiTags('File')
 @Controller('file')
@@ -56,10 +60,6 @@ export class FileController {
     return this.fileService.createLocal(file, fileCreateDto) ;
     }
 
-    //   @Get()
-    //   findAll() {
-    //     return this.fileService.findAll();
-    //   }
 
     @Get(':id')
     @ApiOperation({ summary: '파일 조회' })
@@ -81,13 +81,27 @@ export class FileController {
     findByIdAndServe(@Param('id') id: number): Promise<StreamableFile> {
         return this.fileService.findByIdAndServe(id);
     }
-//   @Patch(':id')
-//   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-//     return this.fileService.update(+id, updateFileDto);
-//   }
 
-//   @Delete(':id')
-//   remove(@Param('id') id: string) {
-//     return this.fileService.remove(+id);
-//   }
+
+    // @Post('store-register-log')
+    // @UseInterceptors(FileFieldsInterceptor([
+    //     { name: 'businessRegistrationImage', maxCount: 1 },
+    //     { name: 'eCommerceLicenseImage', maxCount: 1 },
+    //     { name: 'accountImage', maxCount: 1 },
+    //     { name: 'profileImage', maxCount: 1 },
+    //     { name: 'bannerImage', maxCount: 1 },
+    // ]))
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({
+    // schema: {
+    //     type: 'object',
+    //     required: ['file'],
+    //     properties: {
+    //         file: { type: 'string', format: 'binary' },
+    //     },
+    // },
+    // })
+    // createStoreRegisterLogFile(@Body() createDto: StoreRegisterLogCreateFileDto, @GetUser() userDto: UserDto) {
+    //     return this.fileService.createStoreRegisterLogFile(createDto, user);
+    // }
 }
