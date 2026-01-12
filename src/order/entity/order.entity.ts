@@ -1,7 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { User } from "src/user/entity/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { OrderProduct } from "./order-product.entity";
+import { UserCoupon } from "src/coupon/entity/user-coupon.entity";
 
 @Entity()
 export class Order extends BaseEntity {
@@ -19,6 +20,4 @@ export class Order extends BaseEntity {
     @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
     orderProducts: OrderProduct[];
 
-    @Column({ type: 'boolean', comment: '체험단 여부' })
-    isTrial: boolean;
 }

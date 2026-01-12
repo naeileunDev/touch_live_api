@@ -1,9 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
-import { IsEnum, IsOptional, IsString, Matches } from "class-validator";
+import { IsEnum, IsIn, IsOptional, IsString, Matches } from "class-validator";
 import { Transform } from "class-transformer";
 import { User } from "../entity/user.entity";
 import { EncryptionUtil } from "src/common/util/encryption.util";
@@ -46,6 +46,12 @@ export class UserDto {
     @ApiProperty({ description: '사용자 성인여부', example: true })
     isAdult: boolean;
 
+    @ApiPropertyOptional({ description: '운영자 권한', enum: UserRole, example: UserRole.Admin, nullable: true })
+    @IsOptional()
+    @IsEnum(UserRole)
+    @IsIn([UserRole.Admin, UserRole.Manager])
+    userOperation?: UserRole;
+
 
     constructor(user: User) {
         this.id = user.publicId;
@@ -60,5 +66,6 @@ export class UserDto {
         this.gender = EncryptionUtil.decryptDeterministic(user.gender) as UserGender?? null;
         this.birth = EncryptionUtil.decryptDeterministic(user.birth)?? null;
         this.isAdult = user.isAdult;
+        this.userOperation = user.userOperation?.role;
     }
 }

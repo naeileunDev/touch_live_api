@@ -3,8 +3,6 @@ import { Order } from "../entity/order.entity";
 import { UserDto } from "src/user/dto";
 
 export class OrderDto {
-    @ApiProperty({ description: '주문 식별자', example: 'uuid' })
-    id: number;
 
     @ApiProperty({ description: '주문 번호', example: '1234567890' })
     orderNo: string;
@@ -22,7 +20,6 @@ export class OrderDto {
     updatedAt: Date;
 
     constructor(order: Order, user: UserDto) {
-        this.id = order.id;
         this.orderNo = order.orderNo;
         this.isUserHidden = order.isUserHidden;
         this.userId = user.id;
