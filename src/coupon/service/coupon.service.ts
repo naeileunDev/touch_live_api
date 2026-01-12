@@ -15,7 +15,7 @@ export class CouponService {
         private readonly couponRepository: CouponRepository,
     ) {
     }
-
+    //* 쿠폰 생성 시 유효성 검사 및 쿠폰 번호 생성 *//
     async create(couponCreateDto: CouponCreateDto): Promise<CouponDto> {
         this.validateIssuableUntil(couponCreateDto.issuableUntil);
         this.validateAmount(couponCreateDto.discountType, couponCreateDto.amount);
@@ -93,7 +93,7 @@ export class CouponService {
             throw new ServiceException(MESSAGE_CODE.COUPON_PERCENTAGE_INVALID);
         }
     }
-
+    //* 최대 할인 금액 유효성 검사 *//
     private validateMaxDiscountAmount(maxDiscountAmount: number | undefined, discountType: DiscountType): void {
         if (maxDiscountAmount === undefined) return;
         if (discountType === DiscountType.Percentage) return;

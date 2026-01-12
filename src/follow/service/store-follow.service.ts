@@ -15,6 +15,11 @@ export class StoreFollowService {
     ) {
         }
 
+    async isFollowing(followerId: string, followingId: number): Promise<boolean> {
+        const follower = await this.userService.findEntityByPublicId(followerId);
+        return await this.storeFollowRepository.existsByStoreId(follower.id, followingId);
+    }
+
     async followAndUnfollow(followerId: string, storeId: number): Promise<boolean> {
         const follower = await this.userService.findEntityByPublicId(followerId);
         const store = await this.storeService.findEntityById(storeId);
@@ -45,7 +50,7 @@ export class StoreFollowService {
         const validStores = followingStores[0].filter(store => store !== null);
         
         if (validStores.length === 0) {
-            return new StoreFollowsDto([], followingStores[1]);
+            return new StoreFollowsDto([], 0);
         }
         const stores: FollowingStoreDto[] = [];
         for (const store of validStores) {
@@ -53,10 +58,7 @@ export class StoreFollowService {
             stores.push(new FollowingStoreDto(store, followersCount));
         }
         
-        return {
-            stores: stores,
-            total: followingStores[1]
-        };
+        return new StoreFollowsDto(stores, followingStores[1]);
     }
 
     async findCountFollowers(storeId: number): Promise<number> {

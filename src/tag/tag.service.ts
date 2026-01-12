@@ -9,6 +9,7 @@ import { CATEGORY_FIELD_MAP, CategoryType } from "./enum/category-type.enum";
 import { USAGE_FIELD_MAP, UsageType } from "./enum/usage-type.enum";
 import { Tag } from "./entity/tag.entity";
 import { TagFindDto } from "./dto/tag-find.dto";
+import { TagCheckDto } from "./dto/tag-check.dto";
 
 @Injectable()
 export class TagService {
@@ -94,4 +95,11 @@ export class TagService {
         return tags.map(tag => new TagDto(tag));
     }
 
+    async checkTags(tagCheckDto: TagCheckDto): Promise<boolean> {
+        const mainTagsSet = new Set(tagCheckDto.mainTags);
+        const subTagsSet = new Set(tagCheckDto.subTags);
+        
+        // 교집합이 있는지 확인 (mainTags와 subTags 간 중복 체크)
+        return !tagCheckDto.mainTags.some(tag => subTagsSet.has(tag));
+    }
 }

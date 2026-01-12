@@ -31,6 +31,10 @@ export class StoreFollowRepository extends Repository<StoreFollow> {
         return await this.findOne({ where: { followerId, storeId } });
     }
 
+    async existsByStoreId(followerId: number, storeId: number): Promise<boolean> {
+        return await this.exists({ where: { followerId, storeId } });
+    }
+
     async existsByStoreIdWithDeleted(followerId: number, storeId: number): Promise<boolean> {
         return await this.exists({ where: { followerId, storeId }, withDeleted: true });
     }

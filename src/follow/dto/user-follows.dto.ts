@@ -5,13 +5,13 @@ import { Type } from 'class-transformer';
 
 // 팔로잉 목록 조회 응답 DTO 리스트의 타입
 export class UserFollowsDto {
-    @ApiProperty({ description: '팔로잉 유저 정보', type: () => FollowingUserDto, required: true })
-    @ValidateNested()
+    @ApiProperty({ description: '팔로잉 유저 정보', type: () => FollowingUserDto, isArray: true, required: true })
+    @ValidateNested({ each: true })
     @Type(() => FollowingUserDto)
     livers?: FollowingUserDto[] = [];
-    @ApiProperty({ description: '팔로워 수', example: 30, required: true })
+    
+    @ApiProperty({ description: '전체 팔로잉 수', example: 9999, required: true })
     @IsInt()
-    @IsPositive()
     total: number;
 
     constructor(livers: FollowingUserDto[] = [], total: number) {

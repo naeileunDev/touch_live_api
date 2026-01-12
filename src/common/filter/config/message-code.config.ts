@@ -1,6 +1,7 @@
 export const MESSAGE_CODE = {
     // Common
     NOT_ALLOWED_SELF: 9000,
+    NOT_ALLOWED_OTHER: 9001,
 
     // User
     USER_NOT_FOUND: 1000,

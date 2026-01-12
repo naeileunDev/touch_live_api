@@ -29,6 +29,7 @@ import { InquiryModule } from './inquiry/inquiry.module';
 import { OrderModule } from './order/order.module';
 import { CouponModule } from './coupon/coupon.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
     imports: [
@@ -63,6 +64,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         InquiryModule,
         OrderModule,
         CouponModule,
+        AuditModule,
     ],
     controllers: [],
     providers: [

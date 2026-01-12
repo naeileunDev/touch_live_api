@@ -21,7 +21,7 @@ export class OrderController {
     @Role(USER_PERMISSION)
     @ApiCreatedSuccessResponse(OrderDto, '주문 생성 성공')
     @Post()
-    async create(@Body() dto: OrderCreateDto, @GetUser() user: UserDto): Promise<OrderDto> {
-        return await this.orderService.create(dto, user);
+    async create(@Body() dto: OrderCreateDto, @GetUser() userDto: UserDto): Promise<OrderDto> {
+        return await this.orderService.create(dto, userDto);
     }
 }

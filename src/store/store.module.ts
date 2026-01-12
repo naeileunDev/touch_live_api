@@ -6,7 +6,6 @@ import { FileModule } from 'src/file/file.module';
 import { StoreRegisterLogRepository } from './repository/store-register-log.repository';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
-import { StoreMediaRepository } from './repository/store-media.repository';
 import { StoreRegisterLogService } from './store-register-log.service';
 
 @Module({
@@ -15,7 +14,6 @@ import { StoreRegisterLogService } from './store-register-log.service';
     StoreService, 
     StoreRepository, 
     StoreRegisterLogRepository, 
-    StoreMediaRepository,
     StoreRegisterLogService,
   ],
   imports: [FileModule, UserModule, AuthModule],

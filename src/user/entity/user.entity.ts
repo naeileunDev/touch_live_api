@@ -1,8 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
-import { UserCreateDto } from "../dto/user-create.dto";
 import { UserSignupSourceData } from "./user-signup-surce-data.entity";
 import { UserTermsAgreement } from "./user-terms-agreement.entity";
 import { UserAddress } from "./user-address.entity";
@@ -89,4 +88,5 @@ export class User extends BaseEntity {
 
     @Column({ type: 'enum', enum: UserTrialRank, comment: '사용자 트라이 등급', default: UserTrialRank.Normal })
     trialRank: UserTrialRank;
+
 }

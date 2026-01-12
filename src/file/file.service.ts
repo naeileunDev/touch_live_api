@@ -11,13 +11,18 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { FileCreateDto } from './dto/file-create.dto';
 import { FileDto } from './dto/file.dto';
 import { MimeType, UsageType, MediaType, ContentCategory } from './enum/file-category.enum';
+import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
+import { UserDto } from 'src/user/dto';
+import { StoreRegisterLogFileDto } from './dto/store-register-log-file.dto';
+import { UserService } from 'src/user/service/user.service';
 
 @Injectable()
 export class FileService {
 
     constructor(
         private readonly fileRepository: FileRepository,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        private readonly userService: UserService
     ) {}
     private readonly envConfig: string = this.configService.get<string>('NODE_ENV') === 'local' ? 'local' : 'prod';
     private basePath = path.join(process.cwd(), 'uploads');
@@ -127,4 +132,10 @@ export class FileService {
             disposition: `inline; filename="${file.originalName}"`,
         });
     }
+
+    // async createStoreRegisterLogFile(createDto: StoreRegisterLogCreateFileDto, userDto: UserDto): Promise<any> {
+    //     const user = await this.userService.findEntityByPublicId(userDto.id, true);
+        
+    //     return this.fileRepository.createStoreRegisterLogFile(createDto, user);
+    // }
 }

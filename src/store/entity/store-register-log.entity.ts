@@ -20,7 +20,7 @@ export class StoreRegisterLog extends BaseEntity {
     email: string;
 
     @Column({ type: 'varchar', length: 255, comment: '가게 정보', nullable: true })
-    storeInfo?: string | null;
+    storeInfo: string;
 
     @Column({ type: 'varchar', length: 255, comment: '사업자 등록번호' })
     businessRegistrationNumber: string;
@@ -56,10 +56,10 @@ export class StoreRegisterLog extends BaseEntity {
     accountImageId: number;
 
     @Column({ type: 'int', comment: '가게 프로필 이미지 id', nullable: true })
-    storeProfileImageId?: number | null;
+    storeProfileImageId: number;
 
     @Column({ type: 'int', comment: '가게 배너 이미지 id', nullable: true })
-    storeBannerImageId?: number | null;
+    storeBannerImageId: number;
 
     @Column({ type: 'varchar', array: true, comment: '메인태그 리스트' })
     mainTags: string[];
@@ -72,4 +72,20 @@ export class StoreRegisterLog extends BaseEntity {
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })
     status: StoreRegisterStatus = StoreRegisterStatus.Pending;
+
+    @Column({ type: 'varchar', length: 255, comment: '교환/환불 불가 사유', nullable: true })
+    nonReturnableReason: string; 
+
+    @Column({ type: 'varchar', length: 255, comment: '교환/환불 처리 방법', nullable: true })
+    returnableProcess: string;
+
+    @Column({ type: 'varchar', length: 255, comment: '택배 지불 주체', nullable: true })
+    shippingPayer: string;
+
+    @Column({ type: 'varchar', length: 255, comment: 'As 제공자', nullable: true })
+    asProvider: string;
+
+    @Column({ type: 'varchar', length: 255, comment: '고객센터 전화번호', nullable: true })
+    csPhoneNumber: string;
+    
 }
