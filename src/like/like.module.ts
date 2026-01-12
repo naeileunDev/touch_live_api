@@ -10,17 +10,22 @@ import { ShortFormLikeRepository } from './repository/short-form-like.repository
 import { ReviewLikeService } from './service/review-like.service';
 import { ReviewLikeRepository } from './repository/review-like.repository';
 import { ReviewModule } from 'src/review/review.module';
+import { CommentModule } from 'src/comment/comment.module';
+import { CommentLikeService } from './service/comment-like.service';
+import { CommentLikeRepository } from './repository/comment-like.repository';
 
 @Module({
-    imports: [UserModule, ProductModule, ShortFormModule, ReviewModule],
+    imports: [UserModule, ProductModule, ShortFormModule, ReviewModule, CommentModule],
     controllers: [LikeController],
     providers: [
         ProductLikeService, 
         ShortFormLikeService, 
         ReviewLikeService, 
+        CommentLikeService,
         ProductLikeRepository, 
         ShortFormLikeRepository, 
         ReviewLikeRepository,
+        CommentLikeRepository,
     ],
 })
 export class LikeModule {}
