@@ -8,6 +8,7 @@ import { UserDto } from 'src/user/dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ShortFormLikeService } from './service/short-form-like.service';
 import { ReviewLikeService } from './service/review-like.service';
+import { CommentLikeService } from './service/comment-like.service';
 
 @ApiTags('Like')
 @Controller('like')
@@ -17,6 +18,7 @@ export class LikeController {
         private readonly productLikeService: ProductLikeService,
         private readonly shortFormLikeService: ShortFormLikeService,
         private readonly reviewLikeService: ReviewLikeService,
+        private readonly commentLikeService: CommentLikeService,
     ) {}
 
     @Get('product/check/:productId')
@@ -106,5 +108,32 @@ export class LikeController {
         return this.reviewLikeService.findCountLikes(reviewId);
     }
 
+    @Get('comment/check/:commentId')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '해당 댓글 좋아요 여부 확인' })
+    @ApiOkSuccessResponse(Boolean, '좋아요 여부 확인 성공')
+    checkCommentLike(
+        @GetUser() userDto: UserDto,
+        @Param('commentId', ParseIntPipe) commentId: number,
+    ): Promise<boolean> {
+        return this.commentLikeService.isLiked(userDto.id, commentId);
+    }
 
+    @Post('comment/:commentId')
+    @Role(USER_PERMISSION)
+    @ApiOperation({ summary: '댓글 좋아요/좋아요 취소 토글 (해당 댓글 좋아요/좋아요 취소)' })
+    @ApiOkSuccessResponse(Boolean, '댓글 좋아요/좋아요 취소 토글 성공')
+    toggleCommentLike(@GetUser() userDto: UserDto, @Param('commentId', ParseIntPipe) commentId: number): Promise<boolean> {
+        return this.commentLikeService.likeAndUnlike(userDto.id, commentId);
+    }
+
+    @Get('comment/count/:commentId')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '해당 댓글 좋아요 수' })
+    @ApiOkSuccessResponse(Number, '해당 댓글 좋아요 수 조회 성공')
+    getCountCommentLikes(
+        @Param('commentId', ParseIntPipe) commentId: number, 
+    ): Promise<number> {
+        return this.commentLikeService.findCountLikes(commentId);
+    }
 }

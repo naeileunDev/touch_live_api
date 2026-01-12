@@ -32,6 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AuditModule } from './audit/audit.module';
 import { LikeModule } from './like/like.module';
 import { ReviewModule } from './review/review.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
@@ -69,6 +70,7 @@ import { ReviewModule } from './review/review.module';
         AuditModule,
         LikeModule,
         ReviewModule,
+        CommentModule,
     ],
     controllers: [],
     providers: [
