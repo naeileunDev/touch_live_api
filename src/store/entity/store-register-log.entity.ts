@@ -3,6 +3,7 @@ import { User } from "src/user/entity/user.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { BaseEntity } from "src/common/base-entity/base.entity";
+import { AuditStatus } from "src/common/enums";
 
 @Entity()
 export class StoreRegisterLog extends BaseEntity {
@@ -67,11 +68,11 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'varchar', array: true, comment: '서브태그 리스트'})
     subTags: string[];
 
-    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default: [] })
+    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)'})
     category: CategoryType[];
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })
-    status: StoreRegisterStatus = StoreRegisterStatus.Pending;
+    status: StoreRegisterStatus;
 
     @Column({ type: 'varchar', length: 255, comment: '교환/환불 불가 사유' })
     nonReturnableReason: string; 
@@ -87,5 +88,10 @@ export class StoreRegisterLog extends BaseEntity {
 
     @Column({ type: 'varchar', length: 255, comment: '고객센터 전화번호' })
     csPhoneNumber: string;
-    
+
+    @Column({ type: 'enum', enum: AuditStatus, comment: '심사 상태', default: AuditStatus.Pending })
+    auditStatus: AuditStatus;
+
+    @Column({ type: 'varchar', length: 255, comment: '심사 코멘트', nullable: true })
+    comment?: string | null;
 }

@@ -7,6 +7,7 @@ import { StoreStatusType } from "../enum/store-status-type.enum";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
+import { StoreRegisterLog } from "../entity/store-register-log.entity";
 
 @Injectable()
 export class StoreRepository extends Repository<Store> {
@@ -14,36 +15,15 @@ export class StoreRepository extends Repository<Store> {
         super(Store, dataSource.createEntityManager());
     }
     
-    async createStore(createDto: StoreRegisterLogDto, user: User, fee: number): Promise<Store> {
-        const store = await this.create({
-            name: createDto.name,
-            phone: createDto.phone,
-            email: createDto.email,
-            storeInfo: createDto.storeInfo,
-            businessRegistrationNumber: createDto.businessRegistrationNumber,
-            businessRegistrationImageId: createDto.businessRegistrationImageId,
-            ceoName: createDto.ceoName,
-            businessType: createDto.businessType,
-            businessCategory: createDto.businessCategory,
-            eCommerceLicenseNumber: createDto.eCommerceLicenseNumber,
-            eCommerceLicenseImageId: createDto.eCommerceLicenseImageId,
-            bankName: createDto.bankName,
-            accountNumber: createDto.accountNumber,
-            accountOwner: createDto.accountOwner,
-            accountImageId: createDto.accountImageId,
-            category: createDto.category,
-            mainTags: createDto.mainTags,
-            subTags: createDto.subTags,
-            storeBannerImageId: createDto.storeBannerImageId ?? null,
-            storeProfileImageId: createDto.storeProfileImageId ?? null,
+    async createStore(log: StoreRegisterLog, fee: number): Promise<Store> {
+        const store = this.create({
+            ...log, 
+            status: StoreStatusType.Active,
+            isVisible: true,    
             saleChageRate: fee,
-            status: createDto.status === StoreRegisterStatus.Approved 
-                ? StoreStatusType.Active 
-                : StoreStatusType.Inactive,
-            user: user,
-            isVisible: createDto.status === StoreRegisterStatus.Approved,
         });
-        return await this.save(store);
+        await this.save(store);
+        return store;
     }
     async findById(id: number): Promise<Store> {
         const store = await this.findOne({

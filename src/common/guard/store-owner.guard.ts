@@ -37,7 +37,7 @@ export class StoreOwnerGuard implements CanActivate {
             storeRegisterStatus?: StoreRegisterStatus | null;
         };
 
-        console.log(user);
+        // console.log(user);
 
         if (requireStore) {
             if (!user.storeId) {
@@ -45,7 +45,7 @@ export class StoreOwnerGuard implements CanActivate {
             }        
         }
         else if (requireNoStore) {
-            console.log(user.storeRegisterStatus);
+            // console.log(user.storeRegisterStatus);
             if (user.storeId) {
                 throw new ServiceException(MESSAGE_CODE.STORE_NON_OWNER_ONLY);
             }

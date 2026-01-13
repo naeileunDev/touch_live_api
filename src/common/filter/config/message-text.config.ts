@@ -58,6 +58,7 @@ export const MESSAGE_TEXT = {
     [MESSAGE_CODE.STORE_REGISTER_STATUS_APPROVED]: '스토어 등록 승인 중입니다.',
     [MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND]: '해당 가게 등록 로그를 찾을 수 없습니다.',
     [MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED]: '해당 가게 등록 로그에 접근할 수 없습니다.',
+    [MESSAGE_CODE.STORE_REGISTER_LOG_AUDIT_ALREADY_DONE]: '해당 가게 등록 로그는 이미 심사가 완료되었습니다.',
 
     // Order
     [MESSAGE_CODE.ORDER_NOT_FOUND]: '주문을 찾을 수 없습니다.',

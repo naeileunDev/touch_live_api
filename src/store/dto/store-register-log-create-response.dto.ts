@@ -12,15 +12,15 @@ export class StoreRegisterLogCreateResponseDto {
     @ApiProperty({ description: '가게 등록 로그 정보', type: StoreRegisterLogDto })
     @ValidateNested()
     @Type(() => StoreRegisterLogDto)
-    storeRegisterLogDto: StoreRegisterLogDto;
+    log: StoreRegisterLogDto;
 
     @ApiProperty({ description: '토큰 정보', type: AuthTokenDto })
     @ValidateNested()
     @Type(()=>AuthTokenDto)
     token: AuthTokenDto;
 
-    constructor(storeRegisterLog: StoreRegisterLog, files: FileDto[], token: AuthTokenDto) {
-        this.storeRegisterLogDto = new StoreRegisterLogDto(storeRegisterLog, StoreRegisterLogFilesDto.of(files));
+    constructor(storeRegisterLog: StoreRegisterLog, token: AuthTokenDto) {
+        this.log = new StoreRegisterLogDto(storeRegisterLog);
         this.token = token;
     }
 }
