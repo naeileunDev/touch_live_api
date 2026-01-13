@@ -18,75 +18,39 @@ import { StoreRegisterLogService } from './store-register-log.service';
 @Controller('store')
 @ApiBearerAuth('access-token')
 export class StoreController {
-  constructor(
-    private readonly storeService: StoreService,
-    private readonly storeRegisterLogService: StoreRegisterLogService,
-  ) {
-  }
-
-  @Post()
-  @Role(ALL_PERMISSION)
-  @NonStoreOwner()
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'businessRegistrationImage', maxCount: 1 },
-    { name: 'eCommerceLicenseImage', maxCount: 1 },
-    { name: 'accountImage', maxCount: 1 },
-    { name: 'profileImage', maxCount: 1 },
-    { name: 'bannerImage', maxCount: 1 },
-  ]))
-  @ApiExtraModels(StoreRegisterLogCreateDto)
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-        type: 'object',
-        allOf: [
-            { $ref: getSchemaPath(StoreRegisterLogCreateDto) },
-            {
-                type: 'object',
-                properties: {
-                    businessRegistrationImage: { type: 'string', format: 'binary' },
-                    eCommerceLicenseImage: { type: 'string', format: 'binary' },
-                    accountImage: { type: 'string', format: 'binary' },
-                    profileImage: { type: 'string', format: 'binary' },
-                    bannerImage: { type: 'string', format: 'binary' },
-                },
-            },
-        ],
-    },
-  })
-  @ApiBearerAuth('access-token')
-  @ApiExtraModels(StoreRegisterLogCreateResponseDto)
-  @Role(USER_PERMISSION)
-  @ApiOperation({ summary: '[유저 role] 가게 등록, 아직 가게를 등록하지 않았고, 로그상태가 null 또는 rejected인 경우 가게 등록 가능' })
-  @ApiCreatedSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 성공')
-  createRegisterLog (
-    @Body() createDto: StoreRegisterLogCreateDto,
-    @GetUser() user: User, 
-    @UploadedFiles(MediaValidationPipeArray) files: {
-        businessRegistrationImage: Express.Multer.File[],
-        eCommerceLicenseImage: Express.Multer.File[],
-        accountImage: Express.Multer.File[],
-        profileImage: Express.Multer.File[],
-        bannerImage: Express.Multer.File[],
-    }): Promise<StoreRegisterLogCreateResponseDto> {
-        return this.storeRegisterLogService.create(createDto, user, files);
+    constructor(
+        private readonly storeService: StoreService,
+        private readonly storeRegisterLogService: StoreRegisterLogService,
+    ) {
     }
 
-  @Get('register-log/:id')
-  @Role(ALL_PERMISSION)
-  @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
-  findRegisterLogById(@GetUser() user: User, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
-    return this.storeRegisterLogService.findById(id, user);
-  }
+    @Post()
+    @Role(ALL_PERMISSION)
+    @NonStoreOwner()
+    @ApiOperation({ summary: '[유저 role] 가게 등록, 가게 등록 로그 파일 저장도 함께 호출, 아직 가게를 등록하지 않았고, 로그상태가 null 또는 rejected인 경우 가게 등록 가능' })
+    @ApiCreatedSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 성공')
+    createRegisterLog (
+        @Body() createDto: StoreRegisterLogCreateDto,
+        @GetUser() user: User, 
+        ): Promise<StoreRegisterLogCreateResponseDto> {
+            return this.storeRegisterLogService.create(createDto, user);
+        }
 
-  @Get('register-log')
-  @Role(ALL_PERMISSION)
-  @ApiOperation({ summary: '[모든 role] 사용자별 가게 등록 로그 목록 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-  @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 목록 조회 성공', true)
-  findByRegisterLogUserId(@GetUser() user: User, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
-    return this.storeRegisterLogService.findByUserId(userId, user);
-  }
+    @Get('register-log/:id')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+    @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
+    findRegisterLogById(@GetUser() user: User, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
+        return this.storeRegisterLogService.findById(id, user);
+    }
+
+    @Get('register-log')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '[모든 role] 사용자별 가게 등록 로그 목록 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+    @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 목록 조회 성공', true)
+    findByRegisterLogUserId(@GetUser() user: User, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
+        return this.storeRegisterLogService.findByUserId(userId, user);
+    }
 }
 
 

@@ -1,10 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
-import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { UserRole } from "src/user/enum/user-role.enum";
+import { StoreFilesDto } from "./store-files.dto";
+import { Type } from "class-transformer";
+import { StoreRegisterLogFilesDto } from "src/file/dto/store-register-log-files.dto";
 
 export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 등록 로그 식별자', example: 1, type: Number })
@@ -108,7 +111,12 @@ export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     catagory: CategoryType[];
 
-    constructor(storeRegisterLog: StoreRegisterLog) {
+    @ApiProperty({ description: '가게 파일 정보', type: StoreFilesDto })
+    @ValidateNested()
+    @Type(() => StoreRegisterLogFilesDto)
+    files: StoreRegisterLogFilesDto;
+
+    constructor(storeRegisterLog: StoreRegisterLog, files: StoreRegisterLogFilesDto) {
         this.id = storeRegisterLog.id;
         this.name = storeRegisterLog.name;
         this.phone = storeRegisterLog.phone;
@@ -134,6 +142,7 @@ export class StoreRegisterLogDto {
         this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
         this.storeInfo = storeRegisterLog.storeInfo;
         this.catagory = storeRegisterLog.category;
+        this.files = files;
     }
     
 }

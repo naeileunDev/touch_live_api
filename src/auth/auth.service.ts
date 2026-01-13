@@ -513,7 +513,7 @@ export class AuthService {
      * 비밀번호 재설정
      * @param authPasswordResetDto 비밀번호 재설정 DTO
      */
-    async resetPassword(userDto: UserDto, authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
+    async resetPassword(reqUser: User, authPasswordResetDto: AuthPasswordResetDto): Promise<boolean> {
         const { sessionKey, loginId, password } = authPasswordResetDto;
         // 토큰 유효기간 확인
         //const isExpired = this.isJwtTokenExpired(sessionKey);
@@ -531,7 +531,7 @@ export class AuthService {
         // // 캐시에서 NICE 정보 삭제
         // await this.cacheManager.del(sessionKey);
 
-        const user = await this.userService.findEntityByPublicId(userDto.id);
+        const user = await this.userService.findEntityByPublicId(reqUser.publicId);
         const isLoginIdMatch = loginId === this.encryptionUtil.decryptDeterministic(user.loginId);
         if (!isLoginIdMatch) {
             throw new ServiceException(MESSAGE_CODE.USER_LOGIN_ID_MISMATCHED);
@@ -550,11 +550,9 @@ export class AuthService {
      * @param user 사용자 정보
      * @param authPasswordConfirmDto 비밀번호 확인 DTO
      */
-    async confirmPassword(userDto: UserDto, authPasswordConfirmDto: AuthPasswordConfirmDto): Promise<boolean> {
-        console.log("userDto", userDto.id);
-        console.log("authPasswordConfirmDto", authPasswordConfirmDto);
+    async confirmPassword(reqUser: User, authPasswordConfirmDto: AuthPasswordConfirmDto): Promise<boolean> {
         const { password } = authPasswordConfirmDto;
-        const user = await this.userService.findEntityById(Number(userDto.id));
+        const user = await this.userService.findEntityById(Number(reqUser.id));
         return await compare(password, user.password);
     }
 
@@ -563,7 +561,7 @@ export class AuthService {
      * @param user 사용자 정보
      * @param uuid JWT UUID
      */
-    async logout(useDto: UserDto, uuid: string): Promise<boolean> {
+    async logout(reqUser: User, uuid: string): Promise<boolean> {
         const device = await this.userDeviceService.findByJwtUuid(uuid);
         return await this.userDeviceService.deleteByJwtUuid(device.jwtUuid);
     }
@@ -572,9 +570,9 @@ export class AuthService {
      * 회원 탈퇴
      * @param user 사용자 정보
      */
-    async leave(userDto: UserDto): Promise<boolean> {
-        await this.userDeviceService.deleteAllByUserId(userDto.id);
-        return await this.userService.leave(userDto);
+    async leave(reqUser: User): Promise<boolean> {
+        await this.userDeviceService.deleteAllByUserId(reqUser.publicId);
+        return await this.userService.leave(new UserDto(reqUser));
     }
 
     /**
@@ -643,8 +641,8 @@ export class AuthService {
      * Access Token 재발급
      * @param userDto 사용자 정보
      */
-    async reissueAccessToken(userDto: UserDto, refreshToken: string): Promise<AuthLoginResponseDto> {
-        const user = await this.userService.findEntityByPublicId(userDto.id, true);
+    async reissueAccessToken(reqUser: User, refreshToken: string): Promise<AuthLoginResponseDto> {
+        const user = await this.userService.findEntityByPublicId(reqUser.publicId, true);
         // 토큰 유효기간 확인
         const decoded = this.jwtService.decode(refreshToken);
         const exp = decoded.exp;
@@ -673,8 +671,8 @@ export class AuthService {
      * 웹 Access Token 재발급
      * @param userDto 사용자 정보
      */
-    async reissueAccessTokenWeb(userDto: UserDto, refreshToken: string): Promise<[AuthLoginResponseDto, string]> {
-        const authLoginResponseDto = await this.reissueAccessToken(userDto, refreshToken);
+    async reissueAccessTokenWeb(reqUser: User, refreshToken: string): Promise<[AuthLoginResponseDto, string]> {
+        const authLoginResponseDto = await this.reissueAccessToken(reqUser, refreshToken);
 
         // CSRF 토큰 생성
         const csrfToken = crypto.randomBytes(32).toString('hex');

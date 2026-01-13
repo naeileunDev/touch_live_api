@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes, ParseIntPipe, UploadedFiles } from '@nestjs/common';
 import { FileService } from './file.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
@@ -9,10 +9,12 @@ import { FileDto } from './dto/file.dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ApiResponse } from '@nestjs/swagger';
 import { StreamableFile } from '@nestjs/common';
+import { Role } from 'src/common/decorator/role.decorator';
+import { ALL_PERMISSION } from 'src/common/permission/permission';
 import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
-import { UserDto } from 'src/user/dto';
+import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
 
 @ApiTags('File')
 @Controller('file')
@@ -24,6 +26,8 @@ export class FileController {
     @Post()
     @UseInterceptors(FileInterceptor('file'))
     @ApiConsumes('multipart/form-data')
+    @Role(ALL_PERMISSION)
+    // dto 와 파일 업로드를 동시에 입력하면 swagger 에서 오류가 발생하므로 별도로 작성
     @ApiBody({
     schema: {
         type: 'object',
@@ -104,4 +108,33 @@ export class FileController {
     // createStoreRegisterLogFile(@Body() createDto: StoreRegisterLogCreateFileDto, @GetUser() user: User) {
     //     return this.fileService.createStoreRegisterLogFile(createDto, user);
     // }
+    @Post('store-register-log')
+    @Role(ALL_PERMISSION)
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'businessRegistrationImage', maxCount: 1 },
+        { name: 'eCommerceLicenseImage', maxCount: 1 },
+        { name: 'accountImage', maxCount: 1 },
+        { name: 'profileImage', maxCount: 1 },
+        { name: 'bannerImage', maxCount: 1 },
+    ]))
+    @ApiOperation({ summary: '가게 등록 로그 파일 저장 ( 사업자 등록증, 통신판매업 신고증, 사업자 정산계좌, 가게 프로필, 가게 배너 )' })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                businessRegistrationImage: { type: 'string', format: 'binary' },
+                eCommerceLicenseImage: { type: 'string', format: 'binary' },
+                accountImage: { type: 'string', format: 'binary' },
+                profileImage: { type: 'string', format: 'binary' },
+                bannerImage: { type: 'string', format: 'binary' },
+            },
+            required: ['businessRegistrationImage', 'eCommerceLicenseImage', 'accountImage', 'profileImage', 'bannerImage'],
+        },
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiOkSuccessResponse(StoreRegisterLogFilesDto, '가게 등록 로그 파일 저장 성공')
+    createStoreRegisterLogFile(@UploadedFiles() files: Record<string, Express.Multer.File[]>, @GetUser() user: User): Promise<StoreRegisterLogFilesDto> {
+        const createDto = StoreRegisterLogCreateFileDto.of(files);
+        return this.fileService.createStoreRegisterLogFile(createDto, user);
+    }
 }

@@ -11,17 +11,12 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
         super(StoreRegisterLog, dataSource.createEntityManager());
     }
 
-    async createStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User, filesDto: StoreFilesDto): Promise<StoreRegisterLog> {
+    async createStoreRegisterLog(createDto: StoreRegisterLogCreateDto, user: User): Promise<StoreRegisterLog> {
         const {  fcmToken, ...storeData } = createDto;
         
         const entity = this.create({
             ...storeData, 
             user,
-            businessRegistrationImageId: filesDto.businessRegistrationImage.id,
-            eCommerceLicenseImageId: filesDto.eCommerceLicenseImage.id,
-            accountImageId: filesDto.accountImage.id,
-            storeProfileImageId: filesDto.profileImage?.id ?? null,
-            storeBannerImageId: filesDto.bannerImage?.id ?? null,
         });
         await this.save(entity)
         return entity;
