@@ -40,4 +40,7 @@ export class OrderProduct extends BaseEntity {
 
     @OneToMany(() => OrderProductOption, (orderProductOption) => orderProductOption.orderProduct)
     orderProductOptions: OrderProductOption[];
+
+    @Column({ type: 'int', comment: '스토어 ID' })
+    storeId: number;
 }

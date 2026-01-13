@@ -34,7 +34,7 @@ export class TagController {
     }
 
     @Get(':id')
-    @Role(ANY_PERMISSION)
+    @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 태그 조회' })
     @ApiOkSuccessResponse(TagDto, '태그 조회 성공')
     findById(@Param('name') name: string): Promise<TagDto> {
@@ -42,7 +42,7 @@ export class TagController {
     }
 
     @Get()
-    @Role(ANY_PERMISSION)
+    @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 태그 목록 조회 (사용처별 그룹화)' })
     @ApiOkSuccessResponse(TagFindDto, '태그 목록 조회 성공', true)
     findByUsageAndCategory(@Query() requestDto: TagFindRequestDto): Promise<string[]> {

@@ -10,7 +10,10 @@ import { UserOrdersDto } from "../dto/user-orders.dto";
 import { UserRole } from "src/user/enum/user-role.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
+import { User } from "src/user/entity/user.entity";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class OrderService {
     constructor(
         private readonly orderRepository: OrderRepository,
@@ -18,13 +21,13 @@ export class OrderService {
         private readonly productService: ProductService,
     ) {}
 
-    async create(dto: OrderCreateDto, userDto: UserDto): Promise<OrderDto> {
-        const user = await this.userService.findEntityByPublicId(userDto.id, false);
-        const order = await this.orderRepository.createOrder(dto, user);
+    async create(dto: OrderCreateDto, user: User): Promise<OrderDto> {
+        const userEntity = await this.userService.findEntityById(user.id, false);
+        const order = await this.orderRepository.createOrder(dto, userEntity);
         const orderNo = await this.createOrderNo(order.orderProducts[0].productId, order);
         order.orderNo = orderNo;
         const savedOrder = await this.save(order);
-        return new OrderDto(savedOrder, userDto);
+        return new OrderDto(savedOrder, new UserDto(userEntity));
     }
 
     async createOrderNo(productId: number, order: Order): Promise<string> {
@@ -44,13 +47,15 @@ export class OrderService {
     async findEntityById(id: number): Promise<Order> {
         return await this.orderRepository.findById(id);
     }
-
-    async findByUserId(publicId: string, query: PaginationDto, userDto: UserDto): Promise<UserOrdersDto> {
-        if (userDto.id !== publicId && userDto.role === UserRole.User) {
+    // 유저 role 조회 시 자신의 주문만 조회 가능, 운영자 role 조회 시 모든 주문 조회 가능
+    async findByUserId(userId: string, query: PaginationDto, user: User): Promise<UserOrdersDto> {
+        if (user.publicId !== userId && user.role === UserRole.User) {
             throw new ServiceException(MESSAGE_CODE.NOT_ALLOWED_OTHER);
         }
-        const user = await this.userService.findEntityByPublicId(publicId);
-        const { orders, total } = await this.orderRepository.findByUserId(user.id, query);
-        return { orders: orders.map(order => new OrderDto(order, new UserDto(order.user))), total };
+        console.log("findByUserId", userId, user);
+        const userEntity = await this.userService.findEntityByPublicId(userId);
+        console.log("userEntity", userEntity);
+        const { orders, total } = await this.orderRepository.findByUserId(userEntity.id, query);
+        return new UserOrdersDto(orders, total);
     }
 }

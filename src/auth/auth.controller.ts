@@ -73,7 +73,7 @@ export class AuthController {
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '비밀번호 재설정: 직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. 로그인 아이디도 함께 확인합니다.' })
     @ApiOkSuccessResponse(Boolean, '비밀번호 재설정 성공')
-    resetPassword(@GetUser() userDto: UserDto, @Body() authPasswordResetDto: AuthPasswordResetDto) {
+    resetPassword(@GetUser() user: User, @Body() authPasswordResetDto: AuthPasswordResetDto) {
         return this.authService.resetPassword(userDto, authPasswordResetDto);
     }
     // @Post('password/reset')
@@ -89,7 +89,7 @@ export class AuthController {
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '비밀번호 재확인' })
     @ApiOkSuccessResponse(Boolean, '비밀번호 재확인 성공')
-    confirmPassword(@GetUser() userDto: UserDto, @Body() authPasswordConfirmDto: AuthPasswordConfirmDto) {
+    confirmPassword(@GetUser() user: User, @Body() authPasswordConfirmDto: AuthPasswordConfirmDto) {
         return this.authService.confirmPassword(userDto, authPasswordConfirmDto);
     }
 
@@ -97,7 +97,7 @@ export class AuthController {
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '로그아웃' })
     @ApiOkSuccessResponse(Boolean, '로그아웃 성공')
-    logoutBody(@Req() req: Request, @GetUser() userDto: UserDto) {
+    logoutBody(@Req() req: Request, @GetUser() user: User) {
         return this.authService.logout(userDto, req.user['uuid']);
     }
 
@@ -105,7 +105,7 @@ export class AuthController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '회원 탈퇴' })
     @ApiNoContentSuccessResponse('회원 탈퇴 성공')
-    leaveBody(@GetUser() userDto: UserDto) {
+    leaveBody(@GetUser() user: User) {
         return this.authService.leave(userDto);
     }
 
@@ -113,7 +113,7 @@ export class AuthController {
     @UseGuards(JwtRefreshAuthGuard)
     @ApiOperation({ summary: 'Access Token 재발급' })
     @ApiOkSuccessResponse(AuthLoginResponseDto, 'Access Token 재발급 성공')
-    getAccessTokenBody(@Req() req: Request, @GetUser() userDto: UserDto) {
+    getAccessTokenBody(@Req() req: Request, @GetUser() user: User) {
         return this.authService.reissueAccessToken(userDto, req.headers.authorization?.replace('Bearer ', '') || '');
     }
 
@@ -168,14 +168,14 @@ export class AuthController {
     // @Post('sns/link')
     // @Role(ALL_PERMISSION)
     // @ApiOperation({ summary: 'SNS 계정 연동' })
-    // linkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsLinkDto: AuthSnsLinkDto) {
+    // linkSnsBody(@GetUser() user: User, @Body() authSnsLinkDto: AuthSnsLinkDto) {
     //     return this.authService.linkSns(userDto, authSnsLinkDto);
     // }
 
     // @Post('sns/unlink')
     // @Role(ALL_PERMISSION)
     // @ApiOperation({ summary: 'SNS 계정 연동 해제' })
-    // unlinkSnsBody(@GetUser() userDto: UserDto, @Body() authSnsUnlinkDto: AuthSnsUnlinkDto) {
+    // unlinkSnsBody(@GetUser() user: User, @Body() authSnsUnlinkDto: AuthSnsUnlinkDto) {
     //     return this.authService.unlinkSns(userDto, authSnsUnlinkDto);
     // }
 

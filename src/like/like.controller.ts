@@ -9,6 +9,7 @@ import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.
 import { ShortFormLikeService } from './service/short-form-like.service';
 import { ReviewLikeService } from './service/review-like.service';
 import { CommentLikeService } from './service/comment-like.service';
+import { User } from 'src/user/entity/user.entity';
 
 @ApiTags('Like')
 @Controller('like')
@@ -26,7 +27,7 @@ export class LikeController {
     @ApiOperation({ summary: '해당 제품 좋아요 여부 확인' })
     @ApiOkSuccessResponse(Boolean, '팔로우 여부 확인 성공')
     checkProductLike(
-        @GetUser() userDto: UserDto,
+        @GetUser() user: User,
         @Param('productId', ParseIntPipe) productId: number,
     ): Promise<boolean> {
         return this.productLikeService.isLiked(userDto.id, productId);
@@ -36,7 +37,7 @@ export class LikeController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '제품 좋아요/좋아요 취소 토글 (해당 제품 좋아요/좋아요 취소)' })
     @ApiOkSuccessResponse(Boolean, '제품 좋아요/좋아요 취소 토글 성공')
-    toggleProductLike(@GetUser() userDto: UserDto, @Param('productId', ParseIntPipe) productId: number): Promise<boolean> {
+    toggleProductLike(@GetUser() user: User, @Param('productId', ParseIntPipe) productId: number): Promise<boolean> {
         return this.productLikeService.likeAndUnlike(userDto.id, productId);
     }
 
@@ -55,18 +56,18 @@ export class LikeController {
     @ApiOperation({ summary: '해당 숏폼 좋아요 여부 확인' })
     @ApiOkSuccessResponse(Boolean, '좋아요 여부 확인 성공')
     checkShortFormLike(
-        @GetUser() userDto: UserDto,
+        @GetUser() user: User,
         @Param('shortFormId', ParseIntPipe) shortFormId: number,
     ): Promise<boolean> {
-        return this.shortFormLikeService.isLiked(userDto.id, shortFormId);
+        return this.shortFormLikeService.isLiked(user.publicId, shortFormId);
     }
 
     @Post('short-form/:shortFormId')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '숏폼 좋아요/좋아요 취소 토글 (해당 숏폼 좋아요/좋아요 취소)' })
     @ApiOkSuccessResponse(Boolean, '숏폼 좋아요/좋아요 취소 토글 성공')
-    toggleShortFormLike(@GetUser() userDto: UserDto, @Param('shortFormId', ParseIntPipe) shortFormId: number): Promise<boolean> {
-        return this.shortFormLikeService.likeAndUnlike(userDto.id, shortFormId);
+    toggleShortFormLike(@GetUser() user: User, @Param('shortFormId', ParseIntPipe) shortFormId: number): Promise<boolean> {
+        return this.shortFormLikeService.likeAndUnlike(user.publicId, shortFormId);
     }
 
     @Get('short-form/count/:shortFormId')
@@ -84,18 +85,18 @@ export class LikeController {
     @ApiOperation({ summary: '해당 리뷰 좋아요 여부 확인' })
     @ApiOkSuccessResponse(Boolean, '좋아요 여부 확인 성공')
     checkReviewLike(
-        @GetUser() userDto: UserDto,
+        @GetUser() user: User,
         @Param('reviewId', ParseIntPipe) reviewId: number,
     ): Promise<boolean> {
-        return this.reviewLikeService.isLiked(userDto.id, reviewId);
+        return this.reviewLikeService.isLiked(user.publicId, reviewId);
     }   
 
     @Post('review/:reviewId')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '리뷰 좋아요/좋아요 취소 토글 (해당 리뷰 좋아요/좋아요 취소)' })
     @ApiOkSuccessResponse(Boolean, '리뷰 좋아요/좋아요 취소 토글 성공')
-    toggleReviewLike(@GetUser() userDto: UserDto, @Param('reviewId', ParseIntPipe) reviewId: number): Promise<boolean> {
-        return this.reviewLikeService.likeAndUnlike(userDto.id, reviewId);
+    toggleReviewLike(@GetUser() user: User, @Param('reviewId', ParseIntPipe) reviewId: number): Promise<boolean> {
+        return this.reviewLikeService.likeAndUnlike(user.publicId, reviewId);
     }
 
     @Get('review/count/:reviewId')
@@ -113,18 +114,18 @@ export class LikeController {
     @ApiOperation({ summary: '해당 댓글 좋아요 여부 확인' })
     @ApiOkSuccessResponse(Boolean, '좋아요 여부 확인 성공')
     checkCommentLike(
-        @GetUser() userDto: UserDto,
+        @GetUser() user: User,
         @Param('commentId', ParseIntPipe) commentId: number,
     ): Promise<boolean> {
-        return this.commentLikeService.isLiked(userDto.id, commentId);
+        return this.commentLikeService.isLiked(user.publicId, commentId);
     }
 
     @Post('comment/:commentId')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '댓글 좋아요/좋아요 취소 토글 (해당 댓글 좋아요/좋아요 취소)' })
     @ApiOkSuccessResponse(Boolean, '댓글 좋아요/좋아요 취소 토글 성공')
-    toggleCommentLike(@GetUser() userDto: UserDto, @Param('commentId', ParseIntPipe) commentId: number): Promise<boolean> {
-        return this.commentLikeService.likeAndUnlike(userDto.id, commentId);
+    toggleCommentLike(@GetUser() user: User, @Param('commentId', ParseIntPipe) commentId: number): Promise<boolean> {
+        return this.commentLikeService.likeAndUnlike(user.publicId, commentId);
     }
 
     @Get('comment/count/:commentId')

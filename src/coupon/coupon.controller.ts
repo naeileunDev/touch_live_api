@@ -67,7 +67,7 @@ export class CouponController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '[유저 role] 쿠폰 발급' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 발급 성공')
-    issueCoupon(@Param('couponNo') couponNo: string, @GetUser() userDto: UserDto): Promise<any> {
+    issueCoupon(@Param('couponNo') couponNo: string, @GetUser() user: User): Promise<any> {
         return this.userCouponService.create(couponNo, userDto.id);
     }
 

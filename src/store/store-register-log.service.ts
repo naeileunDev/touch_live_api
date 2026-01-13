@@ -101,10 +101,10 @@ export class StoreRegisterLogService {
     return new StoreRegisterLogCreateResponseDto(storeRegisterLog, storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
   }
 
-  async findById(id: number, user: UserDto): Promise<StoreRegisterLogDto> {
+  async findById(id: number, user: User): Promise<StoreRegisterLogDto> {
     const log = await this.storeRegisterLogRepository.findById(id);
-    if (log.user.publicId !== user.id){
-        const userEntity = await this.userService.findEntityByPublicId(user.id, true);
+    if (log.user.id !== user.id){
+        const userEntity = await this.userService.findEntityById(user.id, true);
         if (userEntity.userOperation == null && userEntity.role === UserRole.User) {
             throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
         }
@@ -128,7 +128,7 @@ export class StoreRegisterLogService {
     return await this.storeRegisterLogRepository.deleteById(id);
   }
 
-  async findByUserId(userId: string, dto: UserDto): Promise<StoreRegisterLogDto[]> {
+  async findByUserId(userId: string, user: User): Promise<StoreRegisterLogDto[]> {
     const logs = await this.storeRegisterLogRepository.findAllByUserId(userId);
     if (logs[1] === 0 || logs[0].length === 0) {
         return [];

@@ -3,7 +3,7 @@ import { UserRole } from "../enum/user-role.enum";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
 import { UserGender } from "../enum/user-gender.enum";
-import { IsEnum, IsIn, IsOptional, IsString, Matches } from "class-validator";
+import { IsEnum, IsIn, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 import { Transform } from "class-transformer";
 import { User } from "../entity/user.entity";
 import { EncryptionUtil } from "src/common/util/encryption.util";
@@ -51,6 +51,11 @@ export class UserDto {
     @IsEnum(UserRole)
     @IsIn([UserRole.Admin, UserRole.Manager])
     userOperation?: UserRole;
+    
+    @ApiPropertyOptional({ description: '스토어 ID', example: 1, nullable: true })
+    @IsOptional()
+    @IsNumber()
+    storeId?: number | null;
 
 
     constructor(user: User) {
@@ -67,5 +72,6 @@ export class UserDto {
         this.birth = EncryptionUtil.decryptDeterministic(user.birth)?? null;
         this.isAdult = user.isAdult;
         this.userOperation = user.userOperation?.role;
+        this.storeId = user.store?.id ?? null;
     }
 }
