@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { plainToInstance, Transform, Type } from "class-transformer";
+import { ApiProperty } from "@nestjs/swagger";
+import { Transform, Type } from "class-transformer";
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { FileDto } from "src/file/dto/file.dto";
@@ -104,14 +104,39 @@ export class StoreRegisterLogCreateDto {
     )
     category: CategoryType[];
 
-    @ApiPropertyOptional({ description: '가게 정보', example: '가게 정보', nullable: true })
-    @IsOptional()
+    @ApiProperty({ description: '가게 정보', example: '가게 정보' })
+    @IsRequiredString()
     @IsString()
     @MaxLength(255)
     storeInfo: string;
 
     @ApiProperty()
     @ValidateNested()
-    @Type(() => FileDto)
-    files: FileDto[];
+    @Type(() => StoreRegisterLogFilesDto)
+    files: StoreRegisterLogFilesDto;
+
+    @ApiProperty({ description: '교환/환불 불가 사유', example: '교환/환불 불가 사유' })
+    @IsRequiredString()
+    nonReturnableReason: string; 
+
+    @ApiProperty({ description: '교환/환불 처리 방법', example: '교환/환불 처리 방법' })
+    @IsRequiredString()
+    returnableProcess: string;
+
+    @ApiProperty({ description: '택배 지불 주체', example: '택배 지불 주체' })
+    @IsRequiredString()
+    shippingPayer: string;
+
+    @ApiProperty({ description: 'As 제공자', example: 'As 제공자' })
+    @IsRequiredString()
+    asProvider: string;
+
+    @ApiProperty({ description: '고객센터 전화번호', example: '고객센터 전화번호' })
+    @IsRequiredString()
+    csPhoneNumber: string;
+
+    constructor(createDto: StoreRegisterLogCreateDto, files: StoreRegisterLogFilesDto) {
+        Object.assign(this, createDto);
+        this.files = files;
+    }
 }

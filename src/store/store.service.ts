@@ -7,18 +7,27 @@ import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { plainToInstance } from 'class-transformer';
 import { StoreDto } from './dto/store.dto';
 import { Store } from './entity/store.entity';
+import { StoreRegisterLog } from './entity/store-register-log.entity';
+import { UserService } from 'src/user/service/user.service';
+import { StoreRegisterStatus } from './enum/store-register-status.enum';
 
 @Injectable()
 export class StoreService {
   constructor(
     private readonly storeRepository: StoreRepository,
+    private readonly userService: UserService,
   ) {
   }
 
   
-  async create(createDto: StoreRegisterLogDto, user: User): Promise<StoreDto> {
-    const store = await this.storeRepository.createStore(createDto, user, 11);
-    return plainToInstance(StoreDto, store);
+  async create(log: StoreRegisterLog): Promise<void> {
+    const useEntity = await this.userService.findEntityById(log.user.id, true);
+    useEntity.storeRegisterStatus = StoreRegisterStatus.Approved;
+    const savedUser = await this.userService.save(useEntity);
+    const store = await this.storeRepository.createStore(log, 11);
+    savedUser.store = store;
+    await this.userService.save(savedUser);
+    await this.storeRepository.save(store);
   }
   
   async findById(id: number): Promise<StoreDto> {

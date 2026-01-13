@@ -117,33 +117,30 @@ export class StoreDto {
     @ApiProperty({ description: '가게 노출 여부', example: true, type: Boolean })
     @IsBoolean()
     isVisible: boolean;
+    
+    @ApiProperty({ description: '교환/환불 불가 사유', example: '교환/환불 불가 사유' })
+    @IsRequiredString()
+    nonReturnableReason: string;
+
+    @ApiProperty({ description: '교환/환불 처리 방법', example: '교환/환불 처리 방법' })
+    @IsRequiredString()
+    returnableProcess: string;
+
+    @ApiProperty({ description: '택배 지불 주체', example: '택배 지불 주체' })
+    @IsRequiredString()
+    shippingPayer: string;
+
+    @ApiProperty({ description: 'As 제공자', example: 'As 제공자' })
+    @IsRequiredString()
+    asProvider: string;
+
+    @ApiProperty({ description: '고객센터 전화번호', example: '고객센터 전화번호' })
+    @IsRequiredString()
+    csPhoneNumber: string;
 
     constructor(storeRegisterLog: StoreRegisterLog, fee: number) {
-        this.id = storeRegisterLog.id;
-        this.name = storeRegisterLog.name;
-        this.phone = storeRegisterLog.phone;
-        this.email = storeRegisterLog.email;
-        this.status = storeRegisterLog.status as unknown as StoreStatusType;
-        this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
-        this.businessRegistrationImageId = storeRegisterLog.businessRegistrationImageId;
-        this.ceoName = storeRegisterLog.ceoName;
-        this.businessType = storeRegisterLog.businessType;
-        this.businessCategory = storeRegisterLog.businessCategory;
-        this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
-        this.eCommerceLicenseImageId = storeRegisterLog.eCommerceLicenseImageId;
-        this.bankName = storeRegisterLog.bankName;
-        this.accountNumber = storeRegisterLog.accountNumber;
-        this.accountOwner = storeRegisterLog.accountOwner;
-        this.accountImageId = storeRegisterLog.accountImageId;
-        this.category = storeRegisterLog.category;  
-        this.storeEntryFee = fee;
-        this.mainTags = storeRegisterLog.mainTags;
-        this.subTags = storeRegisterLog .subTags;
-        this.isVisible = storeRegisterLog.status === StoreRegisterStatus.Approved;
-        this.userId = storeRegisterLog.user.id;
-        this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
-        this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
-        this.storeInfo = storeRegisterLog.storeInfo;
+       Object.assign(this, storeRegisterLog);
+       this.storeEntryFee = fee;
     }
 
 }

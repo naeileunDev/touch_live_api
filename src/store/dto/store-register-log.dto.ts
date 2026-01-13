@@ -4,10 +4,10 @@ import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength, 
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { UserRole } from "src/user/enum/user-role.enum";
 import { StoreFilesDto } from "./store-files.dto";
 import { Type } from "class-transformer";
 import { StoreRegisterLogFilesDto } from "src/file/dto/store-register-log-files.dto";
+import { AuditStatus } from "src/common/enums";
 
 export class StoreRegisterLogDto {
     @ApiProperty({ description: '가게 등록 로그 식별자', example: 1, type: Number })
@@ -93,8 +93,9 @@ export class StoreRegisterLogDto {
     @IsEnum(StoreRegisterStatus)
     status: StoreRegisterStatus;
 
-    @ApiProperty({ description: '가게 등록 사용자', example: {id: 'uuid', role: UserRole.User} })
+    @ApiProperty({ description: '가게 등록 사용자', example: 'publicId' })
     userId: string;
+
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     category: CategoryType[];
 
@@ -108,41 +109,15 @@ export class StoreRegisterLogDto {
     @IsNumber()
     storeProfileImageId: number;
 
+    @ApiProperty({ description: '심사 상태', example: AuditStatus.Pending, enum: AuditStatus })
+    auditStatus: AuditStatus;
+
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     catagory: CategoryType[];
 
-    @ApiProperty({ description: '가게 파일 정보', type: StoreFilesDto })
-    @ValidateNested()
-    @Type(() => StoreRegisterLogFilesDto)
-    files: StoreRegisterLogFilesDto;
-
-    constructor(storeRegisterLog: StoreRegisterLog, files: StoreRegisterLogFilesDto) {
-        this.id = storeRegisterLog.id;
-        this.name = storeRegisterLog.name;
-        this.phone = storeRegisterLog.phone;
-        this.email = storeRegisterLog.email;
-        this.storeInfo = storeRegisterLog.storeInfo;
-        this.businessRegistrationImageId = storeRegisterLog.businessRegistrationImageId;
-        this.businessRegistrationNumber = storeRegisterLog.businessRegistrationNumber;
-        this.eCommerceLicenseImageId = storeRegisterLog.eCommerceLicenseImageId;
-        this.ceoName = storeRegisterLog.ceoName;
-        this.businessType = storeRegisterLog.businessType;
-        this.businessCategory = storeRegisterLog.businessCategory;
-        this.eCommerceLicenseNumber = storeRegisterLog.eCommerceLicenseNumber;
-        this.bankName = storeRegisterLog.bankName;
-        this.accountNumber = storeRegisterLog.accountNumber;
-        this.accountOwner = storeRegisterLog.accountOwner;
-        this.accountImageId = storeRegisterLog.accountImageId;
-        this.category = storeRegisterLog.category;
-        this.status = storeRegisterLog.status;
-        this.mainTags = storeRegisterLog.mainTags;
-        this.subTags = storeRegisterLog.subTags;
+    constructor(storeRegisterLog: StoreRegisterLog) {
+        Object.assign(this, storeRegisterLog);
         this.userId = storeRegisterLog.user.publicId;
-        this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
-        this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
-        this.storeInfo = storeRegisterLog.storeInfo;
-        this.catagory = storeRegisterLog.category;
-        this.files = files;
     }
     
 }

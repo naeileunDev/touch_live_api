@@ -95,3 +95,11 @@ export enum BannerPosition {
     MainBottom = 'MAIN_BOTTOM',
     CategoryTop = 'CATEGORY_TOP',
 }
+
+// 심사 상태 
+export enum AuditStatus {
+    Pending = 'PENDING', // 대기 중 (심사 요청 후 심사 대기 상태)
+    Approved = 'APPROVED', // 승인 (심사 결과 승인 상태)
+    Rejected = 'REJECTED', // 거절 (심사 결과 거절 상태)
+    CompletedRating = 'COMPLETED_RATING', // 평가 완료 (등급심사의 경우 평가 완료 상태)   
+}

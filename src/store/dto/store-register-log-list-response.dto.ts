@@ -14,11 +14,11 @@ export class StoreRegisterLogListResponseDto {
         example: 10,
         type: Number 
     })
-    count: number;
+    total: number;
 
-    constructor(logs: StoreRegisterLogDto[], count: number) {
+    constructor(logs: StoreRegisterLogDto[], total: number) {
         this.logs = logs;
-        this.count = count;
+        this.total = total;
     }
 }
 
