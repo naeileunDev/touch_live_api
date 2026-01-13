@@ -13,6 +13,7 @@ import { UserOperationDto } from './dto/user-operaion.dto';
 import { UserOperationRequestDto } from './dto/user-operation-request.dto';
 import { UserAddressService } from './service/user-address.service';
 import { UserOperationService } from './service/user-operation.service';
+import { User } from './entity/user.entity';
 
 @ApiTags('User')
 @Controller('user')
@@ -53,24 +54,24 @@ export class UserController {
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 등록' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 등록 성공')
-    registerAddress(@Body() userAddressCreateDto: UserAddressCreateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
-        return this.userAddressService.create(userAddressCreateDto, userDto);
+    registerAddress(@Body() userAddressCreateDto: UserAddressCreateDto, @GetUser() user: User): Promise<UserAddressDto> {
+        return this.userAddressService.create(userAddressCreateDto, user);
     }
 
     @Put('address/:id')
     @Role(USER_PERMISSION)
     @ApiOperation({ summary: '주소 수정' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 수정 성공')
-    updateAddress(@Param('id') id: number, @Body() userAddressUpdateDto: UserAddressUpdateDto, @GetUser() userDto: UserDto): Promise<UserAddressDto> {
-        return this.userAddressService.save(id, userAddressUpdateDto, userDto);
+    updateAddress(@Param('id') id: number, @Body() userAddressUpdateDto: UserAddressUpdateDto, @GetUser() user: User): Promise<UserAddressDto> {
+        return this.userAddressService.save(id, userAddressUpdateDto, user);
     }
 
     @Get('address')
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '주소 목록 조회' })
     @ApiOkSuccessResponse(UserAddressDto, '주소 목록 조회 성공', true)
-    findUserAddressAllByUserId(@GetUser() userDto: UserDto): Promise<UserAddressDto[]> {
-        return this.userAddressService.findAllByUserId(userDto.id);
+    findUserAddressAllByUserId(@GetUser() user: User): Promise<UserAddressDto[]> {
+        return this.userAddressService.findAllByUserId(user.publicId);
     }
 
     @Post('operation/role')

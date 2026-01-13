@@ -1,7 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { ProductTargetAge } from "../enum/product-target-age.enum";
 import { ProductTargetGender } from "../enum/product-target-gender.enum";
+import { Store } from "src/store/entity/store.entity";
 
 @Entity()
 export class Product extends BaseEntity {
@@ -50,7 +51,6 @@ export class Product extends BaseEntity {
     @Column({ type: 'int', comment: '도서산간 배송비', default: 0 })
     islandDeliveryFee: number;
 
-
-
-    
+    @Column({ type: 'int', comment: '스토어 ID' })
+    storeId: number;
 }

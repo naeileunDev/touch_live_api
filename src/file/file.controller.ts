@@ -101,7 +101,7 @@ export class FileController {
     //     },
     // },
     // })
-    // createStoreRegisterLogFile(@Body() createDto: StoreRegisterLogCreateFileDto, @GetUser() userDto: UserDto) {
+    // createStoreRegisterLogFile(@Body() createDto: StoreRegisterLogCreateFileDto, @GetUser() user: User) {
     //     return this.fileService.createStoreRegisterLogFile(createDto, user);
     // }
 }

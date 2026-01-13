@@ -91,11 +91,7 @@ export class StoreRegisterLogDto {
     status: StoreRegisterStatus;
 
     @ApiProperty({ description: '가게 등록 사용자', example: {id: 'uuid', role: UserRole.User} })
-    user: {
-        id: string;
-        role: UserRole;
-    };
-
+    userId: string;
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     category: CategoryType[];
 
@@ -133,10 +129,7 @@ export class StoreRegisterLogDto {
         this.status = storeRegisterLog.status;
         this.mainTags = storeRegisterLog.mainTags;
         this.subTags = storeRegisterLog.subTags;
-        this.user = {
-            id: storeRegisterLog.user.publicId,
-            role: storeRegisterLog.user.role as UserRole,
-        };
+        this.userId = storeRegisterLog.user.publicId;
         this.storeBannerImageId = storeRegisterLog.storeBannerImageId;
         this.storeProfileImageId = storeRegisterLog.storeProfileImageId;
         this.storeInfo = storeRegisterLog.storeInfo;

@@ -2,12 +2,12 @@ import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { UserAddressCreateDto } from "../dto/user-address-create.dto";
 import { UserAddressUpdateDto } from "../dto/user-address-update.dto";
 import { UserAddressDto } from "../dto/user-address.dto";
-import { UserDto } from "../dto/user.dto";
 import { UserAddressRepository } from "../repository/user-address-repository";
-import { UserRepository } from "../repository/user.repository";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Injectable } from "@nestjs/common";
 import { UserAddress } from "../entity/user-address.entity";
+import { User } from "../entity/user.entity";
+import { UserRepository } from "../repository/user.repository";
 
 @Injectable()
 export class UserAddressService {
@@ -16,9 +16,9 @@ export class UserAddressService {
         private readonly userRepository: UserRepository) {
     }
 
-    async create(userAddressCreateDto: UserAddressCreateDto, userDto: UserDto): Promise<UserAddressDto> {
-        const user = await this.userRepository.findByPublicId(userDto.id);
-        const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, user);
+    async create(userAddressCreateDto: UserAddressCreateDto, user: User): Promise<UserAddressDto> {
+        const userEntity = await this.userRepository.findById(user.id);
+        const userAddress = await this.userAddressRepository.createUserAddress(userAddressCreateDto, userEntity);
         return new UserAddressDto(userAddress);
     }
 
@@ -45,9 +45,9 @@ export class UserAddressService {
         return await this.userAddressRepository.deleteById(id);
     }
 
-    async save(id: number, userAddressUpdateDto: UserAddressUpdateDto, userDto: UserDto): Promise<UserAddressDto> {
+    async save(id: number, userAddressUpdateDto: UserAddressUpdateDto, user: User): Promise<UserAddressDto> {
         const userAddress = await this.userAddressRepository.findById(id);
-        if (userAddress.user.publicId !== userDto.id) {
+        if (userAddress.user.id !== user.id) {
             throw new ServiceException(MESSAGE_CODE.USER_ADDRESS_UPDATE_NOT_ALLOWED);
         }
         const updatedUserAddress = await this.userAddressRepository.updateById(id, userAddressUpdateDto);

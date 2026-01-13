@@ -1,13 +1,16 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { OrderService } from "./service/order.service";
 import { UserDto } from "src/user/dto";
 import { GetUser } from "src/common/decorator/get-user.decorator";
 import { OrderCreateDto } from "./dto/order-create.dto";
 import { OrderDto } from "./dto/order.dto";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { USER_PERMISSION } from "src/common/permission/permission";
+import { ALL_PERMISSION, ANY_PERMISSION, USER_PERMISSION } from "src/common/permission/permission";
 import { Role } from "src/common/decorator/role.decorator";
-import { ApiCreatedSuccessResponse } from "src/common/decorator/swagger/api-response.decorator";
+import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from "src/common/decorator/swagger/api-response.decorator";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
+import { UserOrdersDto } from "./dto/user-orders.dto";
+import { User } from "src/user/entity/user.entity";
 
 @ApiTags('Order')
 @Controller('order')
@@ -21,7 +24,17 @@ export class OrderController {
     @Role(USER_PERMISSION)
     @ApiCreatedSuccessResponse(OrderDto, '주문 생성 성공')
     @Post()
-    async create(@Body() dto: OrderCreateDto, @GetUser() userDto: UserDto): Promise<OrderDto> {
-        return await this.orderService.create(dto, userDto);
+    async create(@Body() dto: OrderCreateDto, @GetUser() user: User): Promise<OrderDto> {
+        return await this.orderService.create(dto, user);
     }
+
+    @ApiOperation({ summary: '[모든 role] 해당 유저주문 조회' })
+    @Role(ALL_PERMISSION)
+    @ApiOkSuccessResponse(UserOrdersDto, '주문 조회 성공')
+    @Get(':userId')
+    async findByUserId(@Param('userId') userId: string, @Query() query: PaginationDto, @GetUser() user: User): Promise<UserOrdersDto> {
+        return await this.orderService.findByUserId(userId, query, user);
+    }
+
+    // @ApiOperation({ summary: '[판매자 role] 해당 스토어 주문 조회' })
 }

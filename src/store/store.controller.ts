@@ -4,7 +4,7 @@ import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
-import { NonStoreOwner, StoreOwner } from 'src/common/decorator/store-owner.decorator';
+import { NonStoreOwner } from 'src/common/decorator/store-owner.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -13,7 +13,6 @@ import { ApiCreatedSuccessResponse, ApiOkSuccessResponse } from 'src/common/deco
 import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-create-response.dto';
 import { StoreRegisterLogDto } from './dto/store-register-log.dto';
 import { StoreRegisterLogService } from './store-register-log.service';
-import { UserDto } from 'src/user/dto';
 
 @ApiTags('Store')
 @Controller('store')
@@ -77,16 +76,16 @@ export class StoreController {
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
-  findRegisterLogById(@GetUser() userDto: UserDto, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
-    return this.storeRegisterLogService.findById(id, userDto);
+  findRegisterLogById(@GetUser() user: User, @Param('id', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
+    return this.storeRegisterLogService.findById(id, user);
   }
 
   @Get('register-log')
   @Role(ALL_PERMISSION)
   @ApiOperation({ summary: '[모든 role] 사용자별 가게 등록 로그 목록 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
   @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 목록 조회 성공', true)
-  findByRegisterLogUserId(@GetUser() userDto: UserDto, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
-    return this.storeRegisterLogService.findByUserId(userId, userDto);
+  findByRegisterLogUserId(@GetUser() user: User, @Query('userId') userId: string): Promise<StoreRegisterLogDto[]> {
+    return this.storeRegisterLogService.findByUserId(userId, user);
   }
 }
 
