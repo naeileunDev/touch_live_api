@@ -2,9 +2,8 @@ import { Controller, Get, Post, Param, Query, ParseIntPipe, Body, ParseArrayPipe
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiExtraModels, ApiBody } from '@nestjs/swagger';
 import { ProductLikeService } from './service/product-like.service';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
-import { ALL_PERMISSION, ANY_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
+import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { Role } from 'src/common/decorator/role.decorator';
-import { UserDto } from 'src/user/dto';
 import { ApiOkSuccessResponse } from 'src/common/decorator/swagger/api-response.decorator';
 import { ShortFormLikeService } from './service/short-form-like.service';
 import { ReviewLikeService } from './service/review-like.service';
@@ -30,7 +29,7 @@ export class LikeController {
         @GetUser() user: User,
         @Param('productId', ParseIntPipe) productId: number,
     ): Promise<boolean> {
-        return this.productLikeService.isLiked(userDto.id, productId);
+        return this.productLikeService.isLiked(user.publicId, productId);
     }
 
     @Post('product/:productId')
@@ -38,7 +37,7 @@ export class LikeController {
     @ApiOperation({ summary: '제품 좋아요/좋아요 취소 토글 (해당 제품 좋아요/좋아요 취소)' })
     @ApiOkSuccessResponse(Boolean, '제품 좋아요/좋아요 취소 토글 성공')
     toggleProductLike(@GetUser() user: User, @Param('productId', ParseIntPipe) productId: number): Promise<boolean> {
-        return this.productLikeService.likeAndUnlike(userDto.id, productId);
+        return this.productLikeService.likeAndUnlike(user.publicId, productId);
     }
 
     @Get('product/count/:productId')

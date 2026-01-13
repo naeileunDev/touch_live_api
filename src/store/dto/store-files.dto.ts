@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsOptional } from "class-validator";
+import { FileDto } from "src/file/dto/file.dto";
 import { UsageType } from "src/file/enum/file-category.enum";
 
 export class StoreFilesDto {
@@ -20,11 +21,11 @@ export class StoreFilesDto {
     @IsOptional()
     bannerImage?: {id: number, url: string};
 
-    constructor(data: Map<UsageType, {id: number, url: string}>) {
-        this.businessRegistrationImage = data.get(UsageType.BusinessRegistrationImage)!;
-        this.eCommerceLicenseImage = data.get(UsageType.eCommerceLicenseImage)!;
-        this.accountImage = data.get(UsageType.AccountImage)!
-        this.profileImage = data.get(UsageType.Profile) ?? undefined;
-        this.bannerImage = data.get(UsageType.Banner) ?? undefined;
+    constructor(data: FileDto[]) {
+        this.businessRegistrationImage = {id: data.find(file => file.usageType === UsageType.BusinessRegistrationImage)!.id, url: data.find(file => file.usageType === UsageType.BusinessRegistrationImage)!.fileUrl};
+        this.eCommerceLicenseImage = {id: data.find(file => file.usageType === UsageType.eCommerceLicenseImage)!.id, url: data.find(file => file.usageType === UsageType.eCommerceLicenseImage)!.fileUrl};
+        this.accountImage = {id: data.find(file => file.usageType === UsageType.AccountImage)!.id, url: data.find(file => file.usageType === UsageType.AccountImage)!.fileUrl};
+        this.profileImage = {id: data.find(file => file.usageType === UsageType.Profile)!.id, url: data.find(file => file.usageType === UsageType.Profile)!.fileUrl};
+        this.bannerImage = {id: data.find(file => file.usageType === UsageType.Banner)!.id, url: data.find(file => file.usageType === UsageType.Banner)!.fileUrl};
     }
 }

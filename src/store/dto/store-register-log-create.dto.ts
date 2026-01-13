@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { plainToInstance, Transform } from "class-transformer";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsOptional, IsString, MaxLength } from "class-validator";
+import { plainToInstance, Transform, Type } from "class-transformer";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
+import { FileDto } from "src/file/dto/file.dto";
+import { StoreRegisterLogFilesDto } from "src/file/dto/store-register-log-files.dto";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 
 export class StoreRegisterLogCreateDto {
@@ -107,4 +109,9 @@ export class StoreRegisterLogCreateDto {
     @IsString()
     @MaxLength(255)
     storeInfo: string;
+
+    @ApiProperty()
+    @ValidateNested()
+    @Type(() => FileDto)
+    files: FileDto[];
 }

@@ -9,8 +9,8 @@ import { ALL_PERMISSION, ANY_PERMISSION, OPERATOR_PERMISSION, USER_PERMISSION } 
 import { CouponUpdateDto } from "./dto/coupon-update.dto";
 import { UserCouponService } from "./service/user-coupon.service";
 import { GetUser } from "src/common/decorator/get-user.decorator";
-import { UserDto } from "src/user/dto";
 import { UserCouponDto } from "./dto/user-coupon.dto";
+import { User } from "src/user/entity/user.entity";
 
 @ApiTags('Coupon')
 @Controller('coupon')
@@ -23,7 +23,7 @@ export class CouponController {
     }
 
     @Post()
-    @Role(ANY_PERMISSION)
+    @Role(OPERATOR_PERMISSION)
     @ApiOperation({ summary: '[operator role] 쿠폰 생성' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 생성 성공')
     create(@Body() couponCreateDto: CouponCreateDto): Promise<CouponDto> {
@@ -40,7 +40,7 @@ export class CouponController {
     }
 
     @Get(':couponNo')
-    @Role(ANY_PERMISSION)
+    @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 쿠폰 번호로 조회, 비회원이 외부에서 유입될 경우의 쿠폰 조회를 위해 모든 타입의 role 접근 가능' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 상세 조회 성공')
     findById(@Param('couponNo') couponNo: string): Promise<CouponDto> {
@@ -68,7 +68,7 @@ export class CouponController {
     @ApiOperation({ summary: '[유저 role] 쿠폰 발급' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 발급 성공')
     issueCoupon(@Param('couponNo') couponNo: string, @GetUser() user: User): Promise<any> {
-        return this.userCouponService.create(couponNo, userDto.id);
+        return this.userCouponService.create(couponNo, user.publicId);
     }
 
     @Get('users/:userId')

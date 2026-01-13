@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, DeleteResult, Repository } from "typeorm";
+import { DataSource, DeleteResult, In, Repository } from "typeorm";
 import { File } from "../entity/file.entity";
 import { FileDto } from "../dto/file.dto";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
@@ -31,6 +31,17 @@ export class FileRepository extends Repository<File> {
             throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
         }
         return file;
+    }
+
+    async findByIds(ids: number[]): Promise<File[]> {
+        if (ids.length === 0) {
+            return [];
+        }
+        return await this.find({
+            where: {
+                id: In(ids),
+            },
+        });
     }
 
     async deleteById(id: number): Promise<boolean> {

@@ -11,6 +11,7 @@ import { FollowingUserDto } from './dto/following-user.dto';
 import { StoreFollowService } from './service/store-follow.service';
 import { StoreFollowsDto } from './dto/store-follows.dto';
 import { FollowingStoreDto } from './dto/following-store.dto';
+import { User } from 'src/user/entity/user.entity';
 
 @ApiTags('Follow')
 @Controller('follow')
@@ -29,7 +30,7 @@ export class FollowController {
         @GetUser() user: User,
         @Param('userId') followingId: string,
     ): Promise<boolean> {
-        return this.userFollowService.isFollowing(userDto.id, followingId);
+        return this.userFollowService.isFollowing(user.publicId, followingId);
     }
 
     @Post('user/:userId')
@@ -37,7 +38,7 @@ export class FollowController {
     @ApiOperation({ summary: '[user role] 팔로우/언팔로우 토글 (해당 유저 팔로우/언팔로우)' })
     @ApiOkSuccessResponse(Boolean, '팔로우/언팔로우 토글 성공')
     toggleFollow(@GetUser() user: User, @Param('userId') userId: string): Promise<boolean> {
-        return this.userFollowService.followAndUnfollow(userDto.id, userId);
+        return this.userFollowService.followAndUnfollow(user.publicId, userId);
     }
 
     @Get('user/followings')
@@ -49,7 +50,7 @@ export class FollowController {
         @GetUser() user: User,
         @Query('lastId') lastId?: number,
     ): Promise<UserFollowsDto> {
-        return this.userFollowService.findFollowingUsersFollowerCounts(userDto.id, lastId, 7);
+        return this.userFollowService.findFollowingUsersFollowerCounts(user.publicId, lastId, 7);
     }
 
     @Get('user/count/:userId')
@@ -90,7 +91,7 @@ export class FollowController {
         @GetUser() user: User, 
         @Body(new ParseArrayPipe({ items: Number })) livers: number[]
     ): Promise<boolean> {
-        return this.userFollowService.unfollow(userDto.id, livers);
+        return this.userFollowService.unfollow(user.publicId, livers);
     }
 
     @Get('store/check/:storeId')
@@ -101,7 +102,7 @@ export class FollowController {
         @GetUser() user: User,
         @Param('storeId', ParseIntPipe) storeId: number,
     ): Promise<boolean> {
-        return this.storeFollowService.isFollowing(userDto.id, storeId);
+        return this.storeFollowService.isFollowing(user.publicId, storeId);
     }
 
     @Post('store/:storeId')
@@ -109,7 +110,7 @@ export class FollowController {
     @ApiOperation({ summary: '유저가 해당 스토어를 팔로우/언팔로우 토글' })
     @ApiOkSuccessResponse(Boolean, '유저가 해당 스토어를 팔로우/언팔로우 토글 성공')
     toggleStoreFollow(@GetUser() user: User, @Param('storeId') storeId: number): Promise<boolean> {
-        return this.storeFollowService.followAndUnfollow(userDto.id, storeId);
+        return this.storeFollowService.followAndUnfollow(user.publicId, storeId);
     }
 
     @Get('store/followings/:userId')
@@ -151,7 +152,7 @@ export class FollowController {
         @GetUser() user: User, 
         @Body(new ParseArrayPipe({ items: Number })) stores: number[]
     ): Promise<boolean> {
-        return this.storeFollowService.unfollow(userDto.id, stores);
+        return this.storeFollowService.unfollow(user.publicId, stores);
     }
 
     @Get('total/count')
@@ -161,7 +162,7 @@ export class FollowController {
     getTotalFollowers(
         @GetUser() user: User,
     ): Promise<number> {
-        return this.userFollowService.findTotalFollowers(userDto.id);
+        return this.userFollowService.findTotalFollowers(user.publicId);
     }
 
 

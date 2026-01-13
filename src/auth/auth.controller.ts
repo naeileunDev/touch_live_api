@@ -29,6 +29,7 @@ import { NiceSuccessDto } from './dto/nice-success.dto';
 import { AuthCheckRegisterFormDto } from './dto/auth-check-register-form.dto';
 import { UserSignupSourceDto } from 'src/user/dto/user-signup-source.dto';
 import { UserTermsAgreementDto } from 'src/user/dto/user-terms-agreement.dto';
+import { User } from 'src/user/entity/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -74,7 +75,7 @@ export class AuthController {
     @ApiOperation({ summary: '비밀번호 재설정: 직전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. 로그인 아이디도 함께 확인합니다.' })
     @ApiOkSuccessResponse(Boolean, '비밀번호 재설정 성공')
     resetPassword(@GetUser() user: User, @Body() authPasswordResetDto: AuthPasswordResetDto) {
-        return this.authService.resetPassword(userDto, authPasswordResetDto);
+        return this.authService.resetPassword(user, authPasswordResetDto);
     }
     // @Post('password/reset')
     // @Role(ANY_PERMISSION)
@@ -90,7 +91,7 @@ export class AuthController {
     @ApiOperation({ summary: '비밀번호 재확인' })
     @ApiOkSuccessResponse(Boolean, '비밀번호 재확인 성공')
     confirmPassword(@GetUser() user: User, @Body() authPasswordConfirmDto: AuthPasswordConfirmDto) {
-        return this.authService.confirmPassword(userDto, authPasswordConfirmDto);
+        return this.authService.confirmPassword(user, authPasswordConfirmDto);
     }
 
     @Post('logout')
@@ -98,7 +99,7 @@ export class AuthController {
     @ApiOperation({ summary: '로그아웃' })
     @ApiOkSuccessResponse(Boolean, '로그아웃 성공')
     logoutBody(@Req() req: Request, @GetUser() user: User) {
-        return this.authService.logout(userDto, req.user['uuid']);
+        return this.authService.logout(user, req.user['uuid']);
     }
 
     @Post('leave')
@@ -106,7 +107,7 @@ export class AuthController {
     @ApiOperation({ summary: '회원 탈퇴' })
     @ApiNoContentSuccessResponse('회원 탈퇴 성공')
     leaveBody(@GetUser() user: User) {
-        return this.authService.leave(userDto);
+        return this.authService.leave(user);
     }
 
     @Post('token/reissue')
@@ -114,7 +115,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Access Token 재발급' })
     @ApiOkSuccessResponse(AuthLoginResponseDto, 'Access Token 재발급 성공')
     getAccessTokenBody(@Req() req: Request, @GetUser() user: User) {
-        return this.authService.reissueAccessToken(userDto, req.headers.authorization?.replace('Bearer ', '') || '');
+        return this.authService.reissueAccessToken(user, req.headers.authorization?.replace('Bearer ', '') || '');
     }
 
     @Post('nice/access/token')

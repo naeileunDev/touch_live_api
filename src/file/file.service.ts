@@ -11,10 +11,10 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { FileCreateDto } from './dto/file-create.dto';
 import { FileDto } from './dto/file.dto';
 import { MimeType, UsageType, MediaType, ContentCategory } from './enum/file-category.enum';
-import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
-import { UserDto } from 'src/user/dto';
-import { StoreRegisterLogFileDto } from './dto/store-register-log-file.dto';
 import { UserService } from 'src/user/service/user.service';
+import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
+import { User } from 'src/user/entity/user.entity';
+import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
 
 @Injectable()
 export class FileService {
@@ -74,7 +74,7 @@ export class FileService {
    */
     generatePath(dto: FileCreateDto, mimeType: string): string {
         const extension = path.extname(mimeType); // 예: ".png"
-        return path.join(this.basePath, dto.contentCategory.toString(), dto.contentId?.toString(), `${uuidv4()}${extension}`);
+        return path.join(this.basePath, dto.contentCategory.toString(), `${uuidv4()}${extension}`);
     }
 
     /**
@@ -117,6 +117,11 @@ export class FileService {
         const file = await this.fileRepository.findById(id);
         return new FileDto(file);
     }
+
+    async findByIds(ids: number[]): Promise<FileDto[]> {
+        const files = await this.fileRepository.findByIds(ids);
+        return files.map(file => new FileDto(file));
+    }
     
     async findByIdAndServe(id: number): Promise<StreamableFile> {
         const file = await this.findById(id);
@@ -133,9 +138,38 @@ export class FileService {
         });
     }
 
-    // async createStoreRegisterLogFile(createDto: StoreRegisterLogCreateFileDto, userDto: UserDto): Promise<any> {
-    //     const user = await this.userService.findEntityByPublicId(userDto.id, true);
+    async createStoreRegisterLogFile(createDto: StoreRegisterLogCreateFileDto, user: User): Promise<StoreRegisterLogFilesDto> {
+        const userEntity = await this.userService.findEntityById(user.id, true);
         
-    //     return this.fileRepository.createStoreRegisterLogFile(createDto, user);
-    // }
+        const fileMappings: Array<{ field: keyof StoreRegisterLogCreateFileDto; usageType: UsageType }> = [
+            { field: 'businessRegistrationImage', usageType: UsageType.BusinessRegistrationImage },
+            { field: 'eCommerceLicenseImage', usageType: UsageType.eCommerceLicenseImage },
+            { field: 'accountImage', usageType: UsageType.AccountImage },
+            { field: 'profileImage', usageType: UsageType.Profile },
+            { field: 'bannerImage', usageType: UsageType.Banner },
+        ];
+
+        const fileDtos = await Promise.all(
+            fileMappings.map(async ({ field, usageType }) => {
+                const files = createDto[field];
+                if (!files || files.length === 0) {
+                    throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
+                }
+                return await this.createLocal(files[0] as Express.Multer.File, {
+                    contentCategory: ContentCategory.User,
+                    usageType,
+                    contentId: userEntity.id,
+                    userId: userEntity.id,
+                });
+            })
+        );
+
+        return new StoreRegisterLogFilesDto(
+            fileDtos[0],
+            fileDtos[1],
+            fileDtos[2],
+            fileDtos[3],
+            fileDtos[4],
+        );
+    }
 }

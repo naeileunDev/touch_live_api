@@ -20,6 +20,7 @@ import { StoreRegisterLogCreateResponseDto } from './dto/store-register-log-crea
 import { StoreRegisterLog } from './entity/store-register-log.entity';
 import { UserDto } from 'src/user/dto';
 import { Store } from './entity/store.entity';
+import { StoreRegisterLogFilesDto } from 'src/file/dto/store-register-log-files.dto';
 
 
 /* 
@@ -40,65 +41,16 @@ export class StoreRegisterLogService {
   }
 
   @Transactional()
-  async create(createDto: StoreRegisterLogCreateDto, user: User, files: {
-    businessRegistrationImage: Express.Multer.File[],
-    eCommerceLicenseImage: Express.Multer.File[],
-    accountImage: Express.Multer.File[],
-    profileImage: Express.Multer.File[],
-    bannerImage: Express.Multer.File[],
-  }) {
+  async create(createDto: StoreRegisterLogCreateDto, user: User) {
     const userEntity = await this.userService.findEntityById(user.id, true);
-    const fileMappings = [
-        { field: 'businessRegistrationImage', usageType: UsageType.BusinessRegistrationImage, required: true },
-        { field: 'eCommerceLicenseImage', usageType: UsageType.eCommerceLicenseImage, required: true },
-        { field: 'accountImage', usageType: UsageType.AccountImage, required: true },
-        { field: 'profileImage', usageType: UsageType.Profile, required: false },
-        { field: 'bannerImage', usageType: UsageType.Banner, required: false },
-    ] as const;
-    
-    // 필수 파일 검증
-    const requiredFiles = fileMappings.filter(m => m.required);
-    if (requiredFiles.some(m => !files[m.field])) {
-        throw new ServiceException(MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND);
-    }
-    
-    // 병렬 처리
-    const fileResults = await Promise.all(
-        fileMappings
-            .filter(m => files[m.field])  // 파일이 있는 것만 처리
-            .map(async (m) => {
-                const fileArray = files[m.field] as Express.Multer.File[];
-                const file = await this.FileService.createLocal(
-                    fileArray[0],
-                    {   
-                        contentCategory: ContentCategory.User,
-                        usageType: m.usageType,
-                        contentId: userEntity.id,  // userEntity.id 사용 (확실한 숫자 값)
-                    } as FileCreateDto
-                );
-                return { usageType: m.usageType, id: file.id, url: file.fileUrl };
-            })
-    );
-    
-    // 필수 이미지 검증 (파일 업로드 후)
-    const requiredFileMappings = fileMappings.filter(m => m.required);
-    const missingRequiredFile = requiredFileMappings.find(m => {
-        const fileResult = fileResults.find(r => r.usageType === m.usageType);
-        return !fileResult || !fileResult.id;
-    });
-    
-    if (missingRequiredFile) {
-        throw new ServiceException(MESSAGE_CODE.FILE_REQUIRED_NOT_FOUND);
-    }
-    
+
     const uuid = uuidv4();
-    const storeFilesDto = new StoreFilesDto(new Map(fileResults.map(r => [r.usageType, {id: r.id, url: r.url}])));
-    const storeRegisterLog = await this.storeRegisterLogRepository.createStoreRegisterLog(createDto, user, storeFilesDto);
+    const storeRegisterLog = await this.storeRegisterLogRepository.createStoreRegisterLog(createDto, user);
     userEntity.storeRegisterStatus = StoreRegisterStatus.Pending;
     const savedUser = await this.userService.save(userEntity);
     const accessToken = await this.authService.createAccessToken(savedUser, uuid, createDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
-    return new StoreRegisterLogCreateResponseDto(storeRegisterLog, storeFilesDto, new AuthTokenDto(accessToken, refreshToken));
+    return new StoreRegisterLogCreateResponseDto(storeRegisterLog, createDto.files ,new AuthTokenDto(accessToken, refreshToken));
   }
 
   async findById(id: number, user: User): Promise<StoreRegisterLogDto> {
@@ -109,7 +61,10 @@ export class StoreRegisterLogService {
             throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
         }
     }
-    return new StoreRegisterLogDto(log);
+    const filesIds = [log.businessRegistrationImageId, log.eCommerceLicenseImageId, log.accountImageId, log.storeProfileImageId, log.storeBannerImageId];
+    const files = await this.FileService.findByIds(filesIds);
+
+    return new StoreRegisterLogDto(log, StoreRegisterLogFilesDto.of(files));
   }
 
   async findEntityById(id: number): Promise<StoreRegisterLog> {
@@ -133,6 +88,8 @@ export class StoreRegisterLogService {
     if (logs[1] === 0 || logs[0].length === 0) {
         return [];
     }
-    return logs[0].map(l => new StoreRegisterLogDto(l));
+    const filesIds = logs[0].map(l => [l.businessRegistrationImageId, l.eCommerceLicenseImageId, l.accountImageId, l.storeProfileImageId, l.storeBannerImageId]);
+    const files = await this.FileService.findByIds(filesIds.flat());
+    return logs[0].map(l => new StoreRegisterLogDto(l, StoreRegisterLogFilesDto.of(files)));
   }
 }

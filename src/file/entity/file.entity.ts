@@ -29,4 +29,7 @@ export class File extends BaseEntity {
     @Column({ type: 'int', comment: '콘텐츠 타입', nullable: true })
     contentId: number;
 
+    @Column({ type: 'int', comment: '유저 ID', nullable: true })
+    userId: number;
+
 }
