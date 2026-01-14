@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Param, Get, UseInterceptors, UploadedFiles, ParseIntPipe, Query, Put } from '@nestjs/common';
-import { StoreService } from './store.service';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
 import { ALL_PERMISSION, OPERATOR_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { NonStoreOwner } from 'src/common/decorator/store-owner.decorator';
@@ -20,7 +19,6 @@ import { StoreRegisterLogAuditDto } from './dto/store-register-log-audit.dto';
 @ApiBearerAuth('access-token')
 export class StoreController {
     constructor(
-        private readonly storeService: StoreService,
         private readonly storeRegisterLogService: StoreRegisterLogService,
     ) {
     }
