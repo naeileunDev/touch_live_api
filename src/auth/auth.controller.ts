@@ -28,8 +28,8 @@ import { NiceEncryptionTokenDto } from './dto/nice-encryption-token.dto';
 import { NiceSuccessDto } from './dto/nice-success.dto';
 import { AuthCheckRegisterFormDto } from './dto/auth-check-register-form.dto';
 import { UserSignupSourceDto } from 'src/user/dto/user-signup-source.dto';
-import { UserTermsAgreementDto } from 'src/user/dto/user-terms-agreement.dto';
 import { User } from 'src/user/entity/user.entity';
+import { TermLogCreateDto } from 'src/term/dto/term-log-create.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -49,7 +49,7 @@ export class AuthController {
     @Role(ANY_PERMISSION)
     @ApiOperation({ summary: '회원가입' })
     @ApiCreatedSuccessResponse(AuthLoginResponseDto, '회원가입 성공')
-    @ApiExtraModels(UserCreateDto, UserSignupSourceDto, UserTermsAgreementDto) 
+    @ApiExtraModels(UserCreateDto, UserSignupSourceDto, TermLogCreateDto) 
     register(@Body() authCheckRegisterFormDto: AuthCheckRegisterFormDto) {
         return this.authService.register(authCheckRegisterFormDto);
     }

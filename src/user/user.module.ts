@@ -5,7 +5,6 @@ import { UserRepository } from './repository/user.repository';
 import { UserOauthRepository } from './repository/user-oauth.repository';
 import { UserDeviceRepository } from './repository/user-device.repository';
 import { UserSignupSourceDataRepository } from './repository/user-signup-source-data.repository';
-import { UserTermsAgreementRepository } from './repository/user-terms-agreement.repository';
 import { UserAddressRepository } from './repository/user-address-repository';
 import { UserDeviceService } from './service/user-device.service';
 import { UserAddressService } from './service/user-address.service';
@@ -15,8 +14,10 @@ import { UserOperationRepository } from './repository/user-operation-repository'
 import { UserOperationService } from './service/user-operation.service';
 import { UserCiRepository } from './repository/user-ci.repository';
 import { UserDiRepository } from './repository/user-di.repository';
+import { TermModule } from 'src/term/term.module';
 
 @Module({
+    imports: [TermModule],
     controllers: [UserController],
     providers: [
         UserService,
@@ -28,7 +29,6 @@ import { UserDiRepository } from './repository/user-di.repository';
         UserOauthRepository,
         UserDeviceRepository,
         UserSignupSourceDataRepository,
-        UserTermsAgreementRepository,
         UserAddressRepository,
         EncryptionUtil,
         UserOperationRepository,

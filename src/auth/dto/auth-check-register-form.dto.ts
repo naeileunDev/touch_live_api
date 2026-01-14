@@ -1,9 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { ValidateNested } from "class-validator";
+import { IsArray, ValidateNested } from "class-validator";
+import { TermLogCreateDto } from "src/term/dto/term-log-create.dto";
+import { TermType } from "src/term/enum/term-version.enum";
 import { UserCreateDto } from "src/user/dto/user-create.dto";
 import { UserSignupSourceDto } from "src/user/dto/user-signup-source.dto";
-import { UserTermsAgreementDto } from "src/user/dto/user-terms-agreement.dto";
 
 export class AuthCheckRegisterFormDto {
     @ApiProperty({ 
@@ -25,10 +26,13 @@ export class AuthCheckRegisterFormDto {
 
     @ApiProperty({ 
         description: '약관 동의 정보', 
-        type: () => UserTermsAgreementDto,
+        type: [TermLogCreateDto], // () => [TermLogCreateDto] 대신 배열 리터럴 사용
+        example: [{ termType: TermType.LocationBased, isAgreed: true, termVersionId: 1, isRequired: true }],
+        isArray: true,            // 리스트임을 명시적으로 선언
         required: true
     })
-    @ValidateNested()
-    @Type(() => UserTermsAgreementDto)
-    termsAgreementInfo: UserTermsAgreementDto;;
+    @IsArray() // 배열인지 검증하는 데코레이터 추가 
+    @ValidateNested({ each: true })
+    @Type(() => TermLogCreateDto)
+    termsAgreementInfo: TermLogCreateDto[];
 }

@@ -7,4 +7,3 @@ export { UserDeviceCreateDto } from './user-device-create.dto';
 export { UserOauthDto } from './user-oauth.dto';
 export { UserOauthCreateDto } from './user-oauth-create.dto';
 export { UserSignupSourceDto } from './user-signup-source.dto';
-export { UserTermsAgreementDto } from './user-terms-agreement.dto';

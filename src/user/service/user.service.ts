@@ -7,12 +7,15 @@ import { UserStatus } from '../enum/user-status.enum';
 import { UserSignupSourceDataRepository } from '../repository/user-signup-source-data.repository';
 import { Transactional } from 'typeorm-transactional';
 import { AuthCheckRegisterFormDto } from 'src/auth/dto/auth-check-register-form.dto';
-import { UserTermsAgreementRepository } from '../repository/user-terms-agreement.repository';
 import {UserDto} from '../dto/index';
 import { EncryptionUtil } from 'src/common/util/encryption.util';
 import { v4 as uuidv4 } from 'uuid'; 
 import { UserCiRepository } from '../repository/user-ci.repository';
 import { UserDiRepository } from '../repository/user-di.repository';
+import { TermService } from 'src/term/service/term.service';
+import { TargetType } from 'src/term/enum/term-version.enum';
+import { UserCi } from '../entity/user-ci.entity';
+import { UserDi } from '../entity/user-di.entity';
 
 @Injectable()
 export class UserService {
@@ -20,10 +23,10 @@ export class UserService {
         private readonly userRepository: UserRepository,
         private readonly userOauthRepository: UserOauthRepository,
         private readonly userSignupSourceDataRepository: UserSignupSourceDataRepository,
-        private readonly userTermsAgreementRepository: UserTermsAgreementRepository,
         private readonly encryptionUtil: EncryptionUtil,
         private readonly userCiRepository: UserCiRepository,
         private readonly userDiRepository: UserDiRepository,
+        private readonly termService: TermService,
     ) {}
     // ** 
     // *private readonly ENCRYPTED_FIELDS = ['loginId', 'birth', 'phone', 'gender', 'name', 'email', 'ci', 'di'];
@@ -36,7 +39,7 @@ export class UserService {
      * 
      */
     @Transactional()
-    async create(dto: AuthCheckRegisterFormDto): Promise<UserDto> {
+    async create(dto: AuthCheckRegisterFormDto): Promise<User> {
         const user = new User();
         user.isAdult = this.checkAdult(dto.userInfo.birth);
         if (user.isAdult) {
@@ -48,22 +51,20 @@ export class UserService {
                 user[key] = this.encryptionUtil.encryptDeterministic(value);
             }
         });
+        const encryptedCi = this.encryptionUtil.encryptDeterministic(dto.userInfo.ci);
+        const encryptedDi = this.encryptionUtil.encryptDeterministic(dto.userInfo.di);
         user.publicId = uuidv4();
         user.status = UserStatus.Active;
-        await this.userCiRepository.createUserCi({
-            ci: dto.userInfo.ci,
-            publicId: user.publicId,
-        });
-        await this.userDiRepository.createUserDi({
-            di: dto.userInfo.di,
-            publicId: user.publicId,
-        });
+        const userCi = new UserCi();
+        userCi.ci = encryptedCi;
+        user.userCi = userCi;
+        const userDi = new UserDi();
+        userDi.di = encryptedDi;
+        user.userDi = userDi;
         const savedUser = await this.userRepository.save(user);
         await this.userSignupSourceDataRepository.createUserSignupSourceData(dto.signupSourceInfo, savedUser);
-        const userTermsAgreement = await this.userTermsAgreementRepository.createUserTermsAgreement(dto.termsAgreementInfo, savedUser);
-        savedUser.userTermsAgreement = userTermsAgreement;
-        await this.userRepository.save(savedUser);
-        return new UserDto(savedUser);
+        await this.termService.createLog(dto.termsAgreementInfo, savedUser, TargetType.User);
+        return savedUser;
     }
 
     private checkAdult(birth: string): boolean {
@@ -128,7 +129,7 @@ export class UserService {
     async findByDi(di: string): Promise<UserDto> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
         const userDi = await this.userDiRepository.findByDi(encryptedDi);
-        const user = await this.userRepository.findByPublicId(userDi.publicId);
+        const user = await this.userRepository.findById(userDi.user.id);
         return new UserDto(user);
     }
 
@@ -141,7 +142,7 @@ export class UserService {
     async findEntityByDi(di: string, includeStore: boolean = false): Promise<User> {
         const encryptedDi = this.encryptionUtil.encryptDeterministic(di);
         const userDi = await this.userDiRepository.findByDi(encryptedDi);
-        return await this.userRepository.findByPublicId(userDi.publicId);
+        return await this.userRepository.findById(userDi.user.id);
     }
     
     /**
@@ -189,7 +190,8 @@ export class UserService {
      * @param ci CI
      */
     async existsByCi(ci: string): Promise<boolean> {
-        return await this.userCiRepository.existsByCiWithDeleted(ci);
+        const encryptedCi = this.encryptionUtil.encryptDeterministic(ci);
+        return await this.userCiRepository.existsByCiWithDeleted(encryptedCi);
     }
 
     /**
