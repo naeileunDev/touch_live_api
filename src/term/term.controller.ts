@@ -33,7 +33,7 @@ export class TermController {
     
     @Get()
     @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '[모든 role] 해당 대상 약관 목록 조회' })
+    @ApiOperation({ summary: '[모든 role] 해당 대상 약관 목록 조회(Query String: target=USER, STORE)' })
     @ApiOkSuccessResponse(TermVersionDto, '해당 대상(유저, 스토어) 약관 목록 조회 성공', true)
     findAllByTargetType(@Query('target') target: TargetType): Promise<TermVersion[]|[]> {
         return this.termService.findAllByTargetType(target);
