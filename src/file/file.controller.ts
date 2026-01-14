@@ -15,6 +15,9 @@ import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-f
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
 import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
+import { StoreOwner } from 'src/common/decorator/store-owner.decorator';
+import { ProductFileCreateDto } from './dto/product-file-create.dto';
+import { ProductFileDto } from './dto/product-file.dto';
 
 @ApiTags('File')
 @Controller('file')
@@ -86,28 +89,6 @@ export class FileController {
         return this.fileService.findByIdAndServe(id);
     }
 
-
-    // @Post('store-register-log')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     { name: 'businessRegistrationImage', maxCount: 1 },
-    //     { name: 'eCommerceLicenseImage', maxCount: 1 },
-    //     { name: 'accountImage', maxCount: 1 },
-    //     { name: 'profileImage', maxCount: 1 },
-    //     { name: 'bannerImage', maxCount: 1 },
-    // ]))
-    // @ApiConsumes('multipart/form-data')
-    // @ApiBody({
-    // schema: {
-    //     type: 'object',
-    //     required: ['file'],
-    //     properties: {
-    //         file: { type: 'string', format: 'binary' },
-    //     },
-    // },
-    // })
-    // createStoreRegisterLogFile(@Body() createDto: StoreRegisterLogCreateFileDto, @GetUser() user: User) {
-    //     return this.fileService.createStoreRegisterLogFile(createDto, user);
-    // }
     @Post('store-register-log')
     @Role(ALL_PERMISSION)
     @UseInterceptors(FileFieldsInterceptor([
@@ -136,5 +117,36 @@ export class FileController {
     createStoreRegisterLogFile(@UploadedFiles() files: Record<string, Express.Multer.File[]>, @GetUser() user: User): Promise<StoreRegisterLogFilesDto> {
         const createDto = StoreRegisterLogCreateFileDto.of(files);
         return this.fileService.createStoreRegisterLogFile(createDto, user);
+    }
+    
+    @Post('product/:productId')
+    @Role(ALL_PERMISSION)
+    @StoreOwner()
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'thumbnailImage', maxCount: 1 },
+        { name: 'infoImage', maxCount: 1 },
+        { name: 'detailImages', maxCount: 10 }
+    ]))
+    @ApiOperation({ summary: '상품 파일 저장 ( 썸네일 이미지, 정보 이미지, 상세 이미지(최대 10장) )' })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                thumbnailImage: { type: 'string', format: 'binary' },
+                infoImage: { type: 'string', format: 'binary' },
+                detailImage: { type: 'string', format: 'binary' },
+            },
+            required: ['thumbnailImage', 'infoImage', 'detailImage'],
+        },
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiOkSuccessResponse(ProductFileCreateDto, '상품 파일 저장 성공')
+    createProductFile(
+        @UploadedFiles() files: Record<string, Express.Multer.File[]>, 
+        @GetUser() user: User,
+        @Param('productId', ParseIntPipe) productId: number
+    ): Promise<ProductFileDto> {
+        const createDto = ProductFileCreateDto.of(files);
+        return this.fileService.createProductFile(createDto, user, productId);
     }
 }

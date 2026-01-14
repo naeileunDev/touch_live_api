@@ -15,6 +15,9 @@ import { UserService } from 'src/user/service/user.service';
 import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
 import { User } from 'src/user/entity/user.entity';
 import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
+import { ProductFileCreateDto } from './dto/product-file-create.dto';
+import { ProductService } from 'src/product/product.service';
+import { ProductFileDto } from './dto/product-file.dto';
 
 @Injectable()
 export class FileService {
@@ -22,7 +25,8 @@ export class FileService {
     constructor(
         private readonly fileRepository: FileRepository,
         private readonly configService: ConfigService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly productService: ProductService
     ) {}
     private readonly envConfig: string = this.configService.get<string>('NODE_ENV') === 'local' ? 'local' : 'prod';
     private basePath = path.join(process.cwd(), 'uploads');
@@ -170,6 +174,38 @@ export class FileService {
             fileDtos[2],
             fileDtos[3],
             fileDtos[4],
+        );
+    }
+
+    async createProductFile(createDto: ProductFileCreateDto, user: User, productId: number): Promise<ProductFileDto> {
+        const userEntity = await this.userService.findEntityById(user.id, true);
+        const productEntity = await this.productService.findEntityById(productId);
+        
+        const fileMappings: Array<{ field: keyof ProductFileCreateDto; usageType: UsageType }> = [
+            { field: 'thumbnailImage', usageType: UsageType.Thumbnail },
+            { field: 'infoImage', usageType: UsageType.InfoImage },
+            { field: 'detailImages', usageType: UsageType.DetailImage },
+        ];
+
+        const fileDtos = await Promise.all(
+            fileMappings.map(async ({ field, usageType }) => {
+                const files = createDto[field];
+                if (!files || files.length === 0) {
+                    throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
+                }
+                return await this.createLocal(files[0] as Express.Multer.File, {
+                    contentCategory: ContentCategory.Product,
+                    usageType,
+                    contentId: productEntity.id,
+                    userId: userEntity.id,
+                });
+            })
+        );
+
+        return new ProductFileDto(
+            fileDtos[0],
+            fileDtos[1],
+            fileDtos[2],
         );
     }
 }
