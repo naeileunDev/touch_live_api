@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { TermVersion } from "../entity/term-version.entity";
 import { DataSource, DeleteResult, Repository } from "typeorm";
-import { ServiceException } from "src/common/filter/exception/service.exception";
-import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { UserTermAgreementChangeLog } from "../entity/user-term-agreement-change-log.entity";
 import { StoreTermAgreementChangeLog } from "../entity/store-term-agreement-change-log.entity";
+import { TermLogCreateDto } from "../dto/term-log-create.dto";
+import { User } from "src/user/entity/user.entity";
+import { UserTermAgreementChangeLog } from "../entity/user-term-agreement-change-log.entity";
+import { TargetType } from "../enum/term-version.enum";
 
 @Injectable()
 export class StoreTermAgreementChangeLogRepository extends Repository<StoreTermAgreementChangeLog> {
@@ -12,23 +13,29 @@ export class StoreTermAgreementChangeLogRepository extends Repository<StoreTermA
         super(TermVersion, dataSource.createEntityManager());
     }
 
-    async createStoreTermAgreementChangeLog(log: StoreTermAgreementChangeLog): Promise<StoreTermAgreementChangeLog> {
-        const entity = this.create(log);
-        return await this.save(entity);
-    }
-
-    async findById(id: number): Promise<StoreTermAgreementChangeLog> {
-        const entity = await this.findOne({ 
-            where: { id },
-        });
-        if (!entity) {
-            throw new ServiceException(MESSAGE_CODE.STORE_TERM_AGREEMENT_CHANGE_LOG_NOT_FOUND);
-        }
-        return entity;
+    async createStoreTermAgreementChangeLog(dtos: TermLogCreateDto[], user: User): Promise<boolean> {
+        const entities = dtos.map((dto) => this.create({
+            ...dto,
+            userId: user.id,
+            storeId: user.store.id,
+        }));
+        await this.save(entities as unknown as UserTermAgreementChangeLog[]);
+        return true;
     }
 
     async deleteById(id: number): Promise<boolean> {
         const rtn: DeleteResult = await this.softDelete({ id });
         return rtn.affected > 0;
+    }
+
+    async findOptionalTermsStatus(storeId: number): Promise<StoreTermAgreementChangeLog[]> {
+        return await this.createQueryBuilder('log')
+            .select('DISTINCT ON (log.termType) log.id', 'log_id') 
+            .addSelect('log.*') 
+            .where('log.storeId = :storeId', { storeId })
+            .andWhere('log.isRequired = false')
+            .orderBy('log.termType', 'ASC') // DISTINCT ON의 첫 번째 인자와 일치 필수
+            .addOrderBy('log.id', 'DESC')
+            .getRawMany(); // DISTINCT ON 사용 시 매핑 이슈 방지를 위해 getRawMany 후 변환 
     }
 }

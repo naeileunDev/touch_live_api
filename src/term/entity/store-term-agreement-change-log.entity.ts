@@ -15,9 +15,8 @@ export class StoreTermAgreementChangeLog extends BaseEntity {
     @Column({ type: 'boolean', comment: '동의 여부'})
     isAgreed: boolean;;
 
-    @ManyToOne(() => TermVersion, termVersion => termVersion.id)
-    @JoinColumn({ name: 'termVersionId' })
-    termVersion: TermVersion;
+    @Column({ type: 'int', comment: '약관 버전 ID' })
+    termVersionId: number;
 
     @Column({ type: 'int', comment: '스토어 주인ID(User ID)' })
     userId: number;

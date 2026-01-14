@@ -1,7 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity } from "typeorm";
 import { BaseEntity } from "src/common/base-entity/base.entity";
 import { TermType } from "../enum/term-version.enum";
-import { TermVersion } from "./term-version.entity";
 
 @Entity()
 export class UserTermAgreementChangeLog extends BaseEntity {
@@ -15,7 +14,6 @@ export class UserTermAgreementChangeLog extends BaseEntity {
     @Column({ type: 'boolean', comment: '동의 여부'})
     isAgreed: boolean;;
 
-    @ManyToOne(() => TermVersion, termVersion => termVersion.id)
-    @JoinColumn({ name: 'termVersionId' })
-    termVersion: TermVersion;
+    @Column({ type: 'int', comment: '약관 버전 ID' })
+    termVersionId: number;
 }

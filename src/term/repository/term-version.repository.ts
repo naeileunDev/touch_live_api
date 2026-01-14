@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { TermVersion } from "../entity/term-version.entity";
-import { DataSource, DeleteResult, Repository } from "typeorm";
+import { DataSource, DeleteResult, In, Repository } from "typeorm";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { TermVersionCreateDto } from "../dto /term-version-create.dto";
+import { TermVersionCreateDto } from "../dto/term-version-create.dto";
 import { User } from "src/user/entity/user.entity";
 import { TargetType, TermType } from "../enum/term-version.enum";
 
@@ -42,12 +42,32 @@ export class TermVersionRepository extends Repository<TermVersion> {
         return entity;
     }
 
-    async  findByRequired(isRequired: boolean, targetType: TargetType): Promise<TermVersion> {
+    async findByRequired(isRequired: boolean, targetType: TargetType): Promise<TermVersion> {
         const entity = await this.findOne({ 
             where: { isRequired, targetType },
             order: { version: 'DESC' },
         });
         return entity;
     }
+
+    async findByIds(ids: number[]): Promise<TermVersion[]> {
+        const entities = await this.find({ 
+            where: { id: In(ids) },
+        });
+        return entities;
+    }
+
+    async getLatestTermsForTargetType(targetType: TargetType): Promise<TermVersion[]> {
+        return await this.createQueryBuilder('term')
+            .where('term.targetType = :targetType', { targetType })
+            .andWhere('term.id IN ' + 
+                this.createQueryBuilder('sub')
+                    .select('MAX(sub.id)')
+                    .groupBy('sub.termType').getQuery()
+            )
+            .getMany();
+    }
+
+
 
 }
