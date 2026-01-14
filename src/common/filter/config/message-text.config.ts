@@ -83,4 +83,8 @@ export const MESSAGE_TEXT = {
 
     // Follow
     [MESSAGE_CODE.FOLLOW_NOT_ALLOWED_SELF]: '자기 자신을 팔로우할 수 없습니다.',
+
+    // Term
+    [MESSAGE_CODE.TERM_VERSION_NOT_FOUND]: '약관 버전을 찾을 수 없습니다.',
+    [MESSAGE_CODE.REQUIRED_TERM_NOT_AGREED]: '필수 약관 동의가 필요합니다.',
 };

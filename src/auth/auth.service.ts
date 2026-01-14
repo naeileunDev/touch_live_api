@@ -133,8 +133,7 @@ export class AuthService {
         userInfo.password = this.hashPassword(userInfo.password);
 
         // 사용자 생성
-        const userDto = await this.userService.create(dto);
-        const user = await this.userService.findEntityByPublicId(userDto.id, true);
+        const user= await this.userService.create(dto);
         const accessToken = await this.generateAccessToken(user, uuid, userInfo.fcmToken);
         const refreshToken = await this.generateRefreshToken(user, uuid);
         return new AuthLoginResponseDto(new UserDto(user), accessToken, refreshToken);

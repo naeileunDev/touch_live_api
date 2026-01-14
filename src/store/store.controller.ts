@@ -3,7 +3,7 @@ import { StoreService } from './store.service';
 import { StoreRegisterLogCreateDto } from './dto/store-register-log-create.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExtraModels, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Role } from 'src/common/decorator/role.decorator';
-import { ALL_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
+import { ALL_PERMISSION, OPERATOR_PERMISSION, USER_PERMISSION } from 'src/common/permission/permission';
 import { NonStoreOwner } from 'src/common/decorator/store-owner.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from 'src/user/entity/user.entity';
@@ -57,14 +57,13 @@ export class StoreController {
     }
 
     @Put('register-log/:logId/audit')
-    @Role(ALL_PERMISSION)
+    @Role(OPERATOR_PERMISSION)
     @ApiOperation({ summary: '[operator role] 가게 등록 로그 심사' })
     auditRegisterLog(
         @Param('logId', ParseIntPipe) id: number, 
         @Body() auditDto: StoreRegisterLogAuditCreateDto,
         @GetUser() user: User,
     ): Promise<StoreRegisterLogAuditDto> {
-        console.log('auditDto', auditDto);
         return this.storeRegisterLogService.auditById(id, auditDto, user);
     }
 }

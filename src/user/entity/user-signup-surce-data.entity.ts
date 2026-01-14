@@ -21,7 +21,7 @@ export class UserSignupSourceData extends BaseEntity {
     })
     etcDescription?: string;
 
-    @OneToOne(() => User, user => user.userSignupSourceData, { 
+    @OneToOne(() => User, { 
         onDelete: 'SET NULL',  // User 삭제 시 userId만 NULL, 데이터는 보존
         nullable: true 
     })

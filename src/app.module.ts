@@ -33,6 +33,7 @@ import { AuditModule } from './audit/audit.module';
 import { LikeModule } from './like/like.module';
 import { ReviewModule } from './review/review.module';
 import { CommentModule } from './comment/comment.module';
+import { TermModule } from './term/term.module';
 
 @Module({
     imports: [
@@ -71,6 +72,7 @@ import { CommentModule } from './comment/comment.module';
         LikeModule,
         ReviewModule,
         CommentModule,
+        TermModule,
     ],
     controllers: [],
     providers: [

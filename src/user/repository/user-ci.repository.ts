@@ -3,9 +3,8 @@ import { DataSource, DeleteResult, Repository } from "typeorm";
 import { UserDi } from "../entity/user-di.entity";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { UserDiCreateDto } from "../dto/user-di-create.dto";
 import { UserCi } from "../entity/user-ci.entity";
-import { UserCiCreateDto } from "../dto/user-ci-create.dto";
+import { User } from "../entity/user.entity";
 
 @Injectable()
 export class UserCiRepository extends Repository<UserCi> {
@@ -13,8 +12,10 @@ export class UserCiRepository extends Repository<UserCi> {
         super(UserDi, dataSource.createEntityManager());
     }
 
-    async createUserCi(userCiCreateDto: UserCiCreateDto): Promise<UserCi> {
-        const userCi = this.create(userCiCreateDto);
+    async createUserCi(ci: string, user: User): Promise<UserCi> {
+        const userCi = new UserCi();
+        userCi.ci = ci;
+        userCi.user = user;
         await this.save(userCi);
         return userCi;
     }
@@ -28,10 +29,10 @@ export class UserCiRepository extends Repository<UserCi> {
         });
     }
 
-    async findByUserIdWithDeleted(publicId: string): Promise<UserCi> {
+    async findByUserIdWithDeleted(userId: number): Promise<UserCi> {
         const userCi = await this.findOne({
             where: {
-                publicId,
+                user: { id: userId },
             },
             withDeleted: true,
         });
@@ -41,9 +42,9 @@ export class UserCiRepository extends Repository<UserCi> {
         return userCi;
     }
 
-    async deleteByUserId(publicId: string): Promise<boolean> {
+    async deleteByUserId(userId: number): Promise<boolean> {
         const result: DeleteResult = await this.softDelete({
-            publicId,
+            user: { id: userId },
         });
         return result.affected > 0;
     }

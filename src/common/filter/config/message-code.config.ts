@@ -81,5 +81,9 @@ export const MESSAGE_CODE = {
 
     // Follow
     FOLLOW_NOT_ALLOWED_SELF: 2000,
+
+    // Term
+    TERM_VERSION_NOT_FOUND: 2100,
+    REQUIRED_TERM_NOT_AGREED: 2101,
 };
 

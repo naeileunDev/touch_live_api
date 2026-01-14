@@ -2,8 +2,6 @@ import { BaseEntity } from "src/common/base-entity/base.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { UserStatus } from "../enum/user-status.enum";
 import { StoreRegisterStatus } from "src/store/enum/store-register-status.enum";
-import { UserSignupSourceData } from "./user-signup-surce-data.entity";
-import { UserTermsAgreement } from "./user-terms-agreement.entity";
 import { UserAddress } from "./user-address.entity";
 import { Store } from "src/store/entity/store.entity";
 import { UserRole } from "../enum/user-role.enum";
@@ -11,6 +9,8 @@ import { UserOperation } from "./user-operation.entity";
 import { StoreRegisterLog } from "src/store/entity/store-register-log.entity";
 import { UserRank } from "../enum/user-rank.enum";
 import { UserTrialRank } from "../enum/user-trial-rank.enum";
+import { UserCi } from "./user-ci.entity";
+import { UserDi } from "./user-di.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -56,16 +56,6 @@ export class User extends BaseEntity {
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '사용자 가게 등록 상태', nullable: true })
     storeRegisterStatus?: StoreRegisterStatus | null;
-    
-    @OneToOne(() => UserSignupSourceData, userSignupSourceData => userSignupSourceData.user, {
-        nullable: true
-    })
-    userSignupSourceData: UserSignupSourceData;
-    
-    @OneToOne(() => UserTermsAgreement, userTermsAgreement => userTermsAgreement.user, {
-        nullable: true
-    })
-    userTermsAgreement: UserTermsAgreement;
 
     @Column({ type: 'timestamptz', comment: '성인 여부 확인 일시', nullable: true })
     adultCheckAt?: Date;
@@ -89,4 +79,9 @@ export class User extends BaseEntity {
     @Column({ type: 'enum', enum: UserTrialRank, comment: '사용자 트라이 등급', default: UserTrialRank.Normal })
     trialRank: UserTrialRank;
 
+    @OneToOne(() => UserCi, userCi => userCi.user, { cascade: true })
+    userCi: UserCi;
+
+    @OneToOne(() => UserDi, userDi => userDi.user, { cascade: true })
+    userDi: UserDi;
 }

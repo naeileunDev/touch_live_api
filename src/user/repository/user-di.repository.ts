@@ -3,7 +3,7 @@ import { DataSource, DeleteResult, Repository } from "typeorm";
 import { UserDi } from "../entity/user-di.entity";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
-import { UserDiCreateDto } from "../dto/user-di-create.dto";
+import { User } from "../entity/user.entity";
 
 @Injectable()
 export class UserDiRepository extends Repository<UserDi> {
@@ -11,8 +11,10 @@ export class UserDiRepository extends Repository<UserDi> {
         super(UserDi, dataSource.createEntityManager());
     }
 
-    async createUserDi(userDiCreateDto: UserDiCreateDto): Promise<UserDi> {
-        const userDi = this.create(userDiCreateDto);
+    async createUserDi(di: string, user: User): Promise<UserDi> {
+        const userDi = new UserDi();
+        userDi.di = di;
+        userDi.user = user;
         await this.save(userDi);
         return userDi;
     }
@@ -46,10 +48,10 @@ export class UserDiRepository extends Repository<UserDi> {
         });
     }
 
-    async findByUserIdWithDeleted(publicId: string): Promise<UserDi> {
+    async findByUserIdWithDeleted(userId: number): Promise<UserDi> {
         const userDi = await this.findOne({
             where: {
-                publicId,
+                user: { id: userId },
             },
             withDeleted: true,
         });
@@ -59,9 +61,9 @@ export class UserDiRepository extends Repository<UserDi> {
         return userDi;
     }
 
-    async deleteByUserId(publicId: string): Promise<boolean> {
+    async deleteByUserId(userId: number): Promise<boolean> {
         const result: DeleteResult = await this.softDelete({
-            publicId,
+            user: { id: userId },
         });
         return result.affected > 0;
     }
