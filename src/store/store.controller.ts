@@ -13,6 +13,7 @@ import { StoreRegisterLogService } from './store-register-log.service';
 import { StoreRegisterLogAuditCreateDto } from './dto/store-register-log-audit-create.dto';
 import { StoreRegisterLogListResponseDto } from './dto/store-register-log-list-response.dto';
 import { StoreRegisterLogAuditDto } from './dto/store-register-log-audit.dto';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 @ApiTags('Store')
 @Controller('store')
@@ -37,8 +38,8 @@ export class StoreController {
 
     @Get('register-log/:logId')
     @Role(ALL_PERMISSION)
-    @ApiOperation({ summary: '[모든 role] 가게 등록 로그 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
-    @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 조회 성공')
+    @ApiOperation({ summary: '[모든 role] 가게 등록 로그 단일 조회, 단 유저의 경우 본인 가게 등록 로그만 조회 가능합니다.' })
+    @ApiOkSuccessResponse(StoreRegisterLogDto, '가게 등록 로그 단일 조회 성공')
     findRegisterLogById(@GetUser() user: User, @Param('logId', ParseIntPipe) id: number): Promise<StoreRegisterLogDto> {
         return this.storeRegisterLogService.findById(id, user);
     }
@@ -50,8 +51,9 @@ export class StoreController {
     findByRegisterLogUserId(
         @GetUser() user: User, 
         @Query('userId') userId: string,
+        @Query() pagination?: PaginationDto,
     ): Promise<StoreRegisterLogListResponseDto> {
-        return this.storeRegisterLogService.findByUserId(userId, user);
+        return this.storeRegisterLogService.findByUserId(userId, user, pagination);
     }
 
     @Put('register-log/:logId/audit')

@@ -8,6 +8,7 @@ import { DiscountType } from "../enum/coupon.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Coupon } from "../entity/coupon.entity";
 import { v4 as uuidv4 } from 'uuid';
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
 export class CouponService {
@@ -36,9 +37,9 @@ export class CouponService {
         return coupon;
     }
 
-    async findAllNotExpired(): Promise<CouponDto[]> {
-        const coupons = await this.couponRepository.findAllNotExpired();
-        return coupons.map(coupon => new CouponDto(coupon));
+    async findAllNotExpired(pagination: PaginationDto): Promise<{coupons: CouponDto[], total: number}> {
+        const { coupons, total } = await this.couponRepository.findAllNotExpired(pagination);
+        return { coupons: coupons.map(coupon => new CouponDto(coupon)), total };
     }
 
     async deleteById(id: number): Promise<boolean> {

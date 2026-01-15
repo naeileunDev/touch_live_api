@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, DeleteResult, IsNull, Not, Repository } from "typeorm";
+import { DataSource, DeleteResult, IsNull, LessThan, Not, Repository } from "typeorm";
 import { StoreRegisterLog } from "../entity/store-register-log.entity";
 import { StoreRegisterLogCreateDto } from "../dto/store-register-log-create.dto";
 import { User } from "src/user/entity/user.entity";
@@ -34,10 +34,13 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
 
     async findById(id: number): Promise<StoreRegisterLog> {
         const entity = await this.findOne({
-            where:{ 
+            where: { 
                 id,
             },
             relations: ['user'],
+            order: {
+                createdAt: 'DESC',
+            },
         });
         if (!entity) {
             throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_FOUND);
@@ -50,8 +53,11 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
         return rtn.affected > 0;
     }
 
-    async findAllByUserId(publicId: string): Promise<[StoreRegisterLog[], number]> {
+    async findAllByUserId(publicId: string, pagination?: PaginationDto): Promise<{logs: StoreRegisterLog[], total: number}> {
+        const { page, limit } = pagination;
         const [logs, total] = await this.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
             where: {
                 user: {
                     publicId,
@@ -62,6 +68,6 @@ export class StoreRegisterLogRepository extends Repository<StoreRegisterLog> {
                 createdAt: 'DESC',
             },
         });
-        return [logs, total];
+        return { logs, total };
     }
 }

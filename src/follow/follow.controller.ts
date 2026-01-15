@@ -12,6 +12,7 @@ import { StoreFollowService } from './service/store-follow.service';
 import { StoreFollowsDto } from './dto/store-follows.dto';
 import { FollowingStoreDto } from './dto/following-store.dto';
 import { User } from 'src/user/entity/user.entity';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 @ApiTags('Follow')
 @Controller('follow')
@@ -43,14 +44,14 @@ export class FollowController {
 
     @Get('user/followings')
     @Role(USER_PERMISSION)
-    @ApiOperation({ summary: '[user role] 해당 유저 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, liver의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
+    @ApiOperation({ summary: '[user role] 해당 유저 팔로잉 목록 (무한 스크롤 용, liver의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
     @ApiExtraModels(FollowingUserDto)
     @ApiOkSuccessResponse(UserFollowsDto, '해당 유저 팔로잉 목록 조회 성공')
     getFollowings(
         @GetUser() user: User,
-        @Query('lastId') lastId?: number,
+        @Query() pagination: PaginationDto,
     ): Promise<UserFollowsDto> {
-        return this.userFollowService.findFollowingUsersFollowerCounts(user.publicId, lastId, 7);
+        return this.userFollowService.findFollowingUsersFollowerCounts(user.publicId, pagination);
     }
 
     @Get('user/count/:userId')
@@ -116,13 +117,13 @@ export class FollowController {
     @Get('store/followings/:userId')
     @Role(ALL_PERMISSION)
     @ApiExtraModels(FollowingStoreDto)
-    @ApiOperation({ summary: '해당 유저의 스토어 팔로잉 목록 (무한 스크롤 용, 7개씩 조회 가능, store의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
+    @ApiOperation({ summary: '해당 유저의 스토어 팔로잉 목록 (무한 스크롤 용, store의 팔로워 수는 followersCount에 표기됩니다. 9999 넘어가면 +9999로 표시해주세요)' })
     @ApiOkSuccessResponse(StoreFollowsDto, '해당 유저의 스토어 팔로잉 목록 조회 성공', true)
     getStoreFollowings(
         @Param('userId') publicId: string,
-        @Query('lastId') lastId?: number,
+        @Query() pagination: PaginationDto,
     ): Promise<StoreFollowsDto> {
-        return this.storeFollowService.findFollowingStoresFollowerCounts(publicId, lastId, 7);
+        return this.storeFollowService.findFollowingStoresFollowerCounts(publicId, pagination);
     }
 
     @Get('store/count/followers/:storeId')

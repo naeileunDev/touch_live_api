@@ -5,6 +5,7 @@ import { UserService } from "src/user/service/user.service";
 import { StoreFollowsDto } from "../dto/store-follows.dto";
 import { FollowingStoreDto } from "../dto/following-store.dto";
 import { StoreFollow } from "../entity/store-follow.entity";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
 export class StoreFollowService {
@@ -42,9 +43,10 @@ export class StoreFollowService {
      * 예시: Store A가 Store B, Store C를 팔로우하는 경우
      * - Store B의 팔로워 수와 Store C의 팔로워 수를 반환
      */
-    async findFollowingStoresFollowerCounts(publicId: string, lastId: number | null, limit: number = 7): Promise<StoreFollowsDto> {
+    async findFollowingStoresFollowerCounts(publicId: string, pagination: PaginationDto): Promise<StoreFollowsDto> {
         const user = await this.userService.findEntityByPublicId(publicId);
-        const followingStores = await this.storeFollowRepository.findFollowingStoresFollowerCounts(user.id, lastId, limit);
+        const { page, limit } = pagination;
+        const followingStores = await this.storeFollowRepository.findFollowingStoresFollowerCounts(user.id, page, limit);
         
         // store가 null인 경우 필터링 (soft delete된 store 제외)
         const validStores = followingStores[0].filter(store => store !== null);
