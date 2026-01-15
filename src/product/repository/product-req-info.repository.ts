@@ -1,7 +1,9 @@
 import { DataSource, Repository } from "typeorm";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ProductReqInfoCreateDto } from "../dto/product-req-info-create.dto";
 import { ProductReqInfo } from "../entity/product-req-info.entity";
+import { ServiceException } from "src/common/filter/exception/service.exception";
+import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 
 @Injectable()
 export class ProductReqInfoRepository extends Repository<ProductReqInfo> {
@@ -10,14 +12,12 @@ export class ProductReqInfoRepository extends Repository<ProductReqInfo> {
     }
 
     async createReqInfo(dto: ProductReqInfoCreateDto): Promise<ProductReqInfo> {
-        console.log('createReqInfo', dto);
         const productReqInfo = this.create(
             {
                 title: dto.title,
                 itemList: dto.itemList as unknown as string[],
             }
         );
-        console.log('productReqInfo', productReqInfo);
         return await this.save(productReqInfo);
     }
 

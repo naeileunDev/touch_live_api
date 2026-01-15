@@ -55,10 +55,10 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '사업자 정산계좌 이미지 id' })
     accountImageId: number;
 
-    @Column({ type: "jsonb", length: 3, comment: '메인태그(3개까지)' })
+    @Column({ type: "jsonb", comment: '메인태그(3개까지)' })
     mainTags: string[];
 
-    @Column({ type: "jsonb", length: 5, comment: '최대 서브태그(5개까지)' })
+    @Column({ type: "jsonb", comment: '최대 서브태그(5개까지)' })
     subTags: string[];
 
     // 가게 상태 타입 ( 유저의 행위나 제재에 영향)
