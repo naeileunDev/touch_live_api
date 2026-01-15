@@ -19,4 +19,8 @@ export class ProductReqInfoService {
         const infos = await this.productReqInfoRepository.findAll();
         return infos.map(info => new ProductReqInfoDto(info));
     }
+
+    async updateById(id: number, dto: ProductReqInfoCreateDto): Promise<ProductReqInfo> {
+        return await this.productReqInfoRepository.updateById(id, dto);
+    }
 }

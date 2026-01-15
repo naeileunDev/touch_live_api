@@ -13,6 +13,9 @@ import { Pagination, PaginationResponse } from "src/common/pagination/pagination
 import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
 import { Transactional } from "typeorm-transactional";
 import { Product } from "./entity/product.entity";
+import { User } from "src/user/entity/user.entity";
+import { StoreService } from "src/store/store.service";
+import { ProductFlexibleRepository } from "./repository/product-flexible.repository";
 
 @Injectable()
 export class ProductService {
@@ -22,6 +25,8 @@ export class ProductService {
         private readonly productOptionRepository: ProductOptionRepository,
         private readonly productOptionDetailRepository: ProductOptionDetailRepository,
         private readonly productOptionDetailStockRepository: ProductOptionDetailStockRepository,
+        private readonly productFlexibleRepository: ProductFlexibleRepository,
+        // private readonly storeService: StoreService,
     ) { }
 
     /**
@@ -31,13 +36,12 @@ export class ProductService {
      * @returns 상품
      */
     @Transactional()
-    async create(productCreateDto: ProductCreateDto) {
-        const { options } = productCreateDto;
+    async create(productCreateDto: ProductCreateDto, user: User) {
+        // const store = await this.storeService.findEntityById(user.store.id);
+        const { options, productFlexible } = productCreateDto;
         const now = new Date();
-
-        // 카테고리 조회
-
-        // TODO: 수수료 계산
+        // 판매자 수수료는 정산 시 따로? 일단 즉시 업로드냐 아니냐에 따라 즉시 업로드인 경우 판매자 수수료 청구
+        const registerFee = productCreateDto?.registerFee ?? 0;
 
         // 상품 생성
         const product = await this.productRepository.createProduct({

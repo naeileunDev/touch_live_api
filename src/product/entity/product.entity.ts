@@ -3,9 +3,14 @@ import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { Store } from "src/store/entity/store.entity";
 import { createPublicId } from "src/common/util/public-id.util";
 import { AuditStatus, UploadType } from "src/common/enums";
+import { ProductTargetGender } from "../enum/product-target-gender.enum";
+import { ProductTargetAge } from "../enum/product-target-age.enum";
 
 @Entity()
 export class Product extends BaseEntity {
+
+    @Column({ type: 'varchar', comment: '상품명' })
+    name: string;
 
     @Column({ type: 'int', comment: '최대 결제 횟수', nullable: true })
     maxPurchaseLimit: number;
@@ -45,7 +50,19 @@ export class Product extends BaseEntity {
     auditStatus: AuditStatus;
 
     @Column({ type: 'varchar', comment: '심사 코멘트', nullable: true })
-    auditComment?: string | null;
+    auditComment?: string;
+
+    @Column({ type: 'varchar', comment: '해당 상품 고시 정보' })
+    reqInfo: string;
+
+    @Column({ type: "jsonb", comment: '해시 태그(최소 1개, 최대 3개까지)' })
+    tags: string[];
+
+    @Column({ type: 'enum', enum: ProductTargetGender, comment: '구매 대상 성별' })
+    targetGender: ProductTargetGender;
+
+    @Column({ type: 'enum', enum: ProductTargetAge, comment: '구매 대상 나이' })
+    targetAge: ProductTargetAge;
 
     @BeforeInsert()
     createPublicId() {

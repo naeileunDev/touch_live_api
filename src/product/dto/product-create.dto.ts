@@ -1,12 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from "class-validator";
-import { ProductTargetGender } from "../enum/product-target-gender.enum";
-import { ProductTargetAge } from "../enum/product-target-age.enum";
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, ValidateNested } from "class-validator";
 import { ProductOptionCreateDto } from "./product-option-create.dto";
 import { Type } from "class-transformer";
 import { UploadType } from "src/common/enums";
 import { ProductFileDto } from "src/file/dto/product-file.dto";
-import { ProductDetailCreateDto } from "./product-detail-create";
+import { ProductFlexibleCreateDto } from "./product-flexible-create.dto";
 
 export class ProductCreateDto {
 
@@ -34,8 +32,8 @@ export class ProductCreateDto {
     @Type(() => ProductFileDto)
     productFiles: ProductFileDto;
 
-    @ApiProperty({ description: '상품 상세', type: ProductDetailCreateDto })
+    @ApiProperty({ description: '상품 상세', type: ProductFlexibleCreateDto })
     @ValidateNested()
-    @Type(() => ProductDetailCreateDto)
-    productDetail: ProductDetailCreateDto;
+    @Type(() => ProductFlexibleCreateDto)
+    productFlexible: ProductFlexibleCreateDto;
 }

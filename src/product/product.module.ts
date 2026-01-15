@@ -6,11 +6,13 @@ import { ProductMediaRepository } from "./repository/product-media.respository"
 import { ProductOptionRepository } from "./repository/product-option.respository"
 import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository"
 import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository"
-import { ProductDetailRepository } from "./repository/product-detail.repository"
+import { ProductFlexibleRepository } from "./repository/product-flexible.repository"
 import { ProductReqInfoService } from "./service/product-req-info.service"
 import { ProductReqInfoRepository } from "./repository/product-req-info.repository"
+// import { StoreModule } from "src/store/store.module"
 
 @Module({
+    // imports: [StoreModule],
     controllers: [ProductController],
     providers: [
         ProductService,
@@ -19,7 +21,7 @@ import { ProductReqInfoRepository } from "./repository/product-req-info.reposito
         ProductOptionRepository,
         ProductOptionDetailRepository,
         ProductOptionDetailStockRepository,
-        ProductDetailRepository,
+        ProductFlexibleRepository,
         ProductReqInfoService,
         ProductReqInfoRepository,
     ],

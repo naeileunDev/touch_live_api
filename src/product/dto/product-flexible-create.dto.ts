@@ -6,7 +6,7 @@ import { ProductTargetGender } from "../enum/product-target-gender.enum";
 import { ProductTargetAge } from "../enum/product-target-age.enum";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 
-export class ProductDetailCreateDto {
+export class ProductFlexibleCreateDto {
 
     @ApiProperty({ description: '재고(단일 옵션시)', type: Number, nullable: true })
     @IsOptional()
