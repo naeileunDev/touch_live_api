@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, ValidationPipe, UsePipes, ParseIntPipe, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UploadedFile, UseInterceptors, ParseIntPipe, UploadedFiles } from '@nestjs/common';
 import { FileService } from './file.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
@@ -30,7 +30,7 @@ export class FileController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiConsumes('multipart/form-data')
     @Role(ALL_PERMISSION)
-    // dto 와 파일 업로드를 동시에 입력하면 swagger 에서 오류가 발생하므로 별도로 작성
+    // dto 와 파일 업로드를 동시에 입력하면 swagger 에서 오류가 발생하므로 ApiBody 별도로 작성
     @ApiBody({
     schema: {
         type: 'object',
@@ -134,8 +134,13 @@ export class FileController {
             properties: {
                 thumbnailImage: { type: 'string', format: 'binary' },
                 infoImage: { type: 'string', format: 'binary' },
-                detailImage: { type: 'string', format: 'binary' },
+                detailImage: { 
+                    type: 'array', 
+                    items: { type: 'string', format: 'binary' },
+                    description: '상세 이미지들 (최대 10 장 선택 가능)'
+                },
             },
+            
             required: ['thumbnailImage', 'infoImage', 'detailImage'],
         },
     })

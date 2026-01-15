@@ -4,6 +4,7 @@ import { Injectable } from "@nestjs/common";
 import { UserCouponCreateDto } from "../dto/user-coupon-create.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
 export class UserCouponRepository extends Repository<UserCoupon> {
@@ -35,7 +36,8 @@ export class UserCouponRepository extends Repository<UserCoupon> {
         return rtn.affected > 0;
     }
 
-    async findByUserId(publicId: string, isUsed?: boolean | undefined): Promise<UserCoupon[]> {
+    async findByUserId(publicId: string, pagination?: PaginationDto, isUsed?: boolean | undefined): Promise<{coupons: UserCoupon[], total: number}> {
+        const { page, limit } = pagination;
         const where: any = {
             user: { publicId },
         };
@@ -43,10 +45,13 @@ export class UserCouponRepository extends Repository<UserCoupon> {
         if (isUsed !== undefined) {
             where.isUsed = isUsed;
         }
-        return await this.find({ 
+        const [coupons, total] = await this.findAndCount({ 
             where,
             relations: ['user', 'coupon'],
+            skip: (page - 1) * limit,
+            take: limit,
         });
+        return { coupons, total };
     }
 
     /**

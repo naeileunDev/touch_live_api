@@ -11,6 +11,7 @@ import { UserCouponService } from "./service/user-coupon.service";
 import { GetUser } from "src/common/decorator/get-user.decorator";
 import { UserCouponDto } from "./dto/user-coupon.dto";
 import { User } from "src/user/entity/user.entity";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @ApiTags('Coupon')
 @Controller('coupon')
@@ -35,8 +36,8 @@ export class CouponController {
     @Role(ALL_PERMISSION)
     @ApiOperation({ summary: '[모든 role] 만료기간이 지나지 않은 모든 쿠폰 목록 조회' })
     @ApiOkSuccessResponse(CouponDto, '쿠폰 목록 조회 성공', true)
-    findAllNotExpired(): Promise<CouponDto[]> {
-        return this.couponService.findAllNotExpired();
+    findAllNotExpired(@Query() pagination: PaginationDto): Promise<{coupons: CouponDto[], total: number}> {
+        return this.couponService.findAllNotExpired(pagination);
     }
 
     @Get(':couponNo')
@@ -78,9 +79,10 @@ export class CouponController {
     @ApiOkSuccessResponse(UserCouponDto, '내 쿠폰 목록 조회 성공', true)
     findMyCoupons(
         @Param('userId') userId: string,
-        @Query('isUsed', ParseBoolPipe) isUsed?: boolean
-    ): Promise<UserCouponDto[]> {
-        return this.userCouponService.findByUserId(userId, isUsed);
+        @Query() pagination: PaginationDto,
+        @Query('isUsed', ParseBoolPipe) isUsed: boolean = false,
+    ): Promise<{coupons: UserCouponDto[], total: number}> {
+        return this.userCouponService.findByUserId(userId, pagination, isUsed);
     }
     @Get(':couponNo')
     @Role(ANY_PERMISSION)

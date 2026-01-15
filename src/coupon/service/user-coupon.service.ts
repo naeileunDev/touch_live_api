@@ -8,6 +8,7 @@ import { UserCouponDto } from "../dto/user-coupon.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { Transactional } from "typeorm-transactional";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
 export class UserCouponService {
@@ -25,8 +26,8 @@ export class UserCouponService {
         const user = await this.userService.findEntityByPublicId(userPublicId);
         
         // 중복 발급 확인
-        const userCoupons = await this.userCouponRepository.findByUserId(user.publicId);
-        const alreadyIssued = userCoupons.some(userCoupon => userCoupon.couponId === coupon.id);
+        const { coupons } = await this.userCouponRepository.findByUserId(user.publicId);
+        const alreadyIssued = coupons.some(userCoupon => userCoupon.couponId === coupon.id);
         if (alreadyIssued) {
             throw new ServiceException(MESSAGE_CODE.USER_COUPON_ALREADY_ISSUED);
         }
@@ -54,10 +55,10 @@ export class UserCouponService {
         return new UserCouponDto(userCoupon);
     }
 
-    async findByUserId(publicId: string, isUsed?: boolean): Promise<UserCouponDto[]> {
+    async findByUserId(publicId: string, pagination: PaginationDto, isUsed?: boolean): Promise<{coupons: UserCouponDto[], total: number}> {
         const isUsedFilter = typeof(isUsed) === 'boolean' ? isUsed : undefined;
-        const userCoupons = await this.userCouponRepository.findByUserId(publicId, isUsedFilter);
-        return userCoupons.map(userCoupon => new UserCouponDto(userCoupon));
+        const { coupons, total } = await this.userCouponRepository.findByUserId(publicId, pagination, isUsedFilter);
+        return { coupons: coupons.map(userCoupon => new UserCouponDto(userCoupon)), total };
     }
 
     /**

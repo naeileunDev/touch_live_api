@@ -20,6 +20,7 @@ import { StoreRegisterLogAuditCreateDto } from './dto/store-register-log-audit-c
 import { StoreService } from './store.service';
 import { StoreRegisterLogListResponseDto } from './dto/store-register-log-list-response.dto';
 import { StoreRegisterLogAuditDto } from './dto/store-register-log-audit.dto';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 @Injectable()
 export class StoreRegisterLogService {
@@ -52,9 +53,6 @@ export class StoreRegisterLogService {
             throw new ServiceException(MESSAGE_CODE.STORE_REGISTER_LOG_NOT_ALLOWED);
         }
     }
-    const filesIds = [log.businessRegistrationImageId, log.eCommerceLicenseImageId, log.accountImageId, log.storeProfileImageId, log.storeBannerImageId];
-    const files = await this.FileService.findByIds(filesIds);
-
     return new StoreRegisterLogDto(log);
   }
 
@@ -74,12 +72,12 @@ export class StoreRegisterLogService {
     return await this.storeRegisterLogRepository.deleteById(id);
   }
 
-  async findByUserId(userId: string, user: User): Promise<StoreRegisterLogListResponseDto> {
-    const [logs, total] = await this.storeRegisterLogRepository.findAllByUserId(userId);
+  async findByUserId(userId: string, user: User, pagination?: PaginationDto): Promise<StoreRegisterLogListResponseDto> {
+    const { logs, total } = await this.storeRegisterLogRepository.findAllByUserId(userId, pagination);
     if (total === 0 || logs.length === 0) {
         return { logs: [], total: 0 };
     }
-    return { logs: logs.map(l => new StoreRegisterLogDto(l)), total };
+    return new StoreRegisterLogListResponseDto(logs.map(l => new StoreRegisterLogDto(l)), total);
   }
 
   /* 

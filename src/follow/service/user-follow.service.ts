@@ -6,6 +6,7 @@ import { UserService } from 'src/user/service/user.service';
 import { UserFollowsDto } from '../dto/user-follows.dto';
 import { FollowingUserDto } from '../dto/following-user.dto';
 import { StoreFollowService } from './store-follow.service';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 @Injectable()
 export class UserFollowService {
@@ -68,10 +69,10 @@ export class UserFollowService {
      * 예시: User A가 User B, User C를 팔로우하는 경우
      * - User B의 팔로워 수와 User C의 팔로워 수를 반환
      */
-    async findFollowingUsersFollowerCounts(followerPublicId: string, lastId: number | null, limit: number = 7): Promise<UserFollowsDto> {
+    async findFollowingUsersFollowerCounts(followerPublicId: string, pagination: PaginationDto): Promise<UserFollowsDto> {
         const follower = await this.userService.findEntityByPublicId(followerPublicId);
-
-        const followings = await this.userFollowRepository.findFollowings(follower.id, lastId, limit);
+        const { page, limit } = pagination;
+        const followings = await this.userFollowRepository.findFollowings(follower.id, page, limit);
 
         const followingIds = followings[0].map(f => f.followingId);
         

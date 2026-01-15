@@ -4,6 +4,7 @@ import { CouponCreateDto } from "../dto/coupon-create.dto";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { Injectable } from "@nestjs/common";
+import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
 export class CouponRepository extends Repository<Coupon> {
@@ -24,17 +25,21 @@ export class CouponRepository extends Repository<Coupon> {
         return coupon;
     }
 
-    async findAllNotExpired(): Promise<Coupon[]> {
-        return await this.find(
+    async findAllNotExpired(pagination?: PaginationDto): Promise<{coupons: Coupon[], total: number}> {
+        const { page, limit } = pagination;
+        const [coupons, total] = await this.findAndCount(
             {
                 where: {
                     issuableUntil: MoreThan(new Date()),
                 },
+                skip: (page - 1) * limit,
+                take: limit,
                 order: {
                     createdAt: 'DESC',
                 },
             }
         );
+        return { coupons, total };
     }
 
     async deleteById(id: number): Promise<boolean> {
