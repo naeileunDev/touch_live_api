@@ -62,13 +62,13 @@ export class StoreRegisterLog extends BaseEntity {
     @Column({ type: 'int', comment: '가게 배너 이미지 id' })
     storeBannerImageId: number;
 
-    @Column({ type: 'varchar', array: true, comment: '메인태그 리스트' })
+    @Column({ type: "jsonb", comment: '메인태그 리스트' })
     mainTags: string[];
 
-    @Column({ type: 'varchar', array: true, comment: '서브태그 리스트'})
+    @Column({ type: "jsonb", comment: '서브태그 리스트'})
     subTags: string[];
 
-    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)'})
+    @Column({ type: "jsonb", comment: '가게 카테고리 리스트 (최대 3개)'})
     category: CategoryType[];
 
     @Column({ type: 'enum', enum: StoreRegisterStatus, comment: '가게 등록 상태', default: StoreRegisterStatus.Pending })

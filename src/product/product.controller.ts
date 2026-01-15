@@ -3,16 +3,22 @@ import { ProductService } from "./product.service";
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { ProductCreateDto } from "./dto/product-create.dto";
 import { Role } from "src/common/decorator/role.decorator";
-import { ANY_PERMISSION } from "src/common/permission/permission";
+import { ALL_PERMISSION, ANY_PERMISSION, OPERATOR_PERMISSION } from "src/common/permission/permission";
 import { ProductUpdateDto } from "./dto/product-update.dto";
 import { ProductReadDto } from "./dto/product-read.dto";
 import { StoreOwner } from "src/common/decorator/store-owner.decorator";
+import { ProductReqInfoCreateDto } from "./dto/product-req-info-create.dto";
+import { ProductReqInfoService } from "./service/product-req-info.service";
+import { ProductReqInfo } from "./entity/product-req-info.entity";
 
 @ApiTags('Product')
 @Controller('product')
 @ApiBearerAuth('access-token')
 export class ProductController {
-    constructor(private readonly productService: ProductService) { }
+    constructor(
+        private readonly productService: ProductService,
+        private readonly productReqInfoService: ProductReqInfoService
+    ) { }
 
     @Post()
     @StoreOwner()
@@ -48,4 +54,21 @@ export class ProductController {
     deleteById(@Param('id') id: number) {
         return this.productService.deleteById(id);
     }
+
+    @Post('req-info')
+    // @Role(OPERATOR_PERMISSION)
+    @ApiOperation({ summary: '상품 고시 정보 정의 등록' })
+    createReqInfo(@Body() createDto: ProductReqInfoCreateDto): Promise<ProductReqInfo> {
+        console.log(createDto);
+        return this.productReqInfoService.create(createDto);
+    }
+
+
+    @Get('req-info')
+    @Role(ALL_PERMISSION)
+    @ApiOperation({ summary: '상품 고시 정보 조회' })
+    findReqInfo() {
+        return this.productReqInfoService.findAll();
+    }
+
 }

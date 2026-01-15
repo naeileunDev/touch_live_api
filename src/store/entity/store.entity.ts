@@ -55,10 +55,10 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '사업자 정산계좌 이미지 id' })
     accountImageId: number;
 
-    @Column({ type: 'varchar', array: true, length: 3, comment: '메인태그(3개까지)' })
+    @Column({ type: "jsonb", length: 3, comment: '메인태그(3개까지)' })
     mainTags: string[];
 
-    @Column({ type: 'varchar', array: true, length: 5, comment: '최대 서브태그(5개까지)' })
+    @Column({ type: "jsonb", length: 5, comment: '최대 서브태그(5개까지)' })
     subTags: string[];
 
     // 가게 상태 타입 ( 유저의 행위나 제재에 영향)
@@ -72,7 +72,7 @@ export class Store extends BaseEntity{
     @Column({ type: 'int', comment: '판매 수수료 비율', default: 11 })
     saleChageRate: number;
 
-    @Column({ type: 'varchar', array: true, comment: '가게 카테고리 리스트 (최대 3개)', default:[]})
+    @Column({ type: "jsonb", comment: '가게 카테고리 리스트 (최대 3개)'})
     category: CategoryType[];
 
     @Column({ type: 'varchar', length: 255, comment: '가게 정보' })

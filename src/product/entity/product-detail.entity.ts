@@ -59,7 +59,7 @@ export class ProductDetail extends BaseEntity {
     @Column({ type: 'varchar', comment: '해당 상품 고시 정보' })
     reqInfo: string;
 
-    @Column({ type: 'varchar', array: true, length: 3, comment: '해시 태그(최소 1개, 최대 3개까지)' })
+    @Column({ type: "jsonb", comment: '해시 태그(최소 1개, 최대 3개까지)' })
     tags: string[];
 
     @BeforeInsert()

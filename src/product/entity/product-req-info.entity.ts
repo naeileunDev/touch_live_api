@@ -6,6 +6,6 @@ export class ProductReqInfo extends BaseEntity {
     @Column({ type: 'varchar', comment: '상품 분류 이름' })
     title: string;
 
-    @Column({ type: 'varchar', array: true, comment: '상품 분류 속성 리스트' })
+    @Column({ type: "jsonb", comment: '상품 분류 속성 리스트' })
     itemList: string[];
 }

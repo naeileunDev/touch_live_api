@@ -7,7 +7,8 @@ import { ProductOptionRepository } from "./repository/product-option.respository
 import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository"
 import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository"
 import { ProductDetailRepository } from "./repository/product-detail.repository"
-import { ProductReqInfoRepository } from "./repository/product-req-info.entity"
+import { ProductReqInfoService } from "./service/product-req-info.service"
+import { ProductReqInfoRepository } from "./repository/product-req-info.repository"
 
 @Module({
     controllers: [ProductController],
@@ -19,8 +20,8 @@ import { ProductReqInfoRepository } from "./repository/product-req-info.entity"
         ProductOptionDetailRepository,
         ProductOptionDetailStockRepository,
         ProductDetailRepository,
+        ProductReqInfoService,
         ProductReqInfoRepository,
-        
     ],
     exports: [ProductService]
 })
