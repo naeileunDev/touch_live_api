@@ -12,10 +12,8 @@ export class FileCommonDto {
     @IsString()
     fileUrl: string;
 
-    constructor(data?: FileDto) {
-        if (data) {
-            this.id = data.id;
-            this.fileUrl = data.fileUrl;
-        }
+    constructor(data: FileDto) {
+        this.id = data.id;
+        this.fileUrl = data.fileUrl;
     }
 }

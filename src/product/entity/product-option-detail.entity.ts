@@ -1,6 +1,7 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { ProductOption } from "./product-option.entity";
+import { createPublicId } from "src/common/util/public-id.util";
 
 @Entity()
 export class ProductOptionDetail extends BaseEntity {
@@ -16,4 +17,15 @@ export class ProductOptionDetail extends BaseEntity {
     @ManyToOne(() => ProductOption)
     @JoinColumn({ name: 'productOptionId' })
     productOption: ProductOption;
+
+    @Column({ type: 'varchar', comment: '옵션 상세 이미지 URL' })
+    imgUrl: string;
+
+    @Column({ type: 'varchar', comment: '옵션 상세 고유 ID(POD_랜덤UUID)' })
+    publicId: string;
+
+    @BeforeInsert()
+    createPublicId() {
+        this.publicId = createPublicId('POD');
+    }
 }

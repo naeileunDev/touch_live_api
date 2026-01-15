@@ -1,7 +1,8 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity } from "typeorm";
 import { DiscountType } from "../enum/coupon.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
+import { createPublicId } from "src/common/util/public-id.util";
 
 @Entity()
 export class Coupon extends BaseEntity {
@@ -29,6 +30,11 @@ export class Coupon extends BaseEntity {
     @Column({ type: 'int', comment: '쿠폰 유효 일수', nullable: true })
     validDays: number;
 
-    @Column({ type: 'varchar',  comment: '쿠폰 번호' })
-    couponNo: string
+    @Column({ type: 'varchar', unique: true, comment: '쿠폰 번호(CPN_랜덤UUID)' })
+    couponNo: string;
+    
+    @BeforeInsert()
+    generateCouponNo() {
+        this.couponNo = createPublicId('CPN');
+    }
 }

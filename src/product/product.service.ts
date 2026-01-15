@@ -1,10 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "./repository/product.respository";
-import { ProductCategoryRepository } from "./repository/product-category.repository";
 import { ProductMediaRepository } from "./repository/product-media.respository";
 import { ProductOptionRepository } from "./repository/product-option.respository";
 import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository";
-import { ProductStockRepository } from "./repository/product-stock.respository";
 import { ProductCreateDto } from "./dto/product-create.dto";
 import { ProductUpdateDto } from "./dto/product-update.dto";
 import { ProductDto } from "./dto/product.dto";
@@ -20,8 +18,6 @@ import { Product } from "./entity/product.entity";
 export class ProductService {
     constructor(
         private readonly productRepository: ProductRepository,
-        private readonly productStockRepository: ProductStockRepository,
-        private readonly productCategoryRepository: ProductCategoryRepository,
         private readonly productMediaRepository: ProductMediaRepository,
         private readonly productOptionRepository: ProductOptionRepository,
         private readonly productOptionDetailRepository: ProductOptionDetailRepository,
@@ -40,23 +36,20 @@ export class ProductService {
         const now = new Date();
 
         // 카테고리 조회
-        const category = await this.productCategoryRepository.findById(productCreateDto.categoryId);
 
         // TODO: 수수료 계산
 
         // 상품 생성
         const product = await this.productRepository.createProduct({
             ...productCreateDto,
-            productCategory: category,
-            version: now,
         });
         const productDto = new ProductDto(product);
 
         // 상품 수량 생성
-        await this.productStockRepository.createProductStock({
-            stock: productCreateDto.stock,
-            product,
-        });
+        // await this.productStockRepository.createProductStock({
+        //     stock: productCreateDto.stock,
+        //     product,
+        // });
 
         // 옵션 생성
         await Promise.all(options.map(async (option) => {

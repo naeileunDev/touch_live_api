@@ -7,7 +7,6 @@ import { MESSAGE_CODE } from "src/common/filter/config/message-code.config";
 import { DiscountType } from "../enum/coupon.enum";
 import { ServiceException } from "src/common/filter/exception/service.exception";
 import { Coupon } from "../entity/coupon.entity";
-import { v4 as uuidv4 } from 'uuid';
 import { PaginationDto } from "src/common/pagination/dto/pagination.dto";
 
 @Injectable()
@@ -21,8 +20,6 @@ export class CouponService {
         this.validateIssuableUntil(couponCreateDto.issuableUntil);
         this.validateAmount(couponCreateDto.discountType, couponCreateDto.amount);
         this.validateMaxDiscountAmount(couponCreateDto.maxDiscountAmount, couponCreateDto.discountType);
-        const couponNo = `COUPON-${uuidv4()}`;
-        couponCreateDto.couponNo = couponNo;
         const coupon = await this.couponRepository.createCoupon(couponCreateDto);
         return new CouponDto(coupon);
     }

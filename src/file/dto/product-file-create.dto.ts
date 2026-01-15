@@ -6,21 +6,21 @@ export class ProductFileCreateDto {
     thumbnailImage: Express.Multer.File[];
 
     @ApiProperty({ description: '정보 이미지' })
-    infoImage: Express.Multer.File[];
+    infoImages: Express.Multer.File[];
 
     @ApiProperty({ description: '상세 이미지' })
     detailImages: Express.Multer.File[];
 
     constructor(files: { [key: string]: Express.Multer.File[] }) {
         this.thumbnailImage = files?.thumbnailImage ?? [];
-        this.infoImage = files?.infoImage ?? [];
+        this.infoImages = files?.infoImages ?? [];
         this.detailImages = files?.detailImages ?? [];
     }
     
     static of(files: { [key: string]: Express.Multer.File[] }): ProductFileCreateDto{
         return new ProductFileCreateDto({
           thumbnailImage: files?.thumbnailImage ?? [],
-          infoImage: files?.infoImage ?? [],
+          infoImages: files?.infoImages ?? [],
           detailImages: files?.detailImages ?? [],
         });
       }

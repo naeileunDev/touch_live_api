@@ -133,15 +133,19 @@ export class FileController {
             type: 'object',
             properties: {
                 thumbnailImage: { type: 'string', format: 'binary' },
-                infoImage: { type: 'string', format: 'binary' },
-                detailImage: { 
+                infoImages: { 
+                    type: 'array', 
+                    items: { type: 'string', format: 'binary' },
+                    description: '정보 이미지들 (개수 제한 없음)'
+                },
+                detailImages: { 
                     type: 'array', 
                     items: { type: 'string', format: 'binary' },
                     description: '상세 이미지들 (최대 10 장 선택 가능)'
                 },
             },
             
-            required: ['thumbnailImage', 'infoImage', 'detailImage'],
+            required: ['thumbnailImage', 'infoImages', 'detailImages'],
         },
     })
     @ApiConsumes('multipart/form-data')

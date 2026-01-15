@@ -1,5 +1,5 @@
 export enum ProductTargetAge {
-    Teenager = 'TEENAGER',
+    Kid = 'KID',
     Adult = 'ADULT',
-    Senior = 'SENIOR',
+    All = 'ALL',
 }

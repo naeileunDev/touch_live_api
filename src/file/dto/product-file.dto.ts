@@ -11,27 +11,23 @@ export class ProductFileDto {
     @Type(() => FileCommonDto)
     thumbnailImage: FileCommonDto;
 
-    @ApiProperty({ description: '정보 이미지', type: FileCommonDto })
+    @ApiProperty({ description: '정보 이미지', isArray: true, type: FileCommonDto })
     @ValidateNested()
     @Type(() => FileCommonDto)
-    infoImage: FileCommonDto;
+    infoImages: FileCommonDto[];
 
-    @ApiProperty({ description: '상세 이미지', type: FileCommonDto })
+    @ApiProperty({ description: '상세 이미지', isArray: true, type: FileCommonDto })
     @ValidateNested()
     @Type(() => FileCommonDto)
-    detailImages: FileCommonDto;
+    detailImages: FileCommonDto[];
 
-    constructor(thumbnailImage: FileDto, infoImage: FileDto, detailImages: FileDto) {
+    constructor(thumbnailImage: FileDto, infoImages: FileDto[], detailImages: FileDto[]) {
         this.thumbnailImage = new FileCommonDto(thumbnailImage);
-        this.infoImage = new FileCommonDto(infoImage);
-        this.detailImages = new FileCommonDto(detailImages);
+        this.infoImages = infoImages.map(infoImage => new FileCommonDto(infoImage));
+        this.detailImages = detailImages.map(detailImage => new FileCommonDto(detailImage));
     }
-    
-    static of(files: FileDto[]): ProductFileDto {
-        return new ProductFileDto(
-            files.find(file => file.usageType === UsageType.Thumbnail)!,
-            files.find(file => file.usageType === UsageType.InfoImage)!,
-            files.find(file => file.usageType === UsageType.DetailImage)!,
-        );
+
+    static of(thumbnailImage: FileDto, infoImages: FileDto[], detailImages: FileDto[]): ProductFileDto {
+        return new ProductFileDto(thumbnailImage, infoImages, detailImages);
     }
 }

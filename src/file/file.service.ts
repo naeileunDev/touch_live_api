@@ -18,6 +18,7 @@ import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
 import { ProductFileCreateDto } from './dto/product-file-create.dto';
 import { ProductService } from 'src/product/product.service';
 import { ProductFileDto } from './dto/product-file.dto';
+import { FileCommonDto } from './dto/file-common-dto';
 
 @Injectable()
 export class FileService {
@@ -181,31 +182,45 @@ export class FileService {
         const userEntity = await this.userService.findEntityById(user.id, true);
         const productEntity = await this.productService.findEntityById(productId);
         
-        const fileMappings: Array<{ field: keyof ProductFileCreateDto; usageType: UsageType }> = [
-            { field: 'thumbnailImage', usageType: UsageType.Thumbnail },
-            { field: 'infoImage', usageType: UsageType.InfoImage },
-            { field: 'detailImages', usageType: UsageType.DetailImage },
+        const fileMappings: Array<{ field: keyof ProductFileCreateDto; usageType: UsageType; isArray: boolean }> = [
+            { field: 'thumbnailImage', usageType: UsageType.Thumbnail, isArray: false },
+            { field: 'infoImages', usageType: UsageType.InfoImage, isArray: true },
+            { field: 'detailImages', usageType: UsageType.DetailImage, isArray: true },
         ];
 
         const fileDtos = await Promise.all(
-            fileMappings.map(async ({ field, usageType }) => {
+            fileMappings.map(async ({ field, usageType, isArray }) => {
                 const files = createDto[field];
                 if (!files || files.length === 0) {
                     throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
                 }
-                return await this.createLocal(files[0] as Express.Multer.File, {
-                    contentCategory: ContentCategory.Product,
-                    usageType,
-                    contentId: productEntity.id,
-                    userId: userEntity.id,
-                });
+                
+                if (isArray) {
+                    return await Promise.all(
+                        files.map(async (file) => 
+                            await this.createLocal(file as Express.Multer.File, {
+                                contentCategory: ContentCategory.Product,
+                                usageType,
+                                contentId: productEntity.id,
+                                userId: userEntity.id,
+                            })
+                        )
+                    );
+                } else {
+                    return await this.createLocal(files[0] as Express.Multer.File, {
+                        contentCategory: ContentCategory.Product,
+                        usageType,
+                        contentId: productEntity.id,
+                        userId: userEntity.id,
+                    });
+                }
             })
         );
 
         return new ProductFileDto(
-            fileDtos[0],
-            fileDtos[1],
-            fileDtos[2],
+            fileDtos[0] as FileDto,
+            fileDtos[1] as FileDto[],
+            fileDtos[2] as FileDto[],
         );
     }
 }
