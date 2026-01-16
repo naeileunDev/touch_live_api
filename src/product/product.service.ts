@@ -1,32 +1,24 @@
 import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "./repository/product.respository";
 import { ProductMediaRepository } from "./repository/product-media.respository";
-import { ProductOptionRepository } from "./repository/product-option.respository";
 import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository";
 import { ProductCreateDto } from "./dto/product-create.dto";
 import { ProductUpdateDto } from "./dto/product-update.dto";
 import { ProductDto } from "./dto/product.dto";
-import { ProductOptionDetailDto } from "./dto/product-option-detail.dto";
-import { ProductOptionDto } from "./dto/product-option.dto";
 import { ProductReadDto } from "./dto/product-read.dto";
 import { Pagination, PaginationResponse } from "src/common/pagination/pagination.interface";
 import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
 import { Transactional } from "typeorm-transactional";
 import { Product } from "./entity/product.entity";
 import { User } from "src/user/entity/user.entity";
-import { StoreService } from "src/store/store.service";
 import { ProductFlexibleRepository } from "./repository/product-flexible.repository";
+import { ProductFlexible } from "./entity/product-flexible.entity";
 
 @Injectable()
 export class ProductService {
     constructor(
         private readonly productRepository: ProductRepository,
-        private readonly productMediaRepository: ProductMediaRepository,
-        private readonly productOptionRepository: ProductOptionRepository,
-        private readonly productOptionDetailRepository: ProductOptionDetailRepository,
-        private readonly productOptionDetailStockRepository: ProductOptionDetailStockRepository,
         private readonly productFlexibleRepository: ProductFlexibleRepository,
-        // private readonly storeService: StoreService,
     ) { }
 
     /**
@@ -36,52 +28,40 @@ export class ProductService {
      * @returns 상품
      */
     @Transactional()
-    async create(productCreateDto: ProductCreateDto, user: User) {
-        // const store = await this.storeService.findEntityById(user.store.id);
-        const { options, productFlexible } = productCreateDto;
-        const now = new Date();
+    async create(dto: ProductCreateDto, user: User) {
+        const {price, deliveryFee, deliveryCompany, deliveryPeriod, jejuDeliveryFee, islandDeliveryFee, charge} = dto;
+        const now = new Date(); // 버전 관리를 위한 날짜
         // 판매자 수수료는 정산 시 따로? 일단 즉시 업로드냐 아니냐에 따라 즉시 업로드인 경우 판매자 수수료 청구
-        const registerFee = productCreateDto?.registerFee ?? 0;
+        const registerFee = dto?.registerFee ?? 0;
 
         // 상품 생성
-        const product = await this.productRepository.createProduct({
-            ...productCreateDto,
-        });
-        const productDto = new ProductDto(product);
+        const product = new Product();
+        product.name = dto.name;
+        product.targetGender = dto.targetGender;
+        product.targetAge = dto.targetAge;
+        product.registerFee = registerFee;
+        product.version = now;
+        product.isMixed = dto.isMixed;
+        product.isActive = true;
+        product.isApproved = false;    
 
-        // 상품 수량 생성
-        // await this.productStockRepository.createProductStock({
-        //     stock: productCreateDto.stock,
-        //     product,
-        // });
+        // 상품 저장
+        const savedProduct = await this.productRepository.save(product);
+        const productFlexible = new ProductFlexible();
+        productFlexible.product = savedProduct;
+        productFlexible.price = price;
+        productFlexible.deliveryFee = deliveryFee;
+        productFlexible.deliveryCompany = deliveryCompany;
+        productFlexible.deliveryPeriod = deliveryPeriod;
+        productFlexible.jejuDeliveryFee = jejuDeliveryFee;
+        productFlexible.islandDeliveryFee = islandDeliveryFee;
+        productFlexible.charge = charge;
+        productFlexible.version = now;
+        productFlexible.isActive = true;
+        await this.productFlexibleRepository.save(productFlexible);        // 옵션 생성
 
-        // 옵션 생성
-        await Promise.all(options.map(async (option) => {
-            const productOption = await this.productOptionRepository.createProductOption({
-                ...option,
-                product,
-            });
-            const productOptionDto = new ProductOptionDto(productOption);
-            productDto.options.push(productOptionDto);
 
-            // 옵션 상세 생성
-            await Promise.all(option.optionDetails.map(async (optionDetail) => {
-                const productOptionDetail = await this.productOptionDetailRepository.createProductOptionDetail({
-                    ...optionDetail,
-                    productOption,
-                });
-                const productOptionDetailDto = new ProductOptionDetailDto(productOptionDetail);
-                productOptionDto.optionDetails.push(productOptionDetailDto);
-
-                // 옵션 상세 수량 생성
-                await this.productOptionDetailStockRepository.createProductOptionDetailStock({
-                    stock: optionDetail.stock,
-                    productOptionDetail,
-                });
-            }));
-        }));
-
-        return productDto;
+        return new ProductDto(savedProduct);
     }
 
     /**

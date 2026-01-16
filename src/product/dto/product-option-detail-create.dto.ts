@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
-import { ProductOption } from "../entity/product-option.entity";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class ProductOptionDetailCreateDto {
@@ -14,8 +13,7 @@ export class ProductOptionDetailCreateDto {
     @IsNumber()
     stock: number;
 
-    @ApiProperty({ description: '옵션', type: ProductOption })
-    @ValidateNested()
-    @Type(() => ProductOption)
-    productOption: ProductOption;
+    @ApiProperty({ description: '조합 옵션 여부', type: Boolean, example: true })
+    @IsBoolean()
+    isMixed: boolean;
 }

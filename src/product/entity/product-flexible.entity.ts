@@ -1,5 +1,5 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { Product } from "./product.entity";
 import { createPublicId } from "src/common/util/public-id.util";
 

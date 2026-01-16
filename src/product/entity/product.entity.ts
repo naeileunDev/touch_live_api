@@ -1,10 +1,11 @@
 import { BaseEntity } from "src/common/base-entity/base.entity";
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { Store } from "src/store/entity/store.entity";
 import { createPublicId } from "src/common/util/public-id.util";
 import { AuditStatus, UploadType } from "src/common/enums";
 import { ProductTargetGender } from "../enum/product-target-gender.enum";
 import { ProductTargetAge } from "../enum/product-target-age.enum";
+import { ProductFlexible } from "./product-flexible.entity";
 
 @Entity()
 export class Product extends BaseEntity {
@@ -50,7 +51,7 @@ export class Product extends BaseEntity {
     auditStatus: AuditStatus;
 
     @Column({ type: 'varchar', comment: '심사 코멘트', nullable: true })
-    auditComment?: string;
+    comment?: string;
 
     @Column({ type: 'varchar', comment: '해당 상품 고시 정보' })
     reqInfo: string;
@@ -63,6 +64,16 @@ export class Product extends BaseEntity {
 
     @Column({ type: 'enum', enum: ProductTargetAge, comment: '구매 대상 나이' })
     targetAge: ProductTargetAge;
+
+    @Column({ type: 'boolean', comment: '노출 여부', default: false})
+    isVisible: boolean;
+
+    @OneToMany(() => ProductFlexible, (flexible) => flexible.product)
+    flexibles: ProductFlexible[];
+
+    @OneToOne(() => ProductFlexible)
+    @JoinColumn({ name: 'currentFlexibleId' })
+    currentFlexible: ProductFlexible;
 
     @BeforeInsert()
     createPublicId() {

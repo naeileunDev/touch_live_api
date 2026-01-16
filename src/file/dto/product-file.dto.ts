@@ -3,28 +3,27 @@ import { FileCommonDto } from "./file-common-dto";
 import { FileDto } from "./file.dto";
 import { ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { UsageType } from "../enum/file-category.enum";
 
 export class ProductFileDto {
-    @ApiProperty({ description: '썸네일 이미지', type: FileCommonDto })
+    @ApiProperty({ description: '썸네일 이미지', type: FileDto })
     @ValidateNested()
-    @Type(() => FileCommonDto)
-    thumbnailImage: FileCommonDto;
+    @Type(() => FileDto)
+    thumbnailImage: FileDto;
 
-    @ApiProperty({ description: '정보 이미지', isArray: true, type: FileCommonDto })
+    @ApiProperty({ description: '정보 이미지', isArray: true, type: FileDto })
     @ValidateNested()
-    @Type(() => FileCommonDto)
-    infoImages: FileCommonDto[];
+    @Type(() => FileDto)
+    infoImages: FileDto[];
 
-    @ApiProperty({ description: '상세 이미지', isArray: true, type: FileCommonDto })
+    @ApiProperty({ description: '상세 이미지', isArray: true, type: FileDto })
     @ValidateNested()
-    @Type(() => FileCommonDto)
-    detailImages: FileCommonDto[];
+    @Type(() => FileDto)
+    detailImages: FileDto[];
 
     constructor(thumbnailImage: FileDto, infoImages: FileDto[], detailImages: FileDto[]) {
-        this.thumbnailImage = new FileCommonDto(thumbnailImage);
-        this.infoImages = infoImages.map(infoImage => new FileCommonDto(infoImage));
-        this.detailImages = detailImages.map(detailImage => new FileCommonDto(detailImage));
+        this.thumbnailImage = new FileDto(thumbnailImage);
+        this.infoImages = infoImages.map(infoImage => new FileDto(infoImage));
+        this.detailImages = detailImages.map(detailImage => new FileDto(detailImage));
     }
 
     static of(thumbnailImage: FileDto, infoImages: FileDto[], detailImages: FileDto[]): ProductFileDto {

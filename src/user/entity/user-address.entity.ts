@@ -17,8 +17,10 @@ export class UserAddress extends BaseEntity {
     phone: string;
     @Column({ type: 'varchar', length: 255, comment: '이름' })
     name: string;
-    @Column({ type: 'boolean', comment: '기본 주소 설정여부', default: false })
-    isDefault: boolean;
+    @Column({ type: 'boolean', comment: '기본 주소 설정여부'})
+    isDefault?: boolean = false;
     @Column({ type: 'varchar', length: 255, comment: '주소 별명', nullable: true })
     addressAlias: string;
+    @Column({ type: 'boolean', comment: '체험단 기본 주소 설정여부' })
+    isReviewerDefault?: boolean = false;
 }

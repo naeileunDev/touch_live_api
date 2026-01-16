@@ -1,7 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ProductOptionUpdateDto } from "./product-option-update.dto";
-import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
-import { Type } from "class-transformer";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class ProductUpdateDto {
     @ApiProperty({ description: '상품명', required: false })
@@ -19,8 +17,4 @@ export class ProductUpdateDto {
     @IsNumber()
     stock?: number;
 
-    @ApiProperty({ description: '옵션 목록', type: [ProductOptionUpdateDto], required: false })
-    @IsArray()
-    @Type(() => ProductOptionUpdateDto)
-    options: ProductOptionUpdateDto[];
 }
