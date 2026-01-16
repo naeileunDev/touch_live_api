@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { ContentCategory, MediaType, UsageType, MimeType } from "../enum/file-category.enum";
 import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 
@@ -37,14 +37,24 @@ export class FileDto {
     @IsNumber()
     duration: number;
 
-    @ApiProperty({ description: '콘텐츠 타입', example: 1, type: Number })
-    @IsNumber()
+    @ApiPropertyOptional({ description: '콘텐츠 타입', example: 1, type: Number })
     @IsOptional()
-    contentId: number;
+    @IsNumber()
+    contentId?: number;
 
-    constructor(data?: Partial<FileDto>) {
+    @ApiProperty({ description: '유저 ID', example: 1, type: Number })
+    @IsNumber()
+    userId: number;
+
+    @ApiProperty({ description: '필드 이름', example: 'thumbnailImage or 블랙/m 등', type: String })
+    @IsString()
+    @IsOptional()
+    field?: string;
+
+    constructor(data:FileDto, field?: string) {
         if (data) {
             Object.assign(this, data);
         }
+        this.field = field;
     }
 }

@@ -31,7 +31,7 @@ export class Product extends BaseEntity {
     @Column({ type: 'boolean', comment: '옵션 여부' })
     isMixed: boolean;
 
-    @Column({ type: 'timestamptz', comment: '버전' })
+    @Column({ type: 'timestamptz', comment: '버전', nullable: true })
     version: Date;
 
     @Column({ type: 'int', comment: '스토어 ID' })

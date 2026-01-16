@@ -13,9 +13,16 @@ export class ProductOptionDetailRepository extends Repository<ProductOptionDetai
 
     async createProductOptionDetail(productOptionDetailCreateDto: ProductOptionDetailCreateDto): Promise<ProductOptionDetail> {
         const productOptionDetail = this.create(productOptionDetailCreateDto);
+        productOptionDetail.version = productOptionDetail.createdAt;
         return this.save(productOptionDetail);
     }
 
+    async createAll(createDtos: ProductOptionDetailCreateDto[]): Promise<ProductOptionDetail[]> {
+        const productOptionDetails = this.create(
+            createDtos.map(dto => Object.assign(new ProductOptionDetail(), dto))
+        );
+        return await this.save(productOptionDetails);
+    }
     async findById(id: number): Promise<ProductOptionDetail> {
         const productOptionDetail = await this.findOne({ 
             where: { 

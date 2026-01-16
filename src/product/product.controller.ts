@@ -13,6 +13,7 @@ import { ProductReqInfo } from "./entity/product-req-info.entity";
 import { ProductReqInfoDto } from "./dto/product-req-info.dto";
 import { User } from "src/user/entity/user.entity";
 import { GetUser } from "src/common/decorator/get-user.decorator";
+import { ProductFilesDto } from "./dto/prodcut-files.dto";
 
 @ApiTags('Product')
 @Controller('product')
@@ -24,9 +25,12 @@ export class ProductController {
     ) { }
 
     @Post()
-    @StoreOwner()
+    // @StoreOwner()
     @ApiOperation({ summary: '[스토어] 상품 생성' })
     create(@Body() productCreateDto: ProductCreateDto, @GetUser() user: User) {
+        const { fileDtos, files, ...productDto } = productCreateDto;
+        const productFiles = new ProductFilesDto(fileDtos);
+        productCreateDto.files = productFiles;
         return this.productService.create(productCreateDto, user);
     }
 

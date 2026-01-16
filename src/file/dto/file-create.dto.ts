@@ -1,30 +1,41 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { ContentCategory, UsageType } from "../enum/file-category.enum";
-import { Expose } from "class-transformer";
-import { IsEnum, IsNumber, IsOptional } from "class-validator";
+import { Expose, Transform } from "class-transformer";
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsRequiredString } from "src/common/validator/is-required-string";
 
 export class FileCreateDto {
-    @Expose()
-    @ApiProperty({ description: '콘텐츠 카테고리', example: ContentCategory.User, enum: ContentCategory })
+    @ApiProperty({ 
+        description: '콘텐츠 카테고리', 
+        example: ContentCategory.User, 
+        enum: ContentCategory,
+    })
     @IsEnum(ContentCategory)
     contentCategory: ContentCategory;
-
+    
     @ApiProperty({ description: '파일 사용 용도', example: UsageType.Profile, enum: UsageType })
     @IsEnum(UsageType)
     usageType: UsageType;
 
-    @ApiProperty({ description: '콘텐츠 타입', example: 1, type: Number })
+    @ApiPropertyOptional({ description: '콘텐츠 타입', example: 1, type: Number })
+    @IsOptional()
     @IsNumber()
-    contentId: number;
+    contentId?: number;
 
-    @ApiProperty({ description: '유저 ID', example: 1, type: Number })
-    @IsNumber()
-    userId: number;
+    @ApiPropertyOptional({ description: '필드 이름', example: 'thumbnailImage or 블랙/m 등', type: String })
+    @IsOptional()
+    @IsRequiredString()
+    field?: string;
 
-    constructor(contentCategory: ContentCategory, usageType: UsageType, contentId?: number, userId?: number) {
+    constructor(
+        contentCategory: ContentCategory, 
+        usageType: UsageType, 
+        contentId?: number, 
+        field?: string,
+    ) {
         this.contentCategory = contentCategory;
         this.usageType = usageType;
         this.contentId = contentId;
-        this.userId = userId;
+        this.field = field;
     }
 }

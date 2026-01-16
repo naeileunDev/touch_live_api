@@ -4,9 +4,6 @@ import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength, 
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { StoreRegisterStatus } from "../enum/store-register-status.enum";
 import { CategoryType } from "src/tag/enum/category-type.enum";
-import { StoreFilesDto } from "./store-files.dto";
-import { Type } from "class-transformer";
-import { StoreRegisterLogFilesDto } from "src/file/dto/store-register-log-files.dto";
 import { AuditStatus } from "src/common/enums";
 
 export class StoreRegisterLogDto {

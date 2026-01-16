@@ -4,6 +4,9 @@ import { StoreRegisterLog } from "../entity/store-register-log.entity";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 import { StoreStatusType } from "../enum/store-status-type.enum";
 import { User } from "src/user/entity/user.entity";
+import { FileDto } from "src/file/dto/file.dto";
+import { ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class StoreCreateDto {
     @ApiProperty({ description: '가게 이름', example: '가게 이름' })
@@ -37,8 +40,8 @@ export class StoreCreateDto {
     @ApiProperty({ description: '통신판매업 신고번호', example: '1234567890123' })
     eCommerceLicenseNumber: string;
 
-    @ApiProperty({ description: '통신판매업 신고증 이미지 id', example: 1, type: Number })
-    eCommerceLicenseImageId: number;
+    // @ApiProperty({ description: '통신판매업 신고증 이미지 id', example: 1, type: Number })
+    // eCommerceLicenseImageId: number;
 
     @ApiProperty({ description: '사업자 은행명', example: '은행명' })
     bankName: string;
@@ -48,9 +51,6 @@ export class StoreCreateDto {
 
     @ApiProperty({ description: '사업자 예금주', example: '홍길동' })
     accountOwner: string;
-
-    @ApiProperty({ description: '사업자 정산계좌 이미지 id', example: 1, type: Number })
-    accountImageId: number;    
     
     @ApiProperty({ description: '가게 카테고리', example: [CategoryType.Food, CategoryType.Lifestyle, CategoryType.Fashion], enum: CategoryType, isArray: true })
     category: CategoryType[];
@@ -60,12 +60,6 @@ export class StoreCreateDto {
 
     @ApiProperty({ description: '서브태그', example: ['태그1', '태그2', '태그3'], isArray: true })
     subTags: string[];
-
-    @ApiProperty({ description: '가게 배너 이미지 id', example: 1, type: Number })
-    storeBannerImageId: number;
-
-    @ApiProperty({ description: '가게 프로필 이미지 id', example: 1, type: Number })
-    storeProfileImageId: number;
 
     @ApiProperty({ description: '판매 수수료 비율', example: 11, type: Number })
     saleChageRate: number;
@@ -88,16 +82,12 @@ export class StoreCreateDto {
         this.businessType = storeLog.businessType;
         this.businessCategory = storeLog.businessCategory;
         this.eCommerceLicenseNumber = storeLog.eCommerceLicenseNumber;
-        this.eCommerceLicenseImageId = storeLog.eCommerceLicenseImageId;
         this.bankName = storeLog.bankName;
         this.accountNumber = storeLog.accountNumber;
         this.accountOwner = storeLog.accountOwner;
-        this.accountImageId = storeLog.accountImageId;
         this.category = storeLog.category;
         this.mainTags = storeLog.mainTags;
         this.subTags = storeLog.subTags;
-        this.storeBannerImageId = storeLog.storeBannerImageId;
-        this.storeProfileImageId = storeLog.storeProfileImageId;
         this.saleChageRate = saleChageRate;
         this.status = StoreStatusType.Active;
         this.userId = user.id;

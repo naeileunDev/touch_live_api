@@ -13,4 +13,11 @@ export class ProductOptionDetailStockRepository extends Repository<ProductOption
         const productOptionDetailStock = this.create(productOptionDetailStockCreateDto);
         return this.save(productOptionDetailStock);
     }
+
+    async createAll(createDtos: ProductOptionDetailStockCreateDto[]): Promise<ProductOptionDetailStock[]> {
+        const productOptionDetailStocks = this.create(
+            createDtos.map(dto => Object.assign(new ProductOptionDetailStock(), dto))
+        );
+        return await this.save(productOptionDetailStocks);
+    }
 }

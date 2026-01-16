@@ -39,7 +39,7 @@ export class ProductFlexible extends BaseEntity {
     @Column({ type: 'int', comment: '수수료' })
     charge: number;
 
-    @Column({ type: 'timestamptz', comment: '버전' })
+    @Column({ type: 'timestamptz', comment: '버전', nullable: true })
     version: Date;
 
     @Column({ type: 'varchar', comment: '상품 상세 고유 ID(PDD_랜덤UUID)' })

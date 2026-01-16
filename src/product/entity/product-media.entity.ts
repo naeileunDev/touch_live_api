@@ -19,9 +19,4 @@ export class ProductMedia extends BaseEntity {
     @Column({ type: 'int', array: true, comment: '상품 상세 이미지 ID(최대 10개)' })
     detailIds: number[];
 
-    @Column({ type: 'boolean', comment: '활성 여부' })
-    isActive: boolean;
-
-    @Column({ type: 'timestamptz', comment: '버전' })
-    version: Date;
 }

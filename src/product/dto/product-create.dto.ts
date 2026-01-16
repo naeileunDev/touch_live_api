@@ -1,11 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import { Exclude, Type } from "class-transformer";
 import { UploadType } from "src/common/enums";
-import { ProductFileDto } from "src/file/dto/product-file.dto";
 import { IsRequiredString } from "src/common/validator/is-required-string";
 import { ProductTargetGender } from "../enum/product-target-gender.enum";
 import { ProductTargetAge } from "../enum/product-target-age.enum";
+import { ProductOptionDetailCreateDto } from "./product-option-detail-create.dto";
+import { ProductFilesDto } from "./prodcut-files.dto";
+import { FileDto } from "src/file/dto/file.dto";
 
 export class ProductCreateDto {
 
@@ -81,9 +83,20 @@ export class ProductCreateDto {
     @IsString({ each: true })
     tags: string[];
 
-    @ApiProperty({ description: '상품 파일', type: ProductFileDto })
-    @ValidateNested()
-    @Type(() => ProductFileDto)
-    productFiles: ProductFileDto;
+    @ApiProperty({ description: '옵션 상세', type: ProductOptionDetailCreateDto, isArray: true })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ProductOptionDetailCreateDto)
+    options: ProductOptionDetailCreateDto[];
 
+    @ApiProperty({ description: '파일', type: FileDto, isArray: true })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => FileDto)
+    fileDtos: FileDto[];
+    
+    @ApiPropertyOptional({ description: '파일', type: ProductFilesDto, nullable: true })
+    @IsOptional()
+    @Type(() => ProductFilesDto)
+    files?: ProductFilesDto;
 }

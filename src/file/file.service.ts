@@ -12,13 +12,8 @@ import { FileCreateDto } from './dto/file-create.dto';
 import { FileDto } from './dto/file.dto';
 import { MimeType, UsageType, MediaType, ContentCategory } from './enum/file-category.enum';
 import { UserService } from 'src/user/service/user.service';
-import { StoreRegisterLogCreateFileDto } from './dto/store-register-log-create-file.dto';
 import { User } from 'src/user/entity/user.entity';
-import { StoreRegisterLogFilesDto } from './dto/store-register-log-files.dto';
-import { ProductFileCreateDto } from './dto/product-file-create.dto';
 import { ProductService } from 'src/product/product.service';
-import { ProductFileDto } from './dto/product-file.dto';
-import { FileCommonDto } from './dto/file-common-dto';
 
 @Injectable()
 export class FileService {
@@ -42,8 +37,8 @@ export class FileService {
         });
     }
       
-    async createLocal(file: Express.Multer.File, dto: FileCreateDto): Promise<FileDto> {
-        const fullPath = this.generatePath(dto, file.mimetype);
+    async createLocal(file: Express.Multer.File, dto: FileCreateDto, user: User): Promise<FileDto> {
+        const fullPath = this.generatePath(file.mimetype);
         const dir = path.dirname(fullPath); 
         await fs.mkdir(dir, { recursive: true });
         
@@ -64,12 +59,14 @@ export class FileService {
                 originalName: file.originalname,
                 fileUrl: fullPath,
                 duration: duration,
+                userId: user.id,
             }
         );
 
-        const savedFile = await this.fileRepository.createFile(fileDto);
+        const newFile = await this.fileRepository.createFile(fileDto);
+        const savedFile = await this.fileRepository.save(newFile);
         fileDto.id = savedFile.id;
-        return fileDto;
+        return new FileDto(fileDto, dto.field);
     }
 
     /**
@@ -77,9 +74,9 @@ export class FileService {
    * entityId: 가게 ID, 유저 ID, 상품 ID 등
    * originalName: 원본 파일명
    */
-    generatePath(dto: FileCreateDto, mimeType: string): string {
+    generatePath(mimeType: string): string {
         const extension = path.extname(mimeType); // 예: ".png"
-        return path.join(this.basePath, dto.contentCategory.toString(), `${uuidv4()}${extension}`);
+        return path.join(this.basePath, `${uuidv4()}${extension}`);
     }
 
     /**
@@ -141,86 +138,5 @@ export class FileService {
             type: file.mimeType,
             disposition: `inline; filename="${file.originalName}"`,
         });
-    }
-
-    async createStoreRegisterLogFile(createDto: StoreRegisterLogCreateFileDto, user: User): Promise<StoreRegisterLogFilesDto> {
-        const userEntity = await this.userService.findEntityById(user.id, true);
-        
-        const fileMappings: Array<{ field: keyof StoreRegisterLogCreateFileDto; usageType: UsageType }> = [
-            { field: 'businessRegistrationImage', usageType: UsageType.BusinessRegistrationImage },
-            { field: 'eCommerceLicenseImage', usageType: UsageType.eCommerceLicenseImage },
-            { field: 'accountImage', usageType: UsageType.AccountImage },
-            { field: 'profileImage', usageType: UsageType.Profile },
-            { field: 'bannerImage', usageType: UsageType.Banner },
-        ];
-
-        const fileDtos = await Promise.all(
-            fileMappings.map(async ({ field, usageType }) => {
-                const files = createDto[field];
-                if (!files || files.length === 0) {
-                    throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
-                }
-                return await this.createLocal(files[0] as Express.Multer.File, {
-                    contentCategory: ContentCategory.User,
-                    usageType,
-                    contentId: userEntity.id,
-                    userId: userEntity.id,
-                });
-            })
-        );
-
-        return new StoreRegisterLogFilesDto(
-            fileDtos[0],
-            fileDtos[1],
-            fileDtos[2],
-            fileDtos[3],
-            fileDtos[4],
-        );
-    }
-
-    async createProductFile(createDto: ProductFileCreateDto, user: User, productId: number): Promise<ProductFileDto> {
-        const userEntity = await this.userService.findEntityById(user.id, true);
-        const productEntity = await this.productService.findEntityById(productId);
-        
-        const fileMappings: Array<{ field: keyof ProductFileCreateDto; usageType: UsageType; isArray: boolean }> = [
-            { field: 'thumbnailImage', usageType: UsageType.Thumbnail, isArray: false },
-            { field: 'infoImages', usageType: UsageType.InfoImage, isArray: true },
-            { field: 'detailImages', usageType: UsageType.DetailImage, isArray: true },
-        ];
-
-        const fileDtos = await Promise.all(
-            fileMappings.map(async ({ field, usageType, isArray }) => {
-                const files = createDto[field];
-                if (!files || files.length === 0) {
-                    throw new ServiceException(MESSAGE_CODE.FILE_NOT_FOUND);
-                }
-                
-                if (isArray) {
-                    return await Promise.all(
-                        files.map(async (file) => 
-                            await this.createLocal(file as Express.Multer.File, {
-                                contentCategory: ContentCategory.Product,
-                                usageType,
-                                contentId: productEntity.id,
-                                userId: userEntity.id,
-                            })
-                        )
-                    );
-                } else {
-                    return await this.createLocal(files[0] as Express.Multer.File, {
-                        contentCategory: ContentCategory.Product,
-                        usageType,
-                        contentId: productEntity.id,
-                        userId: userEntity.id,
-                    });
-                }
-            })
-        );
-
-        return new ProductFileDto(
-            fileDtos[0] as FileDto,
-            fileDtos[1] as FileDto[],
-            fileDtos[2] as FileDto[],
-        );
     }
 }

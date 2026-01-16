@@ -12,7 +12,7 @@ export class ProductOptionDetail extends BaseEntity {
     @Column({ type: 'boolean', default: true, comment: '옵션 상세 활성 여부' })
     isActive: boolean;
 
-    @Column({ type: 'timestamptz', comment: '버전' })
+    @Column({ type: 'timestamptz', comment: '버전', nullable: true })
     version: Date;
 
     @Column({ type: 'int', comment: '옵션 상세 이미지 ID' })

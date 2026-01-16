@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsDate, IsNumber } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
+import { ProductCreateDto } from "./product-create.dto";
 
 export class ProductFlexibleCreateDto {
     @ApiProperty({ description: '재고', example: 10 })
@@ -28,9 +29,8 @@ export class ProductFlexibleCreateDto {
     @IsNumber()
     islandDeliveryFee: number;
 
-    @ApiProperty({ description: '버전', example: new Date() })
-    @IsDate()
-    @Type(() => Date)
-    version: Date = new Date();
+    constructor(dto: ProductCreateDto){
+        Object.assign(this, dto);
+    }
     
 }

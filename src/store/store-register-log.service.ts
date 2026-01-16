@@ -21,6 +21,7 @@ import { StoreService } from './store.service';
 import { StoreRegisterLogListResponseDto } from './dto/store-register-log-list-response.dto';
 import { StoreRegisterLogAuditDto } from './dto/store-register-log-audit.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { StoreFilesDto } from './dto/store-files.dto';
 
 @Injectable()
 export class StoreRegisterLogService {
@@ -34,14 +35,14 @@ export class StoreRegisterLogService {
   }
 
   @Transactional()
-  async create(createDto: StoreRegisterLogCreateDto, user: User) {
+  async create(createDto: StoreRegisterLogCreateDto, storeFiles: StoreFilesDto, user: User) {
     const userEntity = await this.userService.findEntityById(user.id, true);
     userEntity.storeRegisterStatus = StoreRegisterStatus.Pending;
     const savedUser = await this.userService.save(userEntity);
     const uuid = uuidv4();
     const accessToken = await this.authService.createAccessToken(savedUser, uuid, createDto.fcmToken);
     const refreshToken = await this.authService.createRefreshToken(savedUser, uuid);
-    const storeRegisterLog = await this.storeRegisterLogRepository.createStoreRegisterLog(createDto, createDto.files, userEntity);
+    const storeRegisterLog = await this.storeRegisterLogRepository.createStoreRegisterLog(createDto, storeFiles, userEntity);
     return new StoreRegisterLogCreateResponseDto(storeRegisterLog, new AuthTokenDto(accessToken, refreshToken));
   }
 

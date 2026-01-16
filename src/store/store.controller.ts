@@ -14,6 +14,8 @@ import { StoreRegisterLogAuditCreateDto } from './dto/store-register-log-audit-c
 import { StoreRegisterLogListResponseDto } from './dto/store-register-log-list-response.dto';
 import { StoreRegisterLogAuditDto } from './dto/store-register-log-audit.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { FileDto } from 'src/file/dto/file.dto';
+import { StoreFilesDto } from './dto/store-files.dto';
 
 @ApiTags('Store')
 @Controller('store')
@@ -31,9 +33,10 @@ export class StoreController {
     @ApiCreatedSuccessResponse(StoreRegisterLogCreateResponseDto, '가게 등록 성공')
     createRegisterLog (
         @Body() createDto: StoreRegisterLogCreateDto,
+        @Body() storeFiles: StoreFilesDto,
         @GetUser() user: User, 
         ): Promise<StoreRegisterLogCreateResponseDto> {
-            return this.storeRegisterLogService.create(createDto, user);
+            return this.storeRegisterLogService.create(createDto, storeFiles, user);
         }
 
     @Get('register-log/:logId')

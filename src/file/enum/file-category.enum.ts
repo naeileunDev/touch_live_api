@@ -34,4 +34,5 @@ export enum UsageType {
     eCommerceLicenseImage = 'ECOMMERCE_LICENSE_IMAGE',
     AccountImage = 'ACCOUNT_IMAGE',
     Etc = 'ETC',
+    OptionImage = 'OPTION_IMAGE',
 }

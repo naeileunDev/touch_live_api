@@ -12,8 +12,13 @@ export class ProductRepository extends Repository<Product> {
         super(Product, dataSource.createEntityManager());
     }
 
-    async createProduct(productCreateDto: ProductCreateDto): Promise<Product> {
-        const product = this.create(productCreateDto);
+    async createProduct(productCreateDto: ProductCreateDto, storeId: number): Promise<Product> {
+        const product = this.create({
+            ...productCreateDto,
+            storeId: storeId,
+            store: { id: storeId },
+        });
+        product.version = product.createdAt;
         return this.save(product);
     }
 

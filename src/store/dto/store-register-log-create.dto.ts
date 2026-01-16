@@ -2,8 +2,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from "class-validator";
 import { IsRequiredString } from "src/common/validator/is-required-string";
-import { FileDto } from "src/file/dto/file.dto";
-import { StoreRegisterLogFilesDto } from "src/file/dto/store-register-log-files.dto";
 import { CategoryType } from "src/tag/enum/category-type.enum";
 
 export class StoreRegisterLogCreateDto {
@@ -110,11 +108,6 @@ export class StoreRegisterLogCreateDto {
     @MaxLength(255)
     storeInfo: string;
 
-    @ApiProperty()
-    @ValidateNested()
-    @Type(() => StoreRegisterLogFilesDto)
-    files: StoreRegisterLogFilesDto;
-
     @ApiProperty({ description: '교환/환불 불가 사유', example: '교환/환불 불가 사유' })
     @IsRequiredString()
     nonReturnableReason: string; 
@@ -135,8 +128,4 @@ export class StoreRegisterLogCreateDto {
     @IsRequiredString()
     csPhoneNumber: string;
 
-    constructor(createDto: StoreRegisterLogCreateDto, files: StoreRegisterLogFilesDto) {
-        Object.assign(this, createDto);
-        this.files = files;
-    }
 }

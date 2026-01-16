@@ -1,24 +1,31 @@
 import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "./repository/product.respository";
-import { ProductMediaRepository } from "./repository/product-media.respository";
-import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository";
 import { ProductCreateDto } from "./dto/product-create.dto";
 import { ProductUpdateDto } from "./dto/product-update.dto";
 import { ProductDto } from "./dto/product.dto";
 import { ProductReadDto } from "./dto/product-read.dto";
 import { Pagination, PaginationResponse } from "src/common/pagination/pagination.interface";
-import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
 import { Transactional } from "typeorm-transactional";
 import { Product } from "./entity/product.entity";
 import { User } from "src/user/entity/user.entity";
 import { ProductFlexibleRepository } from "./repository/product-flexible.repository";
-import { ProductFlexible } from "./entity/product-flexible.entity";
+import { ProductMediaRepository } from "./repository/product-media.respository";
+import { ProductOptionDetailCreateDto } from "./dto/product-option-detail-create.dto";
+import { ProductOptionDetailRepository } from "./repository/product-option-detail.respository";
+import { ProductOptionDetailStockCreateDto } from "./dto/product-option-detail-stock-create.dto";
+import { ProductOptionDetailStockRepository } from "./repository/product-option-detail-stock.repository";
+import { ProductFlexibleCreateDto } from "./dto/product-flexible-create.dto";
+import { ProductOptionDetailDto } from "./dto/product-option-detail.dto";
+import { ProductWithOptionsDto } from "./dto/product-with-options-dto";
 
 @Injectable()
 export class ProductService {
     constructor(
         private readonly productRepository: ProductRepository,
         private readonly productFlexibleRepository: ProductFlexibleRepository,
+        private readonly productMediaRepository: ProductMediaRepository,
+        private readonly productOptionDetailRepository: ProductOptionDetailRepository,
+        private readonly productOptionDetailStockRepository: ProductOptionDetailStockRepository,
     ) { }
 
     /**
@@ -28,40 +35,27 @@ export class ProductService {
      * @returns 상품
      */
     @Transactional()
-    async create(dto: ProductCreateDto, user: User) {
-        const {price, deliveryFee, deliveryCompany, deliveryPeriod, jejuDeliveryFee, islandDeliveryFee, charge} = dto;
-        const now = new Date(); // 버전 관리를 위한 날짜
-        // 판매자 수수료는 정산 시 따로? 일단 즉시 업로드냐 아니냐에 따라 즉시 업로드인 경우 판매자 수수료 청구
-        const registerFee = dto?.registerFee ?? 0;
-
-        // 상품 생성
-        const product = new Product();
-        product.name = dto.name;
-        product.targetGender = dto.targetGender;
-        product.targetAge = dto.targetAge;
-        product.registerFee = registerFee;
-        product.version = now;
-        product.isMixed = dto.isMixed;
-        product.isActive = true;
-        product.isApproved = false;    
-
-        // 상품 저장
-        const savedProduct = await this.productRepository.save(product);
-        const productFlexible = new ProductFlexible();
-        productFlexible.product = savedProduct;
-        productFlexible.price = price;
-        productFlexible.deliveryFee = deliveryFee;
-        productFlexible.deliveryCompany = deliveryCompany;
-        productFlexible.deliveryPeriod = deliveryPeriod;
-        productFlexible.jejuDeliveryFee = jejuDeliveryFee;
-        productFlexible.islandDeliveryFee = islandDeliveryFee;
-        productFlexible.charge = charge;
-        productFlexible.version = now;
-        productFlexible.isActive = true;
-        await this.productFlexibleRepository.save(productFlexible);        // 옵션 생성
-
-
-        return new ProductDto(savedProduct);
+    async create(dto: ProductCreateDto, user: User): Promise<ProductWithOptionsDto> {
+        // 상품 생성 
+        const product = await this.productRepository.createProduct(dto, user.store.id);
+        const flexible = new ProductFlexibleCreateDto(dto);
+        await this.productFlexibleRepository.createProductFlexible(flexible, product.id);
+        const { options,files} = dto;
+        const optionImages = files.optionImages;
+        const optionDtos = [];
+        for (const option of options) {
+            for (const file of optionImages) {
+                if (file.field === option.name) {
+                    option.fileId = file.id;
+                    const optionDetail = new ProductOptionDetailCreateDto(option, file.id, product.id);
+                    const optionDetailEntity =await this.productOptionDetailRepository.createProductOptionDetail(optionDetail);
+                    const optionDetailStock = new ProductOptionDetailStockCreateDto(optionDetail, optionDetailEntity.id);
+                    const optionDetailStockEntity = await this.productOptionDetailStockRepository.createProductOptionDetailStock(optionDetailStock);
+                    optionDtos.push(new ProductOptionDetailDto(optionDetailEntity, optionDetailStockEntity));
+                }
+            }
+        }
+        return new ProductWithOptionsDto(product, optionDtos);
     }
 
     /**

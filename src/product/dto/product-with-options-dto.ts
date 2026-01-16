@@ -3,11 +3,11 @@ import { Product } from "../entity/product.entity";
 import { ProductTargetGender } from "../enum/product-target-gender.enum";
 import { ProductTargetAge } from "../enum/product-target-age.enum";
 import { UploadType } from "src/common/enums";
+import { ProductOptionDetailDto } from "./product-option-detail.dto";
 import { IsArray, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { ProductOptionDetailDto } from "./product-option-detail.dto";
 
-export class ProductDto {
+export class ProductWithOptionsDto {
 
     @ApiProperty({ description: '상품명', example: '상품명' })
     name: string;
@@ -48,7 +48,14 @@ export class ProductDto {
     @ApiProperty({ description: '활성 여부', example: true })
     isActive: boolean;
 
-    constructor(product: Product) {
+    @ApiProperty({ description: '옵션 상세', type: ProductOptionDetailDto })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ProductOptionDetailDto)
+    options: ProductOptionDetailDto[];
+
+    constructor(product: Product, options: ProductOptionDetailDto[]) {
         Object.assign(this, product);
+        this.options = options;
     }
 }
